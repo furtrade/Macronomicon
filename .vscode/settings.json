@@ -1,0 +1,33 @@
+{
+    "Lua.diagnostics.globals": [
+        "SlashCmdList",
+        "InterfaceOptions_AddCategory",
+        "InterfaceOptionsFrame_OpenToCategory",
+        "GameFontHighlightSmall",
+        "hash_SlashCmdList",
+        "DEFAULT_CHAT_FRAME",
+        "ColorPickerFrame",
+        "OpacitySliderFrame",
+        "NOT_BOUND",
+        "ChatFontNormal",
+        "OKAY",
+        "NORMAL_FONT_COLOR_CODE",
+        "FONT_COLOR_CODE_CLOSE",
+        "SELECTED_CHAT_FRAME",
+        "CLOSE",
+        "ACCEPT",
+        "NORMAL_FONT_COLOR",
+        "GameFontNormal",
+        "GameFontHighlight",
+        "CANCEL",
+        "Settings",
+        "GameFontHighlightLarge",
+        "GameFontDisableSmall",
+        "GameFontNormalSmall",
+        "SetDesaturation",
+        "IsSecureCmd",
+        "NUM_CHAT_WINDOWS",
+        "ChatEdit_GetActiveWindow",
+        "NUM_BAG_FRAMES"
+    ]
+}

@@ -1,0 +1,16 @@
+MACROS (for consideration):
+    Health Instas (health pots, desperate prayer...)
+    Mana Instas (mana pots)
+    Damage Instas (rough dynamite, ...)
+    Kitchen Sink (Harmful quest rewards, ...)
+
+    Food
+    Drink
+
+
+DAMAGE INSTAS:
+    [Explosive Rockets]!
+
+KITCHEN SINK:
+    [Bag of Marbles]!
+    [Glowing Wax Stick]!
