@@ -28,6 +28,7 @@
         "IsSecureCmd",
         "NUM_CHAT_WINDOWS",
         "ChatEdit_GetActiveWindow",
-        "NUM_BAG_FRAMES"
+        "NUM_BAG_FRAMES",
+        "class"
     ]
 }
