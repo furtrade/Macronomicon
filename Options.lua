@@ -1,18 +1,18 @@
---this line is needed for the Options to show up in the Interface Options window
-local addon = LibStub("AceAddon-3.0"):GetAddon("addon")
+local addonName, addon = ...
 
 
 addon.defaults = {
 	profile = {
 		toggleHP = true,
-		toggleMP = true,
-		-- someRange = 7,
-		-- someInput = "Hello World",
-		-- someSelect = 2, -- Banana
+		toggleMP = false,
+		toggleFood = true,
+		toggleDrink = false,
+		toggleBandage = true,
+		toggleHS = false,
+		toggleBang = true,
 	},
 }
 
--- https://www.wowace.com/projects/ace3/pages/ace-config-3-0-options-tables
 addon.options = {
 	type = "group",
 	name = addon.title,
@@ -38,64 +38,55 @@ addon.options = {
 			get = "GetValue",
 			set = "SetValue",
 		},
-		-- someRange = {
-		-- 	type = "range",
-		-- 	order = 2,
-		-- 	name = "a slider",
-		-- 	-- this will look for a getter/setter on our handler object
-		-- 	get = "GetSomeRange",
-		-- 	set = "SetSomeRange",
-		-- 	min = 1, max = 10, step = 1,
-		-- },
-		-- someKeybinding = {
-		-- 	type = "keybinding",
-		-- 	order = 3,
-		-- 	name = "a keybinding",
-		-- 	get = "GetValue",
-		-- 	set = "SetValue",
-		-- },
-		-- group1 = {
-		-- 	type = "group",
-		-- 	order = 4,
-		-- 	name = "a group",
-		-- 	inline = true,
-		-- 	-- getters/setters can be inherited through the table tree
-		-- 	get = "GetValue",
-		-- 	set = "SetValue",
-		-- 	args = {
-		-- 		someInput = {
-		-- 			type = "input",
-		-- 			order = 1,
-		-- 			name = "an input box",
-		-- 			width = "double",
-		-- 		},
-		-- 		someDescription = {
-		-- 			type = "description",
-		-- 			order = 2,
-		-- 			name = function() return format("The current time is: |cff71d5ff%s|r", date("%X")) end,
-		-- 			fontSize = "large",
-		-- 		},
-		-- 		someSelect = {
-		-- 			type = "select",
-		-- 			order = 3,
-		-- 			name = "a dropdown",
-		-- 			values = {"Apple", "Banana", "Strawberry"},
-		-- 		},
-		-- 	},
-		-- },
+		toggleFood = {
+			type = "toggle",
+			order = 1.4,
+			name = "Food",
+			desc = "Manage food macro",
+			-- inline getter/setter example
+			get = "GetValue",
+			set = "SetValue",
+		},
+		toggleDrink = {
+			type = "toggle",
+			order = 1.6,
+			name = "Drink",
+			desc = "Manage drink macro",
+			-- inline getter/setter example
+			get = "GetValue",
+			set = "SetValue",
+		},
+		toggleBandage = {
+			type = "toggle",
+			order = 1.8,
+			name = "Bandage",
+			desc = "Manage bandage macro",
+			-- inline getter/setter example
+			get = "GetValue",
+			set = "SetValue",
+		},
+		toggleHS = {
+			type = "toggle",
+			order = 2,
+			name = "Healthstone",
+			desc = "Manage healthstone macro",
+			-- inline getter/setter example
+			get = "GetValue",
+			set = "SetValue",
+		},
+		toggleBang = {
+			type = "toggle",
+			order = 2.2,
+			name = "Bang",
+			desc = "Manage bang macro",
+			-- inline getter/setter example
+			get = "GetValue",
+			set = "SetValue",
+		},
 	},
 }
 
--- function addon:GetSomeRange(info)
--- 	return self.db.profile.someRange
--- end
 
--- function addon:SetSomeRange(info, value)
--- 	self.db.profile.someRange = value
--- end
-
--- for documentation on the info table
--- https://www.wowace.com/projects/ace3/pages/ace-config-3-0-options-tables#title-4-1
 function addon:GetValue(info)
 	return self.db.profile[info[#info]]
 end

@@ -1,67 +1,7 @@
-local addon = LibStub("AceAddon-3.0"):GetAddon("addon")
-
-addon.macros = {
-    hp = {
-        enabled = addon.db.profile.toggleHP,
-        name = "Heal Pot",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Healing Potion"},
-        items = {},
-        spells = addon:getSpells(addon.spellBook.heals)
-    },
-    mp = {
-        enabled = addon.db.profile.toggleMP,
-        name = "Mana Pot",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Mana Potion"},
-        items = {},
-        spells = {}
-    },
-    food = {
-        enabled = addon.db.profile.toggleFood,
-        name = "Food",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Food"},
-        items = {},
-        spells = {}
-    },
-    drink = {
-        enabled = addon.db.profile.toggleDrink,
-        name = "Drink",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Drink"},
-        items = {},
-        spells = {}
-    },
-    bandage = {
-        enabled = addon.db.profile.toggleBandage,
-        name = "Bandage",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Bandage"},
-        items = {},
-        spells = {}
-    },
-    healthstone = {
-        enabled = addon.db.profile.toggleHS,
-        name = "Healthstone",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Healthstone"},
-        items = {},
-        spells = {}
-    },
-    bang = {
-        enabled = addon.db.profile.toggleBang,
-        name = "Bang",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge"},
-        items = {},
-        spells = {}
-    },
-}
+local addonName, addon = ...
 
 
-
-addon.spellBook.heals = {
+--[[ addon.spellBook.heals = {
     ["Crimson Vial"] = 185311, --Rogue
     ["Renewal"] = 108238, --Druid
     ["Exhilaration"] = 109304, --Hunter
@@ -70,9 +10,9 @@ addon.spellBook.heals = {
     ["Desperate Prayer"] = 19236, --Priest
     ["Expel Harm"] = 322101, --Monk
     ["Healing Elixir"] = 122281 --Monk
-}
+} ]]
 
-function addon:getSpells(spellBook);
+--[[ local function getSpells(spellBook)
     local spellKnown = {}
     -- iterate through addon.spellList and check if spell is known.
     -- if spell is known, add it to spellKnown table.
@@ -82,5 +22,64 @@ function addon:getSpells(spellBook);
         end
     end
     return spellKnown
-end
+end ]]
 
+
+addon.macroData = {
+    HP = {
+        enabled = "toggleHP",
+        name = "Heal Pot",
+        icone = "INV_Misc_QuestionMark",
+        keywords = {"Healing Potion"},
+        items = {},
+        -- spells = getSpells(addon.spellBook.heals)
+    },
+    MP = {
+        enabled = "toggleMP",
+        name = "Mana Pot",
+        icone = "INV_Misc_QuestionMark",
+        keywords = {"Mana Potion"},
+        items = {},
+        spells = {}
+    },
+    Food = {
+        enabled = "toggleFood",
+        name = "Food",
+        icone = "INV_Misc_QuestionMark",
+        keywords = {"Food"},
+        items = {},
+        spells = {}
+    },
+    Drink = {
+        enabled = "toggleDrink",
+        name = "Drink",
+        icone = "INV_Misc_QuestionMark",
+        keywords = {"Drink"},
+        items = {},
+        spells = {}
+    },
+    Bandage = {
+        enabled = "toggleBandage",
+        name = "Bandage",
+        icone = "INV_Misc_QuestionMark",
+        keywords = {"First Aid","Bandage"},
+        items = {},
+        spells = {}
+    },
+    HS = {
+        enabled = "toggleHS",
+        name = "Healthstone",
+        icone = "INV_Misc_QuestionMark",
+        keywords = {"Healthstone"},
+        items = {},
+        spells = {}
+    },
+    Bang = {
+        enabled = "toggleBang",
+        name = "Bang",
+        icone = "INV_Misc_QuestionMark",
+        keywords = {"Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge"},
+        items = {},
+        spells = {}
+    },
+}

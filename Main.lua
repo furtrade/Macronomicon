@@ -1,7 +1,6 @@
---@class addon
 local addonName, addon = ...
 
-addon = LibStub("AceAddon-3.0"):NewAddon("addon", "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
+addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
@@ -10,6 +9,9 @@ local _G = _G
 local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or _G.GetAddOnMetadata
 addon.title = GetAddOnMetadata(addonName, "Title")
 
+addon.items = {}
+-- addon.spellBook = {}
+addon.macroData = {}
 addon.player = {
     localeClass = select(1, UnitClass("player")),
     class = select(2, UnitClass("player")),
@@ -17,8 +19,8 @@ addon.player = {
     faction = select(1,UnitFactionGroup("player"))
 }
 
-addon.itemsAvailable = {}
-local activeItems = addon.itemsAvailable
+local cachedItems = {}
+addon.itemCache = cachedItems
 
 
 
@@ -38,17 +40,39 @@ function addon:OnInitialize()
     
     self:RegisterChatCommand(addon.title, "SlashCommand")
     self:RegisterChatCommand("mbl", "SlashCommand")
-
 end
 
 function addon:OnEnable()
-    -- self:RegisterEvent("PLAYER_STARTED_MOVING")
-    -- self:RegisterEvent("CHAT_MSG_CHANNEL")
+    -- function to callback when an event is triggered
+    local sendIt = "autoTrigger"
+    --triggers
+    self:RegisterEvent("PLAYER_LEVEL_UP", sendIt)
+    self:RegisterEvent("QUEST_TURNED_IN", sendIt)
+    self:RegisterEvent("LOOT_CLOSED", sendIt)
+    self:RegisterEvent("ZONE_CHANGED_NEW_AREA", sendIt)
+    self:RegisterEvent("PLAYER_ENTERING_WORLD", sendIt)
+    self:RegisterEvent("PLAYER_REGEN_ENABLED", sendIt)
+end
+
+local lastEventTime = {}
+local timeThreshold = 7 -- in seconds
+
+-- Event handler to automate the AdornSet() function.
+function addon:autoTrigger(event)
+    -- check if the player is in combat, if so return.
+    if InCombatLockdown() then return end
+
+    local currentTime = GetTime()
+    
+    if not lastEventTime[event] or (currentTime - lastEventTime[event] > timeThreshold) then
+        self:doTheThing()
+        lastEventTime[event] = currentTime
+    end
 end
 
 function addon:SlashCommand(input, editbox)
     -- input is everything after the slash command
-    -- input = input:trim()
+    input = input:trim()
     if input == "run" then
         self:Print("Running...")
         self:doTheThing()
@@ -62,7 +86,6 @@ function addon:SlashCommand(input, editbox)
     elseif input == "message" then
         print("this is our saved message:", self.db.profile.someInput)
     else
-        -- self:Print("Some useful help message.")
         -- https://github.com/Stanzilla/WoWUIBugs/issues/89
         InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
         InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
@@ -71,12 +94,15 @@ function addon:SlashCommand(input, editbox)
 end
 
 -- macro engine to create macros
-function addon.macros:makeMacro(macroName, icon, items)
-    local prefix = ">" -- add an option to change this later
+local function makeMacro(macroName, icon, items)
+    local prefix = "!" -- add an option to change this later
     local macroName = prefix .. macroName
-    local macroExists = GetMacroInfo(macroName)
-    if not macroExists then CreateMacro(macroName, icon) end
     
+    -- check if the macro exists already
+    local macroExists = GetMacroInfo(macroName)
+    if not macroExists then CreateMacro(macroName, "INV_Misc_QuestionMark") end
+    
+    -- build the macro string
     local tip = "#showtooltip "
     local cast = "\n/cast "
     
@@ -93,24 +119,25 @@ function addon.macros:makeMacro(macroName, icon, items)
 end
 
 -- check which macros are enabled and create them.
-function addon.macros:processMacros(table)
-    if not table then table = addon.macros end
+function addon:processMacros(inputTable)
+    if not inputTable then inputTable = addon.macroData end
     
     -- which macros are enabled? e.g. "HealPotMacro"
-    for _, macroInfo in ipairs(table) do
-        if macroInfo.enabled then
-            -- Go through the macroList and create the macros
+    for _, macroInfo in pairs(inputTable) do
+        -- check if the macro is enabled
+        if addon.db.profile[macroInfo.enabled] then
+            -- get macro info
             local name = macroInfo.name
             local icon = macroInfo.icon
             local items = macroInfo.items
             
-            addon.macros:makeMacro(name, icon, items)
+            makeMacro(name, icon, items)
         end
     end
 end
 
 
--- helper function for scanning bags
+-- helper function for scanning bags 
 local function itemizer(dollOrBagIndex, slotIndex)
     local itemLink = slotIndex and C_Container.GetContainerItemLink(dollOrBagIndex, slotIndex) or GetInventoryItemLink("player", dollOrBagIndex)
     
@@ -126,8 +153,8 @@ local function itemizer(dollOrBagIndex, slotIndex)
             -- does the item have a spell associated with it?
             local itemSpell, itemSpellId = GetItemSpell(itemID)
             
-            --Bundle the item info for the activeItems table.
-            if canUse then
+            --Bundle the item info for the cachedItems table.
+            if canUse and itemSpell then
                 local itemInfo = {}
                 itemInfo.id = itemID
                 itemInfo.link = itemLink
@@ -162,11 +189,12 @@ local function sortTableByLevel(items)
     end)
 end
 
--- We need to categorise items in activeItems[itemType] eg "Consumables" 
+-- We need to categorise items in cachedItems[itemType] eg "Consumables" 
 -- into desired categories such as health pots, mana pots, food, drink, devices, etc.
 local function matchMaker(table1, table2, keywords)
-    for _, keyword in ipairs(keywords) do
-        for _, item in ipairs(table1) do
+    
+    for _, keyword in pairs(keywords) do
+        for _, item in pairs(table1) do
             for match in string.gmatch(item.spellName:lower(), keyword:lower()) do
                 if match then
                     table.insert(table2, item)
@@ -177,64 +205,54 @@ local function matchMaker(table1, table2, keywords)
     end
 end
 
--- loop through activeItems and sort them into categories
+-- loop through cachedItems and sort them into categories
 --[[ function addon.items:moveToMacros(itemsTable)
--- push activeItems into addon.macros.
-for _, macroInfo in pairs(addon.macros) do
+-- push cachedItems into addon.macroData.
+for _, macroInfo in pairs(addon.macroData) do
     matchMaker(itemsTable, macroInfo.items, macroInfo.keywords)
 end
 end ]]
 
+
+
 -- scan bags for items we can use
-function addon.items:refreshActiveItems()
-    activeItems = {}
+function addon:refreshcachedItems()
+    cachedItems = {}
     
     -- inventory 
     for bagOrSlotIndex = 1, 19 do
         local itemInfo = itemizer(bagOrSlotIndex);
         
-        if itemInfo then
-            local itemType = itemInfo.type
-            local spellName = itemInfo.spellName
-            if itemType and spellName then
-                if not activeItems[itemType] then
-                    activeItems[itemType] = {}
-                end
-                table.insert(activeItems[itemType], itemInfo);
-            end
+        if itemInfo then 
+            table.insert(cachedItems, itemInfo);
         end
     end
     
     -- bags
-    for bagOrSlotIndex = 0, NUM_TOTAL_EQUIPPED_BAG_SLOTS do
+    for bagOrSlotIndex = 0, 4 do
         local numSlots = C_Container.GetContainerNumSlots(bagOrSlotIndex);
         if numSlots > 0 then
             for slotIndex = 1, numSlots do
                 local itemInfo = itemizer(bagOrSlotIndex, slotIndex)
                 
                 if itemInfo then
-                    local itemType = itemInfo.type
-                    -- local slotEnabled = itemInfo.slotEnabled
-                    if itemType then
-                        if not activeItems[itemType] then
-                            activeItems[itemType] = {}
-                        end
-                        table.insert(activeItems[itemType], itemInfo);
-                    end
+                    table.insert(cachedItems, itemInfo);
                 end
             end
         end
     end
     
     -- send items to the macros tables
-    for _, macroInfo in pairs(addon.macros) do
-        if activeItems then
-            matchMaker(activeItems, macroInfo.items, macroInfo.keywords)
+    if cachedItems then
+        for k, v in pairs(addon.macroData) do
+            if v.items then
+                matchMaker(cachedItems, v.items, v.keywords)
+            end
         end
     end
-    for _, macroInfo in pairs(addon.macros) do
-        if macroInfo.items then
-            sortTableByLevel(macroInfo.items)
+    for _, v in pairs(addon.macroData) do
+        if v.items then
+            sortTableByLevel(v.items)
         end
     end
     -- now we need to prune the macro items to be usable.
@@ -242,8 +260,8 @@ end
 
 -- function to run the addon and create the macros
 function addon:doTheThing()
-    self:Print("Refreshing Active Items...")
-    addon.items:refreshActiveItems()
-    print("\nRefreshed active items... \nProcessing Macros")
-    addon.macros:processMacros()
+    -- self:Print("Refreshing Active Items...")
+    addon:refreshcachedItems()
+    -- self:Print("\nRefreshed active items... \nProcessing Macros")
+    addon:processMacros()
 end
