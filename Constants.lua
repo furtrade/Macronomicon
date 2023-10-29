@@ -1,5 +1,32 @@
 local addonName, addon = ...
 
+-- ===========================================
+-- Normal Macros:
+-- ===========================================
+-- (sit) food
+-- (sit) drink
+--[[ 
+    HP potion
+    healthstone (special case) 
+    ]]
+-- MP potion
+-- explosive
+-- (sit) bandages
+-- Combat potion
+-- ===========================================
+-- Buff Sequences:
+-- ===========================================
+--[[ 
+    (sit) item enhancements
+    (sit) Food Buff (special case)
+    elixir
+    scroll 
+    ]]
+-- ===========================================
+-- Weapon Swaps
+-- ===========================================
+-- Defensive
+-- Offensive
 
 --[[ addon.spellBook.heals = {
     ["Crimson Vial"] = 185311, --Rogue
@@ -24,62 +51,73 @@ local addonName, addon = ...
     return spellKnown
 end ]]
 
-
 addon.macroData = {
-    HP = {
-        enabled = "toggleHP",
-        name = "Heal Pot",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Healing Potion"},
-        items = {},
-        -- spells = getSpells(addon.spellBook.heals)
-    },
-    MP = {
-        enabled = "toggleMP",
-        name = "Mana Pot",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Mana Potion"},
-        items = {},
-        spells = {}
-    },
-    Food = {
-        enabled = "toggleFood",
-        name = "Food",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Food"},
-        items = {},
-        spells = {}
-    },
-    Drink = {
-        enabled = "toggleDrink",
-        name = "Drink",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Drink"},
-        items = {},
-        spells = {}
-    },
-    Bandage = {
-        enabled = "toggleBandage",
-        name = "Bandage",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"First Aid","Bandage"},
-        items = {},
-        spells = {}
-    },
-    HS = {
-        enabled = "toggleHS",
-        name = "Healthstone",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Healthstone"},
-        items = {},
-        spells = {}
-    },
-    Bang = {
-        enabled = "toggleBang",
-        name = "Bang",
-        icone = "INV_Misc_QuestionMark",
-        keywords = {"Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge"},
-        items = {},
-        spells = {}
-    },
+	HP = {
+		enabled = "toggleHP",
+		name = "Heal Pot",
+		icone = "INV_Misc_QuestionMark",
+		keywords = { "Healing Potion" },
+		items = {},
+		-- spells = getSpells(addon.spellBook.heals)
+	},
+	MP = {
+		enabled = "toggleMP",
+		name = "Mana Pot",
+		icone = "INV_Misc_QuestionMark",
+		keywords = { "Mana Potion", "Restore Mana" },
+		items = {},
+		spells = {},
+	},
+	Food = {
+		enabled = "toggleFood",
+		name = "Food",
+		icone = "INV_Misc_QuestionMark",
+		keywords = { "Food" },
+		items = {},
+		spells = {},
+	},
+	Drink = {
+		enabled = "toggleDrink",
+		name = "Drink",
+		icone = "INV_Misc_QuestionMark",
+		keywords = { "Drink" },
+		items = {},
+		spells = {},
+	},
+	Bandage = {
+		enabled = "toggleBandage",
+		name = "Bandage",
+		icone = "INV_Misc_QuestionMark",
+		keywords = { "First Aid", "Bandage" },
+		items = {},
+		spells = {},
+	},
+	HS = {
+		enabled = "toggleHS",
+		name = "Healthstone",
+		icone = "INV_Misc_QuestionMark",
+		keywords = { "Healthstone" },
+		items = {},
+		spells = {},
+	},
+	Bang = {
+		enabled = "toggleBang",
+		name = "Bang",
+		icone = "INV_Misc_QuestionMark",
+		keywords = { "Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge" },
+		items = {},
+		spells = {},
+	},
 }
+
+function addon.resetMacroData()
+	for k, v in pairs(addon.macroData) do
+		if type(v) == "table" then
+			v.items, v.spells = {}, {}
+		end
+	end
+end
+
+-- Usage:
+-- addon.resetMacroData()
+
