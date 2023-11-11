@@ -12,22 +12,25 @@ local addonName, addon = ...
 -- MP potion
 -- explosive
 -- (sit) bandages
--- Combat potion
+--  TODO:Combat potion
 -- ===========================================
 -- Buff Sequences:
 -- ===========================================
 --[[ 
-    (sit) item enhancements
-    (sit) Food Buff (special case)
-    elixir
-    scroll 
+    TODO:(sit) item enhancements
+    TODO:(sit) Food Buff (special case)
+    TODO:elixir
+    TODO:scroll 
     ]]
 -- ===========================================
 -- Weapon Swaps
 -- ===========================================
--- Defensive
--- Offensive
+--  TODO:Defensive
+--  TODO:Offensive
 
+-- ===========================================
+--  TODO:Spells:
+-- ===========================================
 --[[ addon.spellBook.heals = {
     ["Crimson Vial"] = 185311, --Rogue
     ["Renewal"] = 108238, --Druid
@@ -120,4 +123,3 @@ end
 
 -- Usage:
 -- addon.resetMacroData()
-

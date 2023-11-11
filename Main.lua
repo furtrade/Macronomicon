@@ -262,4 +262,3 @@ function addon:doTheThing()
 		return true
 	end
 end
-
