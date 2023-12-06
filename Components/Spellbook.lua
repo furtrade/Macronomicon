@@ -1,17 +1,14 @@
 local addonName, addon = ...
 
 function addon:updateSpelldata()
-	-- Initialize the spellbook table
 	addon.spellbook = {}
 
 	-- Loop through each spell tab
 	for tab = 1, GetNumSpellTabs() do
-		-- Retrieve information about the current tab
 		local _, _, offset, numSlots = GetSpellTabInfo(tab)
 
 		-- Loop through each slot in the tab
 		for slot = offset + 1, offset + numSlots do
-			-- Get the name, subtext, and ID of the spell in the current slot
 			local spellName, spellSubText, spellID = GetSpellBookItemName(slot, BOOKTYPE_SPELL)
 
 			-- Extract a numerical rank from the subtext, if present; otherwise, use the raw subtext

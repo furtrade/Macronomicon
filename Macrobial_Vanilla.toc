@@ -30,4 +30,5 @@ Options.lua
 Constants.lua
 Tooltip.lua
 
+Components\Inventory.lua
 Components\Spellbook.lua
