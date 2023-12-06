@@ -1,14 +1,13 @@
 local addonName, addon = ...
 
-
 addon.defaults = {
 	profile = {
 		toggleHP = true,
-		toggleMP = false,
+		toggleMP = true,
 		toggleFood = true,
-		toggleDrink = false,
+		toggleDrink = true,
 		toggleBandage = true,
-		toggleHS = false,
+		toggleHS = true,
 		toggleBang = true,
 	},
 }
@@ -86,7 +85,6 @@ addon.options = {
 	},
 }
 
-
 function addon:GetValue(info)
 	return self.db.profile[info[#info]]
 end
@@ -94,3 +92,4 @@ end
 function addon:SetValue(info, value)
 	self.db.profile[info[#info]] = value
 end
+
