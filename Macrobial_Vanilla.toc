@@ -29,3 +29,5 @@ Main.lua
 Options.lua
 Constants.lua
 Tooltip.lua
+
+Components\Spellbook.lua

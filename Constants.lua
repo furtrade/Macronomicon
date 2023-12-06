@@ -31,6 +31,8 @@ local addonName, addon = ...
 -- ===========================================
 --  TODO:Spells:
 -- ===========================================
+--  TODO: Add Warlock "Create Healthstone" line to auto update creating healthstones.
+--  TODO: Add Mage Food & Water macros
 --[[ addon.spellBook.heals = {
     ["Crimson Vial"] = 185311, --Rogue
     ["Renewal"] = 108238, --Druid

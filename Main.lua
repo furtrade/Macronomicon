@@ -12,6 +12,7 @@ addon.title = GetAddOnMetadata(addonName, "Title")
 -- addon.items = {}
 -- addon.spellBook = {}
 addon.macroData = {}
+addon.spellbook = {}
 addon.player = {
 	localeClass = select(1, UnitClass("player")),
 	class = select(2, UnitClass("player")),
