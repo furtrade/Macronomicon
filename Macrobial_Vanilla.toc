@@ -33,3 +33,4 @@ Tooltip.lua
 Components\Inventory.lua
 Components\Macros.lua
 Components\Spellbook.lua
+Components\Tooltip.lua
