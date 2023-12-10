@@ -5,10 +5,8 @@ local addonName, addon = ...
 -- ===========================================
 -- (sit) food
 -- (sit) drink
---[[ 
-    HP potion
-    healthstone (special case) 
-    ]]
+-- HP potion
+-- healthstone (special case)
 -- MP potion
 -- explosive
 -- (sit) bandages
@@ -16,12 +14,10 @@ local addonName, addon = ...
 -- ===========================================
 -- Buff Sequences:
 -- ===========================================
---[[ 
-    TODO:(sit) item enhancements
-    TODO:(sit) Food Buff (special case)
-    TODO:elixir
-    TODO:scroll 
-    ]]
+-- TODO:(sit) item enhancements
+-- TODO:(sit) Food Buff (special case)
+-- TODO:elixir
+-- TODO:scroll
 -- ===========================================
 -- Weapon Swaps
 -- ===========================================
@@ -29,7 +25,7 @@ local addonName, addon = ...
 --  TODO:Offensive
 
 -- ===========================================
---  TODO:Spells:
+-- Spells:
 -- ===========================================
 --  TODO: Add Warlock "Create Healthstone" line to auto update creating healthstones.
 --  TODO: Add Mage Food & Water macros
@@ -44,26 +40,16 @@ local addonName, addon = ...
     ["Healing Elixir"] = 122281 --Monk
 } ]]
 
---[[ local function getSpells(spellBook)
-    local spellKnown = {}
-    -- iterate through addon.spellList and check if spell is known.
-    -- if spell is known, add it to spellKnown table.
-    for spellName, spellId in pairs(spellBook) do
-        if IsSpellKnown(spellId) then
-            table.insert(spellKnown, spellName);
-        end
-    end
-    return spellKnown
-end ]]
-
 addon.macroData = {
 	HP = {
 		enabled = "toggleHP",
 		name = "Heal Pot",
 		icone = "INV_Misc_QuestionMark",
 		keywords = { "Healing Potion" },
+		onMatch = function(match)
+			print("Healing effect found:", match)
+		end,
 		items = {},
-		-- spells = getSpells(addon.spellBook.heals)
 	},
 	MP = {
 		enabled = "toggleMP",

@@ -1,5 +1,24 @@
 local addonName, addon = ...
 
+-- check which macros are enabled and create them.
+function addon:processMacros(macroTables)
+	if not macroTables then
+		macroTables = addon.macroData
+	end
+	-- which macros are enabled? e.g. "HealPotMacro"
+	for _, macroInfo in pairs(macroTables) do
+		-- check if the macro is enabled
+		if addon.db.profile[macroInfo.enabled] then
+			-- get macro info
+			local name = macroInfo.name
+			local icon = macroInfo.icon
+			local items = macroInfo.items
+
+			addon:makeMacro(name, icon, items)
+		end
+	end
+end
+
 -- macro engine to create macros
 function addon:makeMacro(name, icon, items)
 	local prefix = "!" -- add an option to change this later
@@ -25,23 +44,4 @@ function addon:makeMacro(name, icon, items)
 
 	EditMacro(macroName, macroName, icon, macro)
 	-- self:Print("Done!")
-end
-
--- check which macros are enabled and create them.
-function addon:processMacros(macroTables)
-	if not macroTables then
-		macroTables = addon.macroData
-	end
-	-- which macros are enabled? e.g. "HealPotMacro"
-	for _, macroInfo in pairs(macroTables) do
-		-- check if the macro is enabled
-		if addon.db.profile[macroInfo.enabled] then
-			-- get macro info
-			local name = macroInfo.name
-			local icon = macroInfo.icon
-			local items = macroInfo.items
-
-			addon:makeMacro(name, icon, items)
-		end
-	end
 end

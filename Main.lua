@@ -44,24 +44,48 @@ function addon:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", sendIt)
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", sendIt)
 	self:RegisterEvent("PLAYER_REGEN_DISABLED", sendIt)
+	self:RegisterEvent("BAG_UPDATE", sendIt)
+	self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", sendIt)
+	-- self:RegisterEvent("BANKFRAME_OPENED", sendIt)
+	self:RegisterEvent("BANKFRAME_CLOSED", sendIt)
+	self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED", sendIt)
+	self:RegisterEvent("ITEM_LOCK_CHANGED", sendIt)
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", sendIt)
+	self:RegisterEvent("PLAYER_MONEY", sendIt)
 end
 
-local lastEventTime = {}
-local timeThreshold = 7 -- in seconds
+local lastTrigger = 0
+local threshold = 5 -- seconds
+local retryPending = false -- Tracks pending retry
 
--- Event handler to automate the AdornSet() function.
 function addon:autoTrigger(event)
-	-- check if the player is in combat, if so return.
+	-- Check for combat state
 	if event == "PLAYER_REGEN_DISABLED" or InCombatLockdown() then
 		return
 	end
 
 	local currentTime = GetTime()
-	if not lastEventTime[event] or (currentTime - lastEventTime[event] > timeThreshold) then
-		local success = self:doTheThing()
-		if success then
-			lastEventTime[event] = currentTime
-		end
+	if currentTime - lastTrigger > threshold then
+		self:tryAction()
+	elseif not retryPending then
+		-- Time until next possible action
+		local timeToAct = threshold - (currentTime - lastTrigger)
+		retryPending = true
+		C_Timer.After(timeToAct, function()
+			retryPending = false
+			self:tryAction()
+		end)
+	end
+end
+
+function addon:tryAction()
+	if InCombatLockdown() then -- Check combat state again
+		return
+	end
+
+	local success = self:doTheThing()
+	if success then
+		lastTrigger = GetTime()
 	end
 end
 
@@ -92,11 +116,11 @@ function addon:doTheThing()
 	if InCombatLockdown() then
 		return false
 	else
-		self:Print("Refreshing Active Items...") -- debugging
+		-- self:Print("Refreshing Active Items...") -- debugging
 		addon:updateItemCache()
-		self:Print("\nRefreshed active items") -- debugging
+		-- self:Print("\nRefreshed Active Items") -- debugging
 		addon:processMacros()
-		self:Print("Done.") -- debugging
+		-- self:Print("Done.") -- debugging
 		return true
 	end
 end

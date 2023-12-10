@@ -28,7 +28,6 @@ Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 Main.lua
 Options.lua
 Constants.lua
-Tooltip.lua
 
 Components\Inventory.lua
 Components\Macros.lua

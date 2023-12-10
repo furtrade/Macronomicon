@@ -10,6 +10,26 @@ local addonName, addon = ...
 -- local myTooltip = GetTooltipByType(12345, "item")  -- Get tooltip for item with ID 12345
 -- local tooltipContent = TableOfContents(myTooltip)  -- Extract text from this tooltip
 
+function addon:matchAndAct(text)
+	local matches = {}
+
+	for category, v in pairs(addon.macroData) do
+		-- search for regex patterns for each category
+		for _, j in ipairs(v.keywords) do
+			if text:match(j) then
+				table.insert(matches, category)
+
+				if v.onMatch then
+					v.action()
+				end
+				break
+			end
+		end
+	end
+
+	return #matches > 0 and matches or "None"
+end
+
 function addon:TableOfContents(aTooltip, retryCount)
 	-- Maximum number of retries
 	local maxRetries = 5

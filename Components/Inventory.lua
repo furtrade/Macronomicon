@@ -61,7 +61,7 @@ local function matchMaker(cache, macroItems, keywords)
 			for match in string.gmatch(item.spellName:lower(), keyword:lower()) do
 				if match then
 					table.insert(macroItems, item)
-					-- break  -- exit inner loop after first match
+					break -- exit inner loop after first match
 				end
 			end
 		end
