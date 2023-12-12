@@ -52,11 +52,16 @@ addon.macroData = {
 		end,
 		--sequence = false,
 		nuance = function(macroLines)
-            -- Example: Add an additional check or line based on a specific condition
-            --if SomeConditionIsMet() then
-                --table.insert(macroLines, "/say Activating Heal Pot")
-            --end
-        end,
+			print("HP nuance function called.")
+			local healthstone = addon:playerHasItem("HS", "Healthstone")
+			if healthstone then
+				print("Healthstone found: Adding to macro.")
+				local healthstoneLine = "/use " .. healthstone.name
+				table.insert(macroLines, 2, healthstoneLine)
+			else
+				print("Healthstone not found.")
+			end
+		end,
 		--condition = "",
 		items = {},
 	},
@@ -121,40 +126,21 @@ end
 -- Usage:
 -- addon.resetMacroData()
 
--- Search for item in a specific category by name or ID
-function addon:findItemInCategoryByNameOrId(category, name, id)
-    for _, item in ipairs(addon.macroData[category].items) do
-        if (name and item.name == name) or (id and item.id == id) then
-            return item
-        end
-    end
-    return false
-end
-
--- Search for the first item in a specific category, or by ID
 function addon:findItemInCategory(category, id)
     if id then
-        for _, item in ipairs(addon.macroData[category].items) do
+        for _, item in ipairs(self.macroData[category].items) do
             if item.id == id then
                 return item
             end
         end
     else
-        return addon.macroData[category].items[1]
+        return self.macroData[category].items[1]
     end
-    return false
+    return nil  -- Return nil if no item is found
 end
 
--- Search for item by name or ID across all categories
-function addon:findItemByNameOrId(name, id)
-    for _, categoryData in pairs(addon.macroData) do
-        for _, item in ipairs(categoryData.items) do
-            if (name and item.name == name) or (id and item.id == id) then
-                return item
-            end
-        end
-    end
-    return false
+function addon:isCategory(category)
+    return self.macroData[category] ~= nil
 end
 
 function addon:playerHasItem(...)
@@ -167,7 +153,7 @@ function addon:playerHasItem(...)
             if self:isCategory(arg) then
                 category = arg
             else
-                spellOrItemName = arg
+                spellOrItemName = arg:lower()  -- Convert to lower case for case-insensitive comparison
             end
         end
     end
@@ -180,5 +166,25 @@ function addon:playerHasItem(...)
         return self:findItemByNameOrId(spellOrItemName, id)
     end
 
-    return false
+    return nil
+end
+
+function addon:findItemInCategoryByNameOrId(category, name, id)
+    for _, item in ipairs(self.macroData[category].items) do
+        if (name and string.find(item.name:lower(), name)) or (id and item.id == id) then
+            return item
+        end
+    end
+    return nil
+end
+
+function addon:findItemByNameOrId(name, id)
+    for _, categoryData in pairs(self.macroData) do
+        for _, item in ipairs(categoryData.items) do
+            if (name and string.find(item.name:lower(), name)) or (id and item.id == id) then
+                return item
+            end
+        end
+    end
+    return nil
 end
