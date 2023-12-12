@@ -50,16 +50,12 @@ addon.macroData = {
 		onMatch = function(match)
 			print("Healing effect found:", match)
 		end,
-		--sequence = false,
 		nuance = function(macroLines)
-			print("HP nuance function called.")
+			-- add a healthstone to our heal pot macro
 			local healthstone = addon:playerHasItem("HS", "Healthstone")
 			if healthstone then
-				print("Healthstone found: Adding to macro.")
 				local healthstoneLine = "/use " .. healthstone.name
 				table.insert(macroLines, 2, healthstoneLine)
-			else
-				print("Healthstone not found.")
 			end
 		end,
 		--condition = "",
