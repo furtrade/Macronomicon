@@ -120,3 +120,65 @@ end
 
 -- Usage:
 -- addon.resetMacroData()
+
+-- Search for item in a specific category by name or ID
+function addon:findItemInCategoryByNameOrId(category, name, id)
+    for _, item in ipairs(addon.macroData[category].items) do
+        if (name and item.name == name) or (id and item.id == id) then
+            return item
+        end
+    end
+    return false
+end
+
+-- Search for the first item in a specific category, or by ID
+function addon:findItemInCategory(category, id)
+    if id then
+        for _, item in ipairs(addon.macroData[category].items) do
+            if item.id == id then
+                return item
+            end
+        end
+    else
+        return addon.macroData[category].items[1]
+    end
+    return false
+end
+
+-- Search for item by name or ID across all categories
+function addon:findItemByNameOrId(name, id)
+    for _, categoryData in pairs(addon.macroData) do
+        for _, item in ipairs(categoryData.items) do
+            if (name and item.name == name) or (id and item.id == id) then
+                return item
+            end
+        end
+    end
+    return false
+end
+
+function addon:playerHasItem(...)
+    local id, category, spellOrItemName = nil, nil, nil
+
+    for _, arg in ipairs({...}) do
+        if type(arg) == "number" then
+            id = arg
+        elseif type(arg) == "string" then
+            if self:isCategory(arg) then
+                category = arg
+            else
+                spellOrItemName = arg
+            end
+        end
+    end
+
+    if category and spellOrItemName then
+        return self:findItemInCategoryByNameOrId(category, spellOrItemName, id)
+    elseif category then
+        return self:findItemInCategory(category, id)
+    elseif spellOrItemName or id then
+        return self:findItemByNameOrId(spellOrItemName, id)
+    end
+
+    return false
+end
