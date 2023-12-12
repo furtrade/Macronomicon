@@ -41,6 +41,7 @@ local addonName, addon = ...
 } ]]
 
 addon.macroData = {
+	-- TODO: Add ability to combine categories in a single macro. e.g. HP & HS
 	HP = {
 		enabled = "toggleHP",
 		name = "Heal Pot",
@@ -49,6 +50,14 @@ addon.macroData = {
 		onMatch = function(match)
 			print("Healing effect found:", match)
 		end,
+		--sequence = false,
+		nuance = function(macroLines)
+            -- Example: Add an additional check or line based on a specific condition
+            --if SomeConditionIsMet() then
+                --table.insert(macroLines, "/say Activating Heal Pot")
+            --end
+        end,
+		--condition = "",
 		items = {},
 	},
 	MP = {

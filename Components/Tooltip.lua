@@ -20,7 +20,7 @@ function addon:matchAndAct(text)
 				table.insert(matches, category)
 
 				if v.onMatch then
-					v.action()
+					v.onMatch()
 				end
 				break
 			end
