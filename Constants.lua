@@ -122,65 +122,81 @@ end
 -- Usage:
 -- addon.resetMacroData()
 
+-- keyword search for a match
+function addon:matchMaker(cache, retTable, keywords)
+	for _, keyword in pairs(keywords) do
+		for _, spellOrItem in pairs(cache) do
+			for match in string.gmatch(spellOrItem.spellName:lower(), keyword:lower()) do
+				if match then
+					--TODO: Add 'onMatch' function
+					table.insert(retTable, spellOrItem)
+					--break -- exit inner loop after first match
+				end
+			end
+		end
+	end
+	-- still need to prune these items
+end
+
 function addon:findItemInCategory(category, id)
-    if id then
-        for _, item in ipairs(self.macroData[category].items) do
-            if item.id == id then
-                return item
-            end
-        end
-    else
-        return self.macroData[category].items[1]
-    end
-    return nil  -- Return nil if no item is found
+	if id then
+		for _, item in ipairs(self.macroData[category].items) do
+			if item.id == id then
+				return item
+			end
+		end
+	else
+		return self.macroData[category].items[1]
+	end
+	return nil -- Return nil if no item is found
 end
 
 function addon:isCategory(category)
-    return self.macroData[category] ~= nil
+	return self.macroData[category] ~= nil
 end
 
 function addon:playerHasItem(...)
-    local id, category, spellOrItemName = nil, nil, nil
+	local id, category, spellOrItemName = nil, nil, nil
 
-    for _, arg in ipairs({...}) do
-        if type(arg) == "number" then
-            id = arg
-        elseif type(arg) == "string" then
-            if self:isCategory(arg) then
-                category = arg
-            else
-                spellOrItemName = arg:lower()  -- Convert to lower case for case-insensitive comparison
-            end
-        end
-    end
+	for _, arg in ipairs({ ... }) do
+		if type(arg) == "number" then
+			id = arg
+		elseif type(arg) == "string" then
+			if self:isCategory(arg) then
+				category = arg
+			else
+				spellOrItemName = arg:lower() -- Convert to lower case for case-insensitive comparison
+			end
+		end
+	end
 
-    if category and spellOrItemName then
-        return self:findItemInCategoryByNameOrId(category, spellOrItemName, id)
-    elseif category then
-        return self:findItemInCategory(category, id)
-    elseif spellOrItemName or id then
-        return self:findItemByNameOrId(spellOrItemName, id)
-    end
+	if category and spellOrItemName then
+		return self:findItemInCategoryByNameOrId(category, spellOrItemName, id)
+	elseif category then
+		return self:findItemInCategory(category, id)
+	elseif spellOrItemName or id then
+		return self:findItemByNameOrId(spellOrItemName, id)
+	end
 
-    return nil
+	return nil
 end
 
 function addon:findItemInCategoryByNameOrId(category, name, id)
-    for _, item in ipairs(self.macroData[category].items) do
-        if (name and string.find(item.name:lower(), name)) or (id and item.id == id) then
-            return item
-        end
-    end
-    return nil
+	for _, item in ipairs(self.macroData[category].items) do
+		if (name and string.find(item.name:lower(), name)) or (id and item.id == id) then
+			return item
+		end
+	end
+	return nil
 end
 
 function addon:findItemByNameOrId(name, id)
-    for _, categoryData in pairs(self.macroData) do
-        for _, item in ipairs(categoryData.items) do
-            if (name and string.find(item.name:lower(), name)) or (id and item.id == id) then
-                return item
-            end
-        end
-    end
-    return nil
+	for _, categoryData in pairs(self.macroData) do
+		for _, item in ipairs(categoryData.items) do
+			if (name and string.find(item.name:lower(), name)) or (id and item.id == id) then
+				return item
+			end
+		end
+	end
+	return nil
 end

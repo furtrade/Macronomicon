@@ -50,45 +50,46 @@ end
 
 -- TODO: Make sure to actually implement a scoring system in the main block.
 function addon:getHighestScoringItem(items)
-    -- Initialize variables to track the favored item and its highest score
-    local favoredItem, highestScore = nil, -1
+	-- Initialize variables to track the favored item and its highest score
+	local favoredItem, highestScore = nil, -1
 
-    -- Loop through the items to find the one with the highest score
-    for _, item in ipairs(items) do
-        -- Check if the item has a score and if it's the highest
-        if item.score and item.score > highestScore then
-            favoredItem = item
-            highestScore = item.score
-        end
-    end
+	-- Loop through the items to find the one with the highest score
+	for _, item in ipairs(items) do
+		-- Check if the item has a score and if it's the highest
+		if item.score and item.score > highestScore then
+			favoredItem = item
+			highestScore = item.score
+		end
+	end
 
-    -- Fallback: Select the first item if no scored item is found
-    if not favoredItem and #items > 0 then
-        favoredItem = items[1]
-    end
+	-- Fallback: Select the first item if no scored item is found
+	if not favoredItem and #items > 0 then
+		favoredItem = items[1]
+	end
 
-    -- Return the item with the highest score or the first item as a fallback
-    return favoredItem
+	-- Return the item with the highest score or the first item as a fallback
+	return favoredItem
 end
 
 -- Builds the macro string from the provided macro information (8th to execute)
 function addon:buildMacroString(macroDef)
-    local macroLines = {"#showtooltip"}
+	local macroLines = { "#showtooltip" }
 
-    -- Get the favored (highest scoring) item
-    local favoredItem = self:getHighestScoringItem(macroDef.items)
+	-- Get the favored (highest scoring) item
+	local favoredItem = self:getHighestScoringItem(macroDef.items)
 
-    -- Building the macro line for the favored item
-    if favoredItem then
-        local conditionPart = macroDef.condition and " [" .. macroDef.condition .. "]" or ""
-        local line = "/cast" .. conditionPart .. " " .. favoredItem.name
-        table.insert(macroLines, line)
-    end
+	-- Building the macro line for the favored item
+	if favoredItem then
+		local conditionPart = macroDef.condition and " [" .. macroDef.condition .. "]" or ""
+		local line = "/cast" .. conditionPart .. " " .. favoredItem.name
+		table.insert(macroLines, line)
+	end
 
-    -- Process nuances for the macro definition
-    if macroDef.nuance and type(macroDef.nuance) == "function" then
-        macroDef.nuance(macroLines)
-    end
+	-- Process nuances for the macro definition
+	if macroDef.nuance and type(macroDef.nuance) == "function" then
+		macroDef.nuance(macroLines)
+	end
 
-    return table.concat(macroLines, "\n")
+	return table.concat(macroLines, "\n")
 end
+

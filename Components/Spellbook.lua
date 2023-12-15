@@ -1,6 +1,6 @@
 local addonName, addon = ...
 
-function addon:updateSpelldata()
+function addon:updateSpellbook()
 	addon.spellbook = {}
 
 	-- Loop through each spell tab
@@ -15,17 +15,22 @@ function addon:updateSpelldata()
 			local extractedRank = spellSubText:match("%d+")
 			local rank = extractedRank and tonumber(extractedRank) or spellSubText
 
-			-- Get the current spell data from the spellbook
-			local currentSpell = addon.spellbook[spellName]
+			-- Check if the spell already exists in the spellbook
+			local spellExists = false
+			for _, spell in ipairs(addon.spellbook) do
+				if spell.spellID == spellID then
+					-- Update rank if the new rank is higher
+					if type(rank) == "number" and type(spell.rank) == "number" and rank > spell.rank then
+						spell.rank = rank
+					end
+					spellExists = true
+					break
+				end
+			end
 
-			-- Update the spellbook:
-			-- If the spell is not already in the spellbook, or if the new rank is numerical and either
-			-- replaces a non-numerical rank or is higher than the current numerical rank
-			if
-				not currentSpell
-				or (type(rank) == "number" and (type(currentSpell.rank) ~= "number" or rank > currentSpell.rank))
-			then
-				addon.spellbook[spellName] = { rank = rank, spellID = spellID }
+			-- Add new spell if it doesn't exist
+			if not spellExists then
+				table.insert(addon.spellbook, { name = spellName, rank = rank, spellID = spellID })
 			end
 		end
 	end

@@ -55,20 +55,8 @@ local function sortTableByLevel(items)
 	end)
 end
 
-local function matchMaker(cache, macroItems, keywords)
-	for _, keyword in pairs(keywords) do
-		for _, item in pairs(cache) do
-			for match in string.gmatch(item.spellName:lower(), keyword:lower()) do
-				if match then
-					table.insert(macroItems, item)
-					break -- exit inner loop after first match
-				end
-			end
-		end
-	end
-	-- still need to prune these items
-end
-
+-- Scans bags and inventory for items we want to use
+-- and adds them to our itemCache.
 function addon:updateItemCache()
 	addon.itemCache = {}
 	addon.resetMacroData()
@@ -103,11 +91,12 @@ function addon:updateItemCache()
 			if v.items then
 				-- search itemCache for keyword matches from macroData
 				-- if match found, add to v.items
-				matchMaker(addon.itemCache, v.items, v.keywords)
+				addon:matchMaker(addon.itemCache, v.items, v.keywords)
 			end
 		end
 	end
-	-- sort items from best to worst.
+
+	-- sort items by level.
 	for _, v in pairs(addon.macroData) do
 		if v.items then
 			sortTableByLevel(v.items)
