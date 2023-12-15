@@ -64,7 +64,7 @@ function addon:TableOfContents(aTooltip, retryCount)
 	-- If tooltip is empty and retries are not exhausted, wait and retry
 	if atyp.onLeftSide == "" and atyp.onRightSide == "" and retryCount < maxRetries then
 		C_Timer.After(0.05, function()
-			TableOfContents(aTooltip, retryCount + 1)
+			addon:TableOfContents(aTooltip, retryCount + 1)
 		end)
 	else
 		if atyp.onLeftSide == "" and atyp.onRightSide == "" then
