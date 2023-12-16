@@ -119,6 +119,7 @@ function addon:doTheThing()
 		addon:UpdateItemCache()
 		addon:UpdateSpellbook()
 		addon:UpdateMacroData()
+		addon:sortMacroData("score")
 		addon:ProcessMacros()
 		-- self:Print("Done.") -- debugging
 		return true

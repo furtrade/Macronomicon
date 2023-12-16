@@ -203,6 +203,32 @@ function addon:UpdateMacroData()
 	-- print("UpdateMacroData function finished") -- Debugging line
 end
 
+-- Function to sort items and spells within macros
+function addon:sortMacroData(attribute)
+	-- Check if attribute is valid
+	if attribute ~= "score" and attribute ~= "level" then
+		print("Invalid attribute. Please use 'score' or 'level'.")
+		return
+	end
+
+	-- Iterate over the macros
+	for _, macro in ipairs(self.macroData) do
+		-- Sort items if the table is not empty
+		if macro.items and #macro.items > 0 then
+			table.sort(macro.items, function(a, b)
+				return a[attribute] < b[attribute]
+			end)
+		end
+
+		-- Sort spells if the table is not empty
+		if macro.spells and #macro.spells > 0 then
+			table.sort(macro.spells, function(a, b)
+				return a[attribute] < b[attribute]
+			end)
+		end
+	end
+end
+
 -- This clears the entire table of items or spells respectively.
 -- Probs better to just update the item count instead
 function addon:resetMacroData(spellsOrItems)
