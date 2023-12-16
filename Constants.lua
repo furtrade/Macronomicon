@@ -90,6 +90,7 @@ addon.macroData = {
 		name = "Bandage",
 		icone = "INV_Misc_QuestionMark",
 		keywords = { "First Aid", "Bandage" },
+		patterns = { "Heals (%d+)" },
 		items = {},
 		spells = {},
 	},
@@ -111,13 +112,79 @@ addon.macroData = {
 	},
 }
 
--- Find matches for items or spells that we want to use.
+-- Function to score an item or spell
+function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
+	-- print("scoreItemOrSpell function started") -- Debugging line
+
+	-- Check if the item or spell ID is valid
+	if not itemOrSpell.id or type(itemOrSpell.id) ~= "number" then
+		-- print("Invalid item or spell ID") -- Debugging line
+		return 0
+	end
+
+	-- Get the tooltip for the item or spell
+	local myTooltip = self:GetTooltipByType(itemOrSpell.id, isOfTypeItemOrSpell)
+
+	-- If the tooltip could not be retrieved, return 0
+	if not myTooltip then
+		-- print("Could not retrieve tooltip") -- Debugging line
+		return 0
+	end
+
+	-- Extract the text from the tooltip
+	local tooltipContentTable = self:TableOfContents(myTooltip)
+
+	-- Concatenate the strings in the table into a single string
+	local tooltipContent = tooltipContentTable.onLeftSide .. " " .. tooltipContentTable.onRightSide
+	-- print("Tooltip content: " .. tooltipContent) -- Debugging line
+
+	-- Extract the values from the tooltip text
+	local values = {}
+	if type(patterns) == "table" then
+		for _, pattern in ipairs(patterns) do
+			local value = string.match(tooltipContent, pattern)
+			if value then
+				-- print("Matched value: " .. value) -- Debugging line
+				table.insert(values, tonumber(value))
+			end
+		end
+	end
+	-- Concatenate the strings in the table into a single string
+	local tooltipContent = table.concat(tooltipContentTable, " ")
+	-- print(tooltipContent)
+
+	-- Extract the values from the tooltip text
+	local values = {}
+	if type(patterns) == "table" then
+		for _, pattern in ipairs(patterns) do
+			local value = string.match(tooltipContent, pattern)
+			if value then
+				table.insert(values, tonumber(value))
+			end
+		end
+	end
+
+	-- Calculate the average of the values
+	local total = 0
+	for _, value in ipairs(values) do
+		total = total + value
+	end
+	local average = #values > 0 and total / #values or 0
+
+	-- print(itemOrSpell.name, "Average:", average) -- debugging line.
+	return average
+end
+
+-- Function to update macro data
 function addon:UpdateMacroData()
+	-- print("UpdateMacroData function started") -- Debugging line
+
 	for macroName, macroData in pairs(self.macroData) do
 		-- Iterate over itemCache
 		for _, itemInfo in ipairs(self.itemCache or {}) do
 			for _, keyword in ipairs(macroData.keywords or {}) do
 				if string.match(itemInfo.name, keyword) then
+					itemInfo.score = self:scoreItemOrSpell(itemInfo, "item", macroData.patterns)
 					table.insert(macroData.items, itemInfo)
 				end
 			end
@@ -127,11 +194,13 @@ function addon:UpdateMacroData()
 		for _, spellInfo in ipairs(self.spellbook or {}) do
 			for _, keyword in ipairs(macroData.keywords or {}) do
 				if string.match(spellInfo.name, keyword) then
+					spellInfo.score = self:scoreItemOrSpell(spellInfo, "spell", macroData.patterns)
 					table.insert(macroData.spells, spellInfo)
 				end
 			end
 		end
 	end
+	-- print("UpdateMacroData function finished") -- Debugging line
 end
 
 -- This clears the entire table of items or spells respectively.

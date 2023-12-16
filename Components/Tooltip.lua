@@ -46,6 +46,7 @@ function addon:GetTooltipByType(id, type)
 	if type == "item" then
 		tooltip:SetItemByID(id)
 	elseif type == "spell" then
+		print(id)
 		tooltip:SetSpellByID(id)
 	else
 		print("Error: Invalid type specified.")
