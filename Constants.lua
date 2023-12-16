@@ -146,9 +146,6 @@ function addon:resetMacroData(spellsOrItems)
 	end
 end
 
--- Usage:
--- addon.resetMacroData()
-
 function addon:findItemInCategory(category, id)
 	if id then
 		for _, item in ipairs(self.macroData[category].items) do

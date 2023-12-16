@@ -11,9 +11,15 @@ function addon:UpdateSpellbook()
 		for slot = offset + 1, offset + numSlots do
 			local spellName, spellSubText, spellID = GetSpellBookItemName(slot, BOOKTYPE_SPELL)
 
-			-- Extract a numerical rank from the subtext, if present; otherwise, use the raw subtext
-			local extractedRank = spellSubText:match("%d+")
-			local rank = extractedRank and tonumber(extractedRank) or spellSubText
+			-- Check if spellSubText is not nil before trying to use it
+			if spellSubText then
+				-- Extract a numerical rank from the subtext, if present; otherwise, use the raw subtext
+				local extractedRank = spellSubText:match("%d+")
+				local rank = extractedRank and tonumber(extractedRank) or spellSubText
+			else
+				-- Handle the case where spellSubText is nil
+				local rank = 0
+			end
 
 			-- Check if the spell already exists in the spellbook
 			local spellExists = false
