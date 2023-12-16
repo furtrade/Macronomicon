@@ -137,9 +137,11 @@ end
 -- This clears the entire table of items or spells respectively.
 -- Probs better to just update the item count instead
 function addon:resetMacroData(spellsOrItems)
-	for _, macroData in pairs(self.macroData) do
-		if type(macroData) == "table" and macroData[spellsOrItems] then
-			macroData[spellsOrItems] = {}
+	if self.macroData then
+		for _, macroData in pairs(self.macroData) do
+			if type(macroData) == "table" and macroData[spellsOrItems] then
+				macroData[spellsOrItems] = {}
+			end
 		end
 	end
 end
