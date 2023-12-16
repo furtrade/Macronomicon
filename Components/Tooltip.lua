@@ -1,15 +1,9 @@
 local addonName, addon = ...
 
--- `GetTooltipByType(id, type)`: Creates/uses a tooltip for a given item or spell ID.
--- `type` can be "item" or "spell". Returns the tooltip object.
-
--- `TableOfContents(tooltip)`: Extracts text from the given tooltip object.
--- If initially empty, retries a few times before giving up. Hides the tooltip after extraction.
-
--- Usage Example:
--- local myTooltip = GetTooltipByType(12345, "item")  -- Get tooltip for item with ID 12345
--- local tooltipContent = TableOfContents(myTooltip)  -- Extract text from this tooltip
-
+-- TODO: Implement this functionality.
+-- This function is used to match a given string against a list of regex patterns.
+-- We can take the text returned from the TableOfContents function 
+-- and try to find a keyword match.
 function addon:matchAndAct(text)
 	local matches = {}
 
@@ -30,6 +24,47 @@ function addon:matchAndAct(text)
 	return #matches > 0 and matches or "None"
 end
 
+-- `GetTooltipByType(id, type)`: Creates/uses a tooltip for a given item or spell ID.
+-- `type` can be "item" or "spell". Returns the tooltip object.
+
+-- `TableOfContents(tooltip)`: Extracts text from the given tooltip object.
+-- If initially empty, retries a few times before giving up. Hides the tooltip after extraction.
+
+-- Usage Example:
+-- local myTooltip = GetTooltipByType(12345, "item")  -- Get tooltip for item with ID 12345
+-- local tooltipContent = TableOfContents(myTooltip)  -- Extract text from this tooltip
+
+-- Global or persistent tooltip frame
+local persistentTooltip = persistentTooltip
+	or CreateFrame("GameTooltip", "MyAddonPersistentTooltip", nil, "GameTooltipTemplate")
+
+-- Function to create a tooltip based on type and ID
+function addon:GetTooltipByType(id, type)
+	local tooltip = persistentTooltip
+	tooltip:SetOwner(UIParent, "ANCHOR_NONE")
+
+	-- Clearing lines before setting new data
+	tooltip:ClearLines()
+
+	if type == "item" then
+		tooltip:SetItemByID(id)
+	elseif type == "spell" then
+		tooltip:SetSpellByID(id)
+	else
+		print("Error: Invalid type specified.")
+		return nil
+	end
+
+	-- Check if tooltip has loaded content
+	if tooltip:NumLines() == 0 then
+		print("Error: Failed to load tooltip for ID " .. id)
+		return nil
+	end
+
+	return tooltip
+end
+
+-- Function to extract text from a tooltip
 function addon:TableOfContents(aTooltip, retryCount)
 	-- Maximum number of retries
 	local maxRetries = 5
@@ -80,32 +115,4 @@ function addon:TableOfContents(aTooltip, retryCount)
 	end
 end
 
--- Global or persistent tooltip frame
-local persistentTooltip = persistentTooltip
-	or CreateFrame("GameTooltip", "MyAddonPersistentTooltip", nil, "GameTooltipTemplate")
 
--- Function to create a tooltip based on type and ID
-function addon:GetTooltipByType(id, type)
-	local tooltip = persistentTooltip
-	tooltip:SetOwner(UIParent, "ANCHOR_NONE")
-
-	-- Clearing lines before setting new data
-	tooltip:ClearLines()
-
-	if type == "item" then
-		tooltip:SetItemByID(id)
-	elseif type == "spell" then
-		tooltip:SetSpellByID(id)
-	else
-		print("Error: Invalid type specified.")
-		return nil
-	end
-
-	-- Check if tooltip has loaded content
-	if tooltip:NumLines() == 0 then
-		print("Error: Failed to load tooltip for ID " .. id)
-		return nil
-	end
-
-	return tooltip
-end

@@ -80,6 +80,7 @@ function addon:buildMacroString(macroDef)
 
 	-- Building the macro line for the favored item
 	if favoredItem then
+		print(favoredItem.name)
 		local conditionPart = macroDef.condition and " [" .. macroDef.condition .. "]" or ""
 		local line = "/cast" .. conditionPart .. " " .. favoredItem.name
 		table.insert(macroLines, line)
@@ -92,4 +93,3 @@ function addon:buildMacroString(macroDef)
 
 	return table.concat(macroLines, "\n")
 end
-

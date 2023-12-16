@@ -1,7 +1,7 @@
 -- scan bags for items we can use
 local addonName, addon = ...
 
--- helper function for scanning bags
+-- Create an item object from a bag or inventory slot.
 local function itemizer(dollOrBagIndex, slotIndex)
 	local itemLink = slotIndex and C_Container.GetContainerItemLink(dollOrBagIndex, slotIndex)
 		or GetInventoryItemLink("player", dollOrBagIndex)
@@ -31,8 +31,18 @@ local function itemizer(dollOrBagIndex, slotIndex)
 				itemInfo.equipLoc = equipLoc
 				itemInfo.spellName = itemSpell
 				itemInfo.spellId = itemSpellId
+				itemInfo.rank = GetSpellSubtext(itemSpellId)
 				local count = GetItemCount(itemID)
 				itemInfo.count = count
+
+				-- trying to get the rank of the spell of the item.
+				-- I think "rank" is really just a feature of classic wow.
+				-- Might not be a good idea to use this.
+				-- TODO: figure out a better method of measuring the "bigness" of an item.
+				if itemSpellId then
+					local rank = GetSpellSubtext(itemSpellId)
+					itemInfo.rank = rank and tonumber(rank:match("%d+")) or rank
+				end
 
 				return itemInfo
 			end
@@ -53,6 +63,22 @@ local function sortTableByLevel(items)
 			return false
 		end
 	end)
+end
+
+-- Process items and update macroData
+local function processItems()
+	-- send items to the macros tables
+	if addon.itemCache then
+		for _, v in pairs(addon.macroData) do
+			if v.items then
+				-- sort items by level.
+				sortTableByLevel(v.items)
+				-- search itemCache for keyword matches from macroData
+				-- if match found, add to v.items
+				addon:matchMaker(addon.itemCache, v.items, v.keywords)
+			end
+		end
+	end
 end
 
 -- Scans bags and inventory for items we want to use
@@ -85,22 +111,6 @@ function addon:updateItemCache()
 		end
 	end
 
-	-- send items to the macros tables
-	if addon.itemCache then
-		for _, v in pairs(addon.macroData) do
-			if v.items then
-				-- search itemCache for keyword matches from macroData
-				-- if match found, add to v.items
-				addon:matchMaker(addon.itemCache, v.items, v.keywords)
-			end
-		end
-	end
-
-	-- sort items by level.
-	for _, v in pairs(addon.macroData) do
-		if v.items then
-			sortTableByLevel(v.items)
-		end
-	end
-	-- now we need to select items for a macro.
+	-- call the processItems function
+	processItems()
 end
