@@ -2,7 +2,7 @@ local addonName, addon = ...
 
 -- Entry point for processing macros (1st to execute)
 -- Iterates over macro data and processes each macro
-function addon:processMacros(macroTables)
+function addon:ProcessMacros(macroTables)
 	macroTables = macroTables or addon.macroData
 
 	for _, macroInfo in pairs(macroTables) do

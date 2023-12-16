@@ -111,32 +111,41 @@ addon.macroData = {
 	},
 }
 
-function addon.resetMacroData()
-	for k, v in pairs(addon.macroData) do
-		if type(v) == "table" then
-			v.items, v.spells = {}, {}
+-- Find matches for items or spells that we want to use.
+function addon:UpdateMacroData()
+	for macroName, macroData in pairs(self.macroData) do
+		-- Iterate over itemCache
+		for _, itemInfo in ipairs(self.itemCache or {}) do
+			for _, keyword in ipairs(macroData.keywords or {}) do
+				if string.match(itemInfo.name, keyword) then
+					table.insert(macroData.items, itemInfo)
+				end
+			end
+		end
+
+		-- Iterate over spellbook
+		for _, spellInfo in ipairs(self.spellbook or {}) do
+			for _, keyword in ipairs(macroData.keywords or {}) do
+				if string.match(spellInfo.name, keyword) then
+					table.insert(macroData.spells, spellInfo)
+				end
+			end
+		end
+	end
+end
+
+-- This clears the entire table of items or spells respectively.
+-- Probs better to just update the item count instead
+function addon:resetMacroData(spellsOrItems)
+	for _, macroData in pairs(self.macroData) do
+		if type(macroData) == "table" and macroData[spellsOrItems] then
+			macroData[spellsOrItems] = {}
 		end
 	end
 end
 
 -- Usage:
 -- addon.resetMacroData()
-
--- keyword search for a match
-function addon:matchMaker(cache, retTable, keywords)
-	for _, keyword in pairs(keywords) do
-		for _, spellOrItem in pairs(cache) do
-			for match in string.gmatch(spellOrItem.spellName:lower(), keyword:lower()) do
-				if match then
-					--TODO: Add 'onMatch' function
-					table.insert(retTable, spellOrItem)
-					--break -- exit inner loop after first match
-				end
-			end
-		end
-	end
-	-- still need to prune these items
-end
 
 function addon:findItemInCategory(category, id)
 	if id then

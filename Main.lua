@@ -55,7 +55,7 @@ function addon:OnEnable()
 end
 
 local lastTrigger = 0
-local threshold = 5 -- seconds
+local threshold = 5        -- seconds
 local retryPending = false -- Tracks pending retry
 
 function addon:autoTrigger(event)
@@ -116,10 +116,10 @@ function addon:doTheThing()
 	if InCombatLockdown() then
 		return false
 	else
-		-- self:Print("Refreshing Active Items...") -- debugging
-		addon:updateItemCache()
-		-- self:Print("\nRefreshed Active Items") -- debugging
-		addon:processMacros()
+		addon:UpdateItemCache()
+		addon:UpdateSpellbook()
+		addon:UpdateMacroData()
+		addon:ProcessMacros()
 		-- self:Print("Done.") -- debugging
 		return true
 	end

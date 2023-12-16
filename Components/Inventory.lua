@@ -75,7 +75,7 @@ local function processItems()
 				sortTableByLevel(v.items)
 				-- search itemCache for keyword matches from macroData
 				-- if match found, add to v.items
-				addon:matchMaker(addon.itemCache, v.items, v.keywords)
+				--addon:matchMaker(addon.itemCache, v.items, v.keywords)
 			end
 		end
 	end
@@ -83,9 +83,9 @@ end
 
 -- Scans bags and inventory for items we want to use
 -- and adds them to our itemCache.
-function addon:updateItemCache()
+function addon:UpdateItemCache()
 	addon.itemCache = {}
-	addon.resetMacroData()
+	addon.resetMacroData("items")
 
 	-- inventory
 	for bagOrSlotIndex = 1, 19 do

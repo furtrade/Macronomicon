@@ -1,6 +1,6 @@
 local addonName, addon = ...
 
-function addon:updateSpellbook()
+function addon:UpdateSpellbook()
 	addon.spellbook = {}
 
 	-- Loop through each spell tab
