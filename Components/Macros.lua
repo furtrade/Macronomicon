@@ -48,27 +48,44 @@ function addon:updateMacro(macroName, macroInfo)
 	EditMacro(macroName, macroName, macroInfo.icon, macroString)
 end
 
--- TODO: Make sure to actually implement a scoring system in the main block.
-function addon:getHighestScoringItem(items)
-	-- Initialize variables to track the favored item and its highest score
-	local favoredItem, highestScore = nil, -1
+function addon:selectElement(t)
+	local selectedElement = nil
+	local highestScore = -math.huge -- Initialize to lowest possible value
 
-	-- Loop through the items to find the one with the highest score
-	for _, item in ipairs(items) do
-		-- Check if the item has a score and if it's the highest
-		if item.score and item.score > highestScore then
-			favoredItem = item
-			highestScore = item.score
+	-- Iterate over the elements
+	for _, element in ipairs(t) do
+		-- Debug: print element and its score
+		print("Element: ", element)
+		print("Score: ", element.score)
+
+		-- Check if the score field is present and numeric
+		if element.score then
+			print("Score field is present.")
+
+			if type(element.score) == "number" then
+				print("Score field is a number.")
+
+				-- Check if the element's score is higher than the current highest score
+				if element.score > highestScore then
+					highestScore = element.score
+					selectedElement = element
+
+					-- Debug: print new highest score and selected element
+					print("New highest score: ", highestScore)
+					print("Selected element: ", selectedElement)
+				end
+			else
+				print("Score field is not a number.")
+			end
+		else
+			print("Score field is not present.")
 		end
 	end
 
-	-- Fallback: Select the first item if no scored item is found
-	if not favoredItem and #items > 0 then
-		favoredItem = items[1]
-	end
+	-- Debug: print selected element before returning
+	print("Final selected element: ", selectedElement)
 
-	-- Return the item with the highest score or the first item as a fallback
-	return favoredItem
+	return selectedElement
 end
 
 -- Builds the macro string from the provided macro information (8th to execute)
@@ -76,7 +93,7 @@ function addon:buildMacroString(macroDef)
 	local macroLines = { "#showtooltip" }
 
 	-- Get the favored (highest scoring) item
-	local favoredItem = self:getHighestScoringItem(macroDef.items)
+	local favoredItem = self:selectElement(macroDef.items)
 
 	-- Building the macro line for the favored item
 	if favoredItem then

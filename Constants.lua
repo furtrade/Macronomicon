@@ -107,6 +107,7 @@ addon.macroData = {
 		name = "Bang",
 		icone = "INV_Misc_QuestionMark",
 		keywords = { "Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge" },
+		patterns = { "(%d+)%s+to%s+(%d+)" },
 		items = {},
 		spells = {},
 	},
@@ -114,11 +115,11 @@ addon.macroData = {
 
 -- Function to score an item or spell
 function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
-	-- print("scoreItemOrSpell function started") -- Debugging line
+	print("scoreItemOrSpell function started") -- Debugging line
 
 	-- Check if the item or spell ID is valid
 	if not itemOrSpell.id or type(itemOrSpell.id) ~= "number" then
-		-- print("Invalid item or spell ID") -- Debugging line
+		print("Invalid item or spell ID") -- Debugging line
 		return 0
 	end
 
@@ -127,7 +128,7 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 
 	-- If the tooltip could not be retrieved, return 0
 	if not myTooltip then
-		-- print("Could not retrieve tooltip") -- Debugging line
+		print("Could not retrieve tooltip") -- Debugging line
 		return 0
 	end
 
@@ -136,31 +137,24 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 
 	-- Concatenate the strings in the table into a single string
 	local tooltipContent = tooltipContentTable.onLeftSide .. " " .. tooltipContentTable.onRightSide
-	-- print("Tooltip content: " .. tooltipContent) -- Debugging line
+	print("Tooltip content: " .. tooltipContent) -- Debugging line
 
 	-- Extract the values from the tooltip text
 	local values = {}
 	if type(patterns) == "table" then
 		for _, pattern in ipairs(patterns) do
-			local value = string.match(tooltipContent, pattern)
-			if value then
-				-- print("Matched value: " .. value) -- Debugging line
-				table.insert(values, tonumber(value))
-			end
-		end
-	end
-	-- Concatenate the strings in the table into a single string
-	local tooltipContent = table.concat(tooltipContentTable, " ")
-	-- print(tooltipContent)
-
-	-- Extract the values from the tooltip text
-	local values = {}
-	if type(patterns) == "table" then
-		for _, pattern in ipairs(patterns) do
-			local value = string.match(tooltipContent, pattern)
-			if value then
-				table.insert(values, tonumber(value))
-			end
+			-- Use string.gsub as a workaround to iterate over all matches
+			string.gsub(tooltipContent, pattern, function(...)
+				-- The arguments to the function are the captures
+				local captures = { ... }
+				for _, value in ipairs(captures) do
+					local numValue = tonumber(value)
+					print("Converted value: ", numValue) -- Debugging line
+					if numValue then
+						table.insert(values, numValue)
+					end
+				end
+			end)
 		end
 	end
 
@@ -171,7 +165,7 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 	end
 	local average = #values > 0 and total / #values or 0
 
-	-- print(itemOrSpell.name, "Average:", average) -- debugging line.
+	print(itemOrSpell.name, "Average:", average) -- debugging line.
 	return average
 end
 
