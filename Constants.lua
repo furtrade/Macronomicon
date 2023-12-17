@@ -47,8 +47,9 @@ addon.macroData = {
 		name = "Heal Pot",
 		icone = "INV_Misc_QuestionMark",
 		keywords = { "Healing Potion" },
+		patterns = { "(%d+)%s+to%s+(%d+) health" },
 		onMatch = function(match)
-			print("Healing effect found:", match)
+			-- print("Healing effect found:", match)
 		end,
 		nuance = function(macroLines)
 			-- add a healthstone to our heal pot macro
@@ -66,6 +67,7 @@ addon.macroData = {
 		name = "Mana Pot",
 		icone = "INV_Misc_QuestionMark",
 		keywords = { "Mana Potion", "Restore Mana" },
+		patterns = { "(%d+)%s+to%s+(%d+) mana" },
 		items = {},
 		spells = {},
 	},
@@ -74,6 +76,7 @@ addon.macroData = {
 		name = "Food",
 		icone = "INV_Misc_QuestionMark",
 		keywords = { "Food" },
+		patterns = { "(%d+) health over %d+ sec" },
 		items = {},
 		spells = {},
 	},
@@ -82,6 +85,7 @@ addon.macroData = {
 		name = "Drink",
 		icone = "INV_Misc_QuestionMark",
 		keywords = { "Drink" },
+		patterns = { "(%d+) mana over %d+ sec" },
 		items = {},
 		spells = {},
 	},
@@ -99,6 +103,7 @@ addon.macroData = {
 		name = "Healthstone",
 		icone = "INV_Misc_QuestionMark",
 		keywords = { "Healthstone" },
+		patterns = { "(%d+) life" },
 		items = {},
 		spells = {},
 	},
@@ -115,11 +120,11 @@ addon.macroData = {
 
 -- Function to score an item or spell
 function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
-	print("scoreItemOrSpell function started") -- Debugging line
+	-- print("scoreItemOrSpell function started") -- Debugging line
 
 	-- Check if the item or spell ID is valid
 	if not itemOrSpell.id or type(itemOrSpell.id) ~= "number" then
-		print("Invalid item or spell ID") -- Debugging line
+		-- print("Invalid item or spell ID") -- Debugging line
 		return 0
 	end
 
@@ -128,7 +133,7 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 
 	-- If the tooltip could not be retrieved, return 0
 	if not myTooltip then
-		print("Could not retrieve tooltip") -- Debugging line
+		-- print("Could not retrieve tooltip") -- Debugging line
 		return 0
 	end
 
@@ -137,7 +142,7 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 
 	-- Concatenate the strings in the table into a single string
 	local tooltipContent = tooltipContentTable.onLeftSide .. " " .. tooltipContentTable.onRightSide
-	print("Tooltip content: " .. tooltipContent) -- Debugging line
+	-- print("Tooltip content: " .. tooltipContent) -- Debugging line
 
 	-- Extract the values from the tooltip text
 	local values = {}
@@ -149,7 +154,7 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 				local captures = { ... }
 				for _, value in ipairs(captures) do
 					local numValue = tonumber(value)
-					print("Converted value: ", numValue) -- Debugging line
+					-- print("Converted value: ", numValue) -- Debugging line
 					if numValue then
 						table.insert(values, numValue)
 					end
@@ -201,7 +206,7 @@ end
 function addon:sortMacroData(attribute)
 	-- Check if attribute is valid
 	if attribute ~= "score" and attribute ~= "level" then
-		print("Invalid attribute. Please use 'score' or 'level'.")
+		-- print("Invalid attribute. Please use 'score' or 'level'.")
 		return
 	end
 

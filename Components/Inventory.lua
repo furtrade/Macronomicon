@@ -81,18 +81,30 @@ local function processItems()
 	end
 end
 
--- Scans bags and inventory for items we want to use
--- and adds them to our itemCache.
 function addon:UpdateItemCache()
-	addon.itemCache = {}
-	addon.resetMacroData("items")
+	-- Mark all items in the cache as not reviewed
+	for _, item in ipairs(addon.itemCache) do
+		item.reviewed = false
+	end
+
+	local function addItemToCache(itemInfo)
+		for _, cachedItem in ipairs(addon.itemCache) do
+			if cachedItem.id == itemInfo.id then
+				cachedItem.count = cachedItem.count + itemInfo.count
+				cachedItem.reviewed = true
+				return
+			end
+		end
+		itemInfo.reviewed = true
+		table.insert(addon.itemCache, itemInfo)
+	end
 
 	-- inventory
 	for bagOrSlotIndex = 1, 19 do
 		local itemInfo = itemizer(bagOrSlotIndex)
 
 		if itemInfo then
-			table.insert(addon.itemCache, itemInfo)
+			addItemToCache(itemInfo)
 		end
 	end
 
@@ -105,9 +117,16 @@ function addon:UpdateItemCache()
 				local itemInfo = itemizer(bagOrSlotIndex, slotIndex)
 
 				if itemInfo then
-					table.insert(addon.itemCache, itemInfo)
+					addItemToCache(itemInfo)
 				end
 			end
+		end
+	end
+
+	-- Remove items from the cache that were not reviewed
+	for i = #addon.itemCache, 1, -1 do
+		if not addon.itemCache[i].reviewed then
+			table.remove(addon.itemCache, i)
 		end
 	end
 

@@ -55,15 +55,15 @@ function addon:selectElement(t)
 	-- Iterate over the elements
 	for _, element in ipairs(t) do
 		-- Debug: print element and its score
-		print("Element: ", element)
-		print("Score: ", element.score)
+		-- print("Element: ", element)
+		-- print("Score: ", element.score)
 
 		-- Check if the score field is present and numeric
 		if element.score then
-			print("Score field is present.")
+			-- print("Score field is present.")
 
 			if type(element.score) == "number" then
-				print("Score field is a number.")
+				-- print("Score field is a number.")
 
 				-- Check if the element's score is higher than the current highest score
 				if element.score > highestScore then
@@ -71,19 +71,19 @@ function addon:selectElement(t)
 					selectedElement = element
 
 					-- Debug: print new highest score and selected element
-					print("New highest score: ", highestScore)
-					print("Selected element: ", selectedElement)
+					-- print("New highest score: ", highestScore)
+					-- print("Selected element: ", selectedElement)
 				end
 			else
-				print("Score field is not a number.")
+				-- print("Score field is not a number.")
 			end
 		else
-			print("Score field is not present.")
+			-- print("Score field is not present.")
 		end
 	end
 
 	-- Debug: print selected element before returning
-	print("Final selected element: ", selectedElement)
+	-- print("Final selected element: ", selectedElement)
 
 	return selectedElement
 end
@@ -97,7 +97,7 @@ function addon:buildMacroString(macroDef)
 
 	-- Building the macro line for the favored item
 	if favoredItem then
-		print(favoredItem.name)
+		-- print(favoredItem.name)
 		local conditionPart = macroDef.condition and " [" .. macroDef.condition .. "]" or ""
 		local line = "/cast" .. conditionPart .. " " .. favoredItem.name
 		table.insert(macroLines, line)
