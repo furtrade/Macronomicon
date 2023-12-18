@@ -29,7 +29,7 @@ local function itemizer(dollOrBagIndex, slotIndex)
 				itemInfo.type = itemType
 				itemInfo.subType = itemSubType
 				itemInfo.equipLoc = equipLoc
-				itemInfo.spellName = itemSpell
+				itemInfo.spellName = itemSpell -- more reliable than the actual item name.
 				itemInfo.spellId = itemSpellId
 				itemInfo.rank = GetSpellSubtext(itemSpellId)
 				local count = GetItemCount(itemID)
@@ -65,22 +65,6 @@ local function sortTableByLevel(items)
 	end)
 end
 
--- Process items and update macroData
-local function processItems()
-	-- send items to the macros tables
-	if addon.itemCache then
-		for _, v in pairs(addon.macroData) do
-			if v.items then
-				-- sort items by level.
-				sortTableByLevel(v.items)
-				-- search itemCache for keyword matches from macroData
-				-- if match found, add to v.items
-				--addon:matchMaker(addon.itemCache, v.items, v.keywords)
-			end
-		end
-	end
-end
-
 function addon:UpdateItemCache()
 	-- Mark all items in the cache as not reviewed
 	for _, item in ipairs(addon.itemCache) do
@@ -90,7 +74,7 @@ function addon:UpdateItemCache()
 	local function addItemToCache(itemInfo)
 		for _, cachedItem in ipairs(addon.itemCache) do
 			if cachedItem.id == itemInfo.id then
-				cachedItem.count = cachedItem.count + itemInfo.count
+				cachedItem.count = itemInfo.count
 				cachedItem.reviewed = true
 				return
 			end
@@ -126,10 +110,8 @@ function addon:UpdateItemCache()
 	-- Remove items from the cache that were not reviewed
 	for i = #addon.itemCache, 1, -1 do
 		if not addon.itemCache[i].reviewed then
+			print("Removing item from cache: ", addon.itemCache[i].id, "Count: ", addon.itemCache[i].count)
 			table.remove(addon.itemCache, i)
 		end
 	end
-
-	-- call the processItems function
-	processItems()
 end

@@ -170,7 +170,7 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 	end
 	local average = #values > 0 and total / #values or 0
 
-	print(itemOrSpell.name, "Average:", average) -- debugging line.
+	-- print(itemOrSpell.name, "Average:", average) -- debugging line.
 	return average
 end
 
@@ -182,7 +182,7 @@ function addon:UpdateMacroData()
 		-- Iterate over itemCache
 		for _, itemInfo in ipairs(self.itemCache or {}) do
 			for _, keyword in ipairs(macroData.keywords or {}) do
-				if string.match(itemInfo.name, keyword) then
+				if string.match(itemInfo.spellName, keyword) then
 					itemInfo.score = self:scoreItemOrSpell(itemInfo, "item", macroData.patterns)
 					table.insert(macroData.items, itemInfo)
 				end

@@ -99,6 +99,7 @@
         "CALENDAR_STATUS_TENTATIVE",
         "HP",
         "BOOKTYPE_SPELL",
-        "MP"
+        "MP",
+        "ReloadUI"
     ]
 }
