@@ -118,6 +118,31 @@ addon.macroData = {
 	},
 }
 
+local function FindAndExtractZoneName(text)
+	-- Convert the text to lower case for case insensitive matching
+	text = string.lower(text)
+	local pattern = "usable only inside%s+([^%.]+)%."
+	local match
+	for zone in string.gmatch(text, pattern) do
+		print("Match: " .. zone)
+		match = zone
+	end
+	if match then
+		print("Zone name found: " .. match)
+		return match
+	end
+	return nil
+end
+
+local function IsPlayerInZone(zoneName)
+	local currentZone = string.lower(GetZoneText())
+	if string.lower(zoneName) == currentZone then
+		return true
+	else
+		return false
+	end
+end
+
 -- Function to score an item or spell
 function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 	-- print("scoreItemOrSpell function started") -- Debugging line
@@ -143,6 +168,13 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 	-- Concatenate the strings in the table into a single string
 	local tooltipContent = tooltipContentTable.onLeftSide .. " " .. tooltipContentTable.onRightSide
 	-- print("Tooltip content: " .. tooltipContent) -- Debugging line
+
+	local zoneName = FindAndExtractZoneName(tooltipContent)
+	print("Extracted zone name: ", zoneName)
+	if zoneName then
+		print("Is player in zone: ", IsPlayerInZone(zoneName))
+	end
+	if zoneName and not IsPlayerInZone(zoneName) then return 0 end
 
 	-- Extract the values from the tooltip text
 	local values = {}

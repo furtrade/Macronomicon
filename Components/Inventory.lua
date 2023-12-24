@@ -50,21 +50,6 @@ local function itemizer(dollOrBagIndex, slotIndex)
 	end
 end
 
--- helper function to sort items by type, e.g. health pots, mana pots, food, etc.
-local function sortTableByLevel(items)
-	table.sort(items, function(a, b)
-		if a.level and b.level then
-			return a.level > b.level
-		elseif a.level then
-			return true
-		elseif b.level then
-			return false
-		else
-			return false
-		end
-	end)
-end
-
 function addon:UpdateItemCache()
 	-- Mark all items in the cache as not reviewed
 	for _, item in ipairs(addon.itemCache) do
@@ -110,7 +95,7 @@ function addon:UpdateItemCache()
 	-- Remove items from the cache that were not reviewed
 	for i = #addon.itemCache, 1, -1 do
 		if not addon.itemCache[i].reviewed then
-			print("Removing item from cache: ", addon.itemCache[i].id, "Count: ", addon.itemCache[i].count)
+			print("Removing item from cache: ", addon.itemCache[i].link, "Count: ", addon.itemCache[i].count)
 			table.remove(addon.itemCache, i)
 		end
 	end
