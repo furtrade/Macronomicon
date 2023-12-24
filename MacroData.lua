@@ -124,11 +124,11 @@ local function FindAndExtractZoneName(text)
 	local pattern = "usable only inside%s+([^%.]+)%."
 	local match
 	for zone in string.gmatch(text, pattern) do
-		print("Match: " .. zone)
+		-- print("Match: " .. zone)
 		match = zone
 	end
 	if match then
-		print("Zone name found: " .. match)
+		-- print("Zone name found: " .. match)
 		return match
 	end
 	return nil
@@ -136,6 +136,7 @@ end
 
 local function IsPlayerInZone(zoneName)
 	local currentZone = string.lower(GetZoneText())
+	-- print("Current zone: ", currentZone)
 	if string.lower(zoneName) == currentZone then
 		return true
 	else
@@ -149,7 +150,6 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 
 	-- Check if the item or spell ID is valid
 	if not itemOrSpell.id or type(itemOrSpell.id) ~= "number" then
-		-- print("Invalid item or spell ID") -- Debugging line
 		return 0
 	end
 
@@ -158,7 +158,6 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 
 	-- If the tooltip could not be retrieved, return 0
 	if not myTooltip then
-		-- print("Could not retrieve tooltip") -- Debugging line
 		return 0
 	end
 
@@ -167,14 +166,12 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 
 	-- Concatenate the strings in the table into a single string
 	local tooltipContent = tooltipContentTable.onLeftSide .. " " .. tooltipContentTable.onRightSide
-	-- print("Tooltip content: " .. tooltipContent) -- Debugging line
 
 	local zoneName = FindAndExtractZoneName(tooltipContent)
-	print("Extracted zone name: ", zoneName)
-	if zoneName then
-		print("Is player in zone: ", IsPlayerInZone(zoneName))
+	if zoneName and not IsPlayerInZone(zoneName) then
+		-- print(itemOrSpell.link .. " cant be used outside of " .. zoneName .. "")
+		return 0
 	end
-	if zoneName and not IsPlayerInZone(zoneName) then return 0 end
 
 	-- Extract the values from the tooltip text
 	local values = {}
