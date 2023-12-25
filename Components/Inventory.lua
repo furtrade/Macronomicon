@@ -95,7 +95,8 @@ function addon:UpdateItemCache()
 	-- Remove items from the cache that were not reviewed
 	for i = #addon.itemCache, 1, -1 do
 		if not addon.itemCache[i].reviewed then
-			print("Removing item from cache: ", addon.itemCache[i].link, "Count: ", addon.itemCache[i].count)
+			print("Removing ", addon.itemCache[i].link,
+				" because it doesn't look like we have it anymore")
 			table.remove(addon.itemCache, i)
 		end
 	end
