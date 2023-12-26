@@ -2,13 +2,7 @@ local addonName, addon = ...
 
 addon.defaults = {
 	profile = {
-		toggleHP = true,
-		toggleMP = true,
-		toggleFood = true,
-		toggleDrink = true,
-		toggleBandage = true,
-		toggleHS = true,
-		toggleBang = true,
+		["*"] = true,
 	},
 }
 
@@ -17,6 +11,14 @@ addon.options = {
 	name = addon.title,
 	handler = addon,
 	args = {
+		toggleMain = {
+			type = "toggle",
+			order = 0,
+			name = "Main",
+			desc = "Primary spammable attack macro",
+			get = "GetValue",
+			set = "SetValue",
+		},
 		toggleHP = {
 			type = "toggle",
 			order = 1,
@@ -92,4 +94,3 @@ end
 function addon:SetValue(info, value)
 	self.db.profile[info[#info]] = value
 end
-

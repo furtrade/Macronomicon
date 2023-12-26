@@ -48,10 +48,15 @@ addon.macroData = {
 			name = "Heal Pot",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Healing Potion" },
-			patterns = { "(%d+)%s+to%s+(%d+) health" },
-			onMatch = function(match)
-				-- print("Healing effect found:", match)
-			end,
+			valuation = { "(%d+)%s+to%s+(%d+) health" },
+			patterns = {
+				{
+					pattern = "(%d+)%s+to%s+(%d+) health",
+					onMatch = function(match)
+						-- print("Healing effect found:", match)
+					end,
+				},
+			},
 			nuance = function(macroLines)
 				-- add a healthstone to our heal pot macro
 				local healthstone = addon:playerHasItem("HS", "Healthstone")
@@ -68,7 +73,15 @@ addon.macroData = {
 			name = "Mana Pot",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Mana Potion", "Restore Mana" },
-			patterns = { "(%d+)%s+to%s+(%d+) mana" },
+			valuation = { "(%d+)%s+to%s+(%d+) mana" },
+			patterns = {
+				{
+					pattern = "(%d+)%s+to%s+(%d+) mana",
+					onMatch = function(match)
+						-- Handle the match
+					end,
+				},
+			},
 			items = {},
 			spells = {},
 		},
@@ -77,7 +90,15 @@ addon.macroData = {
 			name = "Food",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Food" },
-			patterns = { "(%d+) health over %d+ sec" },
+			valuation = { "(%d+) health over %d+ sec" },
+			patterns = {
+				{
+					pattern = "(%d+) health over %d+ sec",
+					onMatch = function(match)
+						-- Handle the match
+					end,
+				},
+			},
 			items = {},
 			spells = {},
 		},
@@ -86,7 +107,15 @@ addon.macroData = {
 			name = "Drink",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Drink" },
-			patterns = { "(%d+) mana over %d+ sec" },
+			valuation = { "(%d+) mana over %d+ sec" },
+			patterns = {
+				{
+					pattern = "(%d+) mana over %d+ sec",
+					onMatch = function(match)
+						-- Handle the match
+					end,
+				},
+			},
 			items = {},
 			spells = {},
 		},
@@ -95,7 +124,15 @@ addon.macroData = {
 			name = "Bandage",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "First Aid", "Bandage" },
-			patterns = { "Heals (%d+)" },
+			valuation = { "Heals (%d+)" },
+			patterns = {
+				{
+					pattern = "Heals (%d+)",
+					onMatch = function(match)
+						-- Handle the match
+					end,
+				},
+			},
 			items = {},
 			spells = {},
 		},
@@ -104,7 +141,15 @@ addon.macroData = {
 			name = "Healthstone",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Healthstone" },
-			patterns = { "(%d+) life" },
+			valuation = { "(%d+) life" },
+			patterns = {
+				{
+					pattern = "(%d+) life",
+					onMatch = function(match)
+						-- Handle the match
+					end,
+				},
+			},
 			items = {},
 			spells = {},
 		},
@@ -113,7 +158,15 @@ addon.macroData = {
 			name = "Bang",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge" },
-			patterns = { "(%d+)%s+to%s+(%d+)" },
+			valuation = { "(%d+)%s+to%s+(%d+)" },
+			patterns = {
+				{
+					pattern = "(%d+)%s+to%s+(%d+)",
+					onMatch = function(match)
+						-- Handle the match
+					end,
+				},
+			},
 			items = {},
 			spells = {},
 		},
@@ -123,11 +176,15 @@ addon.macroData = {
 			enabled = "toggleMain",
 			name = "Main",
 			icone = "INV_Misc_QuestionMark",
-			keywords = { "" },
-			patterns = { "(%d+)%s+to%s+(%d+)" },
-			onMatch = function(match)
-				-- print("Healing effect found:", match)
-			end,
+			keywords = { "Master Channeler" },
+			patterns = {
+				{
+					pattern = "(%d+)%s+to%s+(%d+)",
+					onMatch = function(match)
+						-- print("Healing effect found:", match)
+					end,
+				},
+			},
 			items = {},
 			spells = {},
 		},
@@ -169,9 +226,7 @@ local function IsPlayerInZone(zoneName)
 end
 
 -- Function to score an item or spell
-function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
-	-- print("scoreItemOrSpell function started") -- Debugging line
-
+function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, macroInfo)
 	-- Check if the item or spell ID is valid
 	if not itemOrSpell.id or type(itemOrSpell.id) ~= "number" then
 		return 0
@@ -193,21 +248,19 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 
 	local zoneName = FindAndExtractZoneName(tooltipContent)
 	if zoneName and not IsPlayerInZone(zoneName) then
-		-- print(itemOrSpell.link .. " cant be used outside of " .. zoneName .. "")
 		return 0
 	end
 
 	-- Extract the values from the tooltip text
 	local values = {}
-	if type(patterns) == "table" then
-		for _, pattern in ipairs(patterns) do
+	if type(macroInfo.valuation) == "table" then
+		for _, pattern in ipairs(macroInfo.valuation) do
 			-- Use string.gsub as a workaround to iterate over all matches
 			string.gsub(tooltipContent, pattern, function(...)
 				-- The arguments to the function are the captures
 				local captures = { ... }
 				for _, value in ipairs(captures) do
 					local numValue = tonumber(value)
-					-- print("Converted value: ", numValue) -- Debugging line
 					if numValue then
 						table.insert(values, numValue)
 					end
@@ -223,7 +276,6 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 	end
 	local average = #values > 0 and total / #values or 0
 
-	-- print(itemOrSpell.name, "Average:", average) -- debugging line.
 	return average
 end
 
@@ -234,8 +286,9 @@ local function processItemsOrSpells(self, itemsOrSpells, itemType, macroData)
 		for _, keyword in ipairs(macroData.keywords or {}) do
 			local name = itemType == "item" and itemOrSpell.spellName or itemOrSpell.name
 			if string.match(name, keyword) then
-				itemOrSpell.score = self:scoreItemOrSpell(itemOrSpell, itemType, macroData.patterns)
+				itemOrSpell.score = self:scoreItemOrSpell(itemOrSpell, itemType, macroData)
 				table.insert(macroData[itemType .. "s"], itemOrSpell)
+				-- print(itemOrSpell.link, itemOrSpell.score)
 			end
 		end
 	end

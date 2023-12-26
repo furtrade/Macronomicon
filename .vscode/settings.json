@@ -144,6 +144,7 @@
         "UnitFactionGroup",
         "GetCurrentRegionName",
         "GetCurrentRegion",
-        "GameTooltip"
+        "GameTooltip",
+        "MAX_CHARACTER_MACROS"
     ]
 }

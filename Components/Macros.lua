@@ -5,11 +5,13 @@ local addonName, addon = ...
 function addon:ProcessMacros(macroTables)
 	macroTables = macroTables or addon.macroData
 
-	self:forEachMacro(function(macroInfo)
-		if self:isMacroEnabled(macroInfo.enabled) then
-			self:createOrUpdateMacro(macroInfo)
+	for macroType, macroTypeData in pairs(macroTables) do
+		for _, macroInfo in pairs(macroTypeData) do
+			if self:isMacroEnabled(macroInfo.enabled) then
+				self:createOrUpdateMacro(macroType, macroInfo)
+			end
 		end
-	end)
+	end
 end
 
 -- Checks if a macro is enabled in the addon's settings (2nd to execute)
@@ -18,10 +20,10 @@ function addon:isMacroEnabled(macroKey)
 end
 
 -- Handles creation or update of a macro (3rd to execute)
-function addon:createOrUpdateMacro(macroInfo)
+function addon:createOrUpdateMacro(macroType, macroInfo)
 	local macroName = self:getMacroName(macroInfo.name)
 	if not self:macroExists(macroName) then
-		self:createMacro(macroName)
+		self:createMacro(macroType, macroName)
 	end
 	self:updateMacro(macroName, macroInfo)
 end
@@ -38,8 +40,10 @@ function addon:macroExists(name)
 end
 
 -- Creates a new macro in the game (6th to execute)
-function addon:createMacro(name)
-	CreateMacro(name, "INV_Misc_QuestionMark")
+function addon:createMacro(macroType, name)
+	local numGeneralMacros, numCharacterMacros = GetNumMacros()
+	local perCharacter = macroType ~= "GENERAL" and numCharacterMacros < MAX_CHARACTER_MACROS
+	CreateMacro(name, "INV_Misc_QuestionMark", nil, perCharacter)
 end
 
 -- Updates an existing macro with new content (7th to execute)
