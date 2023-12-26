@@ -7,15 +7,17 @@ local addonName, addon = ...
 function addon:matchAndAct(text)
 	-- text is the text from the tooltip
 	-- category is like "HP" or "MP"
-	for category, v in pairs(addon.macroData) do
-		-- search for regex patterns for each category
-		for _, j in ipairs(v.keywords) do
-			if text:match(j) then
-				if v.onMatch then
-					v.onMatch()
-				end
+	for macroType, macroTypeData in pairs(addon.macroData) do
+		for category, v in pairs(macroTypeData) do
+			-- search for regex patterns for each category
+			for _, j in ipairs(v.keywords) do
+				if text:match(j) then
+					if v.onMatch then
+						v.onMatch()
+					end
 
-				--break
+					--break
+				end
 			end
 		end
 	end

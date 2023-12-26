@@ -5,11 +5,11 @@ local addonName, addon = ...
 function addon:ProcessMacros(macroTables)
 	macroTables = macroTables or addon.macroData
 
-	for _, macroInfo in pairs(macroTables) do
+	self:forEachMacro(function(macroInfo)
 		if self:isMacroEnabled(macroInfo.enabled) then
 			self:createOrUpdateMacro(macroInfo)
 		end
-	end
+	end)
 end
 
 -- Checks if a macro is enabled in the addon's settings (2nd to execute)

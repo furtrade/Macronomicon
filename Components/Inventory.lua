@@ -2,52 +2,57 @@
 local addonName, addon = ...
 
 -- Create an item object from a bag or inventory slot.
-local function itemizer(dollOrBagIndex, slotIndex)
-	local itemLink = slotIndex and C_Container.GetContainerItemLink(dollOrBagIndex, slotIndex)
-		or GetInventoryItemLink("player", dollOrBagIndex)
+local function getItemLink(bagOrSlotIndex, slotIndex)
+    local itemLink = slotIndex and C_Container.GetContainerItemLink(bagOrSlotIndex, slotIndex)
+        or GetInventoryItemLink("player", bagOrSlotIndex)
+    return itemLink
+end
 
-	if itemLink then
-		-- Check if the item can be used
-		local itemID = tonumber(string.match(itemLink, "item:(%d+):"))
-		if itemID then
-			local canUse = C_PlayerInfo.CanUseItem(itemID)
+local function itemizer(bagOrSlotIndex, slotIndex)
+    local itemLink = getItemLink(bagOrSlotIndex, slotIndex)
 
-			-- Get item type and subtype and equipSlotLocation
-			local itemLevel, _, itemType, itemSubType, _, equipLoc = select(4, GetItemInfo(itemID))
+    if itemLink then
+        -- Check if the item can be used
+        local itemID = tonumber(string.match(itemLink, "item:(%d+):"))
+        if itemID then
+            local canUse = C_PlayerInfo.CanUseItem(itemID)
 
-			-- does the item have a spell associated with it?
-			local itemSpell, itemSpellId = GetItemSpell(itemID)
+            -- Get item type and subtype and equipSlotLocation
+            local itemLevel, _, itemType, itemSubType, _, equipLoc = select(4, GetItemInfo(itemID))
 
-			--Bundle the item info
-			if canUse and itemSpell then
-				local itemInfo = {}
-				-- usual stuff
-				itemInfo.id = itemID
-				itemInfo.link = itemLink
-				itemInfo.name = C_Item.GetItemNameByID(itemID)
-				itemInfo.level = itemLevel
-				itemInfo.type = itemType
-				itemInfo.subType = itemSubType
-				itemInfo.equipLoc = equipLoc
-				itemInfo.spellName = itemSpell -- more reliable than the actual item name.
-				itemInfo.spellId = itemSpellId
-				itemInfo.rank = GetSpellSubtext(itemSpellId)
-				local count = GetItemCount(itemID)
-				itemInfo.count = count
+            -- does the item have a spell associated with it?
+            local itemSpell, itemSpellId = GetItemSpell(itemID)
 
-				-- trying to get the rank of the spell of the item.
-				-- I think "rank" is really just a feature of classic wow.
-				-- Might not be a good idea to use this.
-				-- TODO: figure out a better method of measuring the "bigness" of an item.
-				if itemSpellId then
-					local rank = GetSpellSubtext(itemSpellId)
-					itemInfo.rank = rank and tonumber(rank:match("%d+")) or rank
-				end
+            --Bundle the item info
+            if canUse and itemSpell then
+                local itemInfo = {}
+                -- usual stuff
+                itemInfo.id = itemID
+                itemInfo.link = itemLink
+                itemInfo.name = C_Item.GetItemNameByID(itemID)
+                itemInfo.level = itemLevel
+                itemInfo.type = itemType
+                itemInfo.subType = itemSubType
+                itemInfo.equipLoc = equipLoc
+                itemInfo.spellName = itemSpell -- more reliable than the actual item name.
+                itemInfo.spellId = itemSpellId
+                itemInfo.rank = GetSpellSubtext(itemSpellId)
+                local count = GetItemCount(itemID)
+                itemInfo.count = count
 
-				return itemInfo
-			end
-		end
-	end
+                -- trying to get the rank of the spell of the item.
+                -- I think "rank" is really just a feature of classic wow.
+                -- Might not be a good idea to use this.
+                -- TODO: figure out a better method of measuring the "bigness" of an item.
+                if itemSpellId then
+                    local rank = GetSpellSubtext(itemSpellId)
+                    itemInfo.rank = rank and tonumber(rank:match("%d+")) or rank
+                end
+
+                return itemInfo
+            end
+        end
+    end
 end
 
 function addon:UpdateItemCache()
@@ -96,7 +101,7 @@ function addon:UpdateItemCache()
 	for i = #addon.itemCache, 1, -1 do
 		if not addon.itemCache[i].reviewed then
 			print("Removing ", addon.itemCache[i].link,
-				" because it doesn't look like we have it anymore")
+				" because it was a duplicate or we ran out.")
 			table.remove(addon.itemCache, i)
 		end
 	end

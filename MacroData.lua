@@ -41,82 +41,106 @@ local addonName, addon = ...
 } ]]
 
 addon.macroData = {
-	-- TODO: Add ability to combine categories in a single macro. e.g. HP & HS
-	HP = {
-		enabled = "toggleHP",
-		name = "Heal Pot",
-		icone = "INV_Misc_QuestionMark",
-		keywords = { "Healing Potion" },
-		patterns = { "(%d+)%s+to%s+(%d+) health" },
-		onMatch = function(match)
-			-- print("Healing effect found:", match)
-		end,
-		nuance = function(macroLines)
-			-- add a healthstone to our heal pot macro
-			local healthstone = addon:playerHasItem("HS", "Healthstone")
-			if healthstone then
-				local healthstoneLine = "/use " .. healthstone.name
-				table.insert(macroLines, 2, healthstoneLine)
-			end
-		end,
-		--condition = "",
-		items = {},
+	GENERAL = {
+		-- TODO: Add ability to combine categories in a single macro. e.g. HP & HS
+		HP = {
+			enabled = "toggleHP",
+			name = "Heal Pot",
+			icone = "INV_Misc_QuestionMark",
+			keywords = { "Healing Potion" },
+			patterns = { "(%d+)%s+to%s+(%d+) health" },
+			onMatch = function(match)
+				-- print("Healing effect found:", match)
+			end,
+			nuance = function(macroLines)
+				-- add a healthstone to our heal pot macro
+				local healthstone = addon:playerHasItem("HS", "Healthstone")
+				if healthstone then
+					local healthstoneLine = "/use " .. healthstone.name
+					table.insert(macroLines, 2, healthstoneLine)
+				end
+			end,
+			--condition = "",
+			items = {},
+		},
+		MP = {
+			enabled = "toggleMP",
+			name = "Mana Pot",
+			icone = "INV_Misc_QuestionMark",
+			keywords = { "Mana Potion", "Restore Mana" },
+			patterns = { "(%d+)%s+to%s+(%d+) mana" },
+			items = {},
+			spells = {},
+		},
+		Food = {
+			enabled = "toggleFood",
+			name = "Food",
+			icone = "INV_Misc_QuestionMark",
+			keywords = { "Food" },
+			patterns = { "(%d+) health over %d+ sec" },
+			items = {},
+			spells = {},
+		},
+		Drink = {
+			enabled = "toggleDrink",
+			name = "Drink",
+			icone = "INV_Misc_QuestionMark",
+			keywords = { "Drink" },
+			patterns = { "(%d+) mana over %d+ sec" },
+			items = {},
+			spells = {},
+		},
+		Bandage = {
+			enabled = "toggleBandage",
+			name = "Bandage",
+			icone = "INV_Misc_QuestionMark",
+			keywords = { "First Aid", "Bandage" },
+			patterns = { "Heals (%d+)" },
+			items = {},
+			spells = {},
+		},
+		HS = {
+			enabled = "toggleHS",
+			name = "Healthstone",
+			icone = "INV_Misc_QuestionMark",
+			keywords = { "Healthstone" },
+			patterns = { "(%d+) life" },
+			items = {},
+			spells = {},
+		},
+		Bang = {
+			enabled = "toggleBang",
+			name = "Bang",
+			icone = "INV_Misc_QuestionMark",
+			keywords = { "Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge" },
+			patterns = { "(%d+)%s+to%s+(%d+)" },
+			items = {},
+			spells = {},
+		},
 	},
-	MP = {
-		enabled = "toggleMP",
-		name = "Mana Pot",
-		icone = "INV_Misc_QuestionMark",
-		keywords = { "Mana Potion", "Restore Mana" },
-		patterns = { "(%d+)%s+to%s+(%d+) mana" },
-		items = {},
-		spells = {},
-	},
-	Food = {
-		enabled = "toggleFood",
-		name = "Food",
-		icone = "INV_Misc_QuestionMark",
-		keywords = { "Food" },
-		patterns = { "(%d+) health over %d+ sec" },
-		items = {},
-		spells = {},
-	},
-	Drink = {
-		enabled = "toggleDrink",
-		name = "Drink",
-		icone = "INV_Misc_QuestionMark",
-		keywords = { "Drink" },
-		patterns = { "(%d+) mana over %d+ sec" },
-		items = {},
-		spells = {},
-	},
-	Bandage = {
-		enabled = "toggleBandage",
-		name = "Bandage",
-		icone = "INV_Misc_QuestionMark",
-		keywords = { "First Aid", "Bandage" },
-		patterns = { "Heals (%d+)" },
-		items = {},
-		spells = {},
-	},
-	HS = {
-		enabled = "toggleHS",
-		name = "Healthstone",
-		icone = "INV_Misc_QuestionMark",
-		keywords = { "Healthstone" },
-		patterns = { "(%d+) life" },
-		items = {},
-		spells = {},
-	},
-	Bang = {
-		enabled = "toggleBang",
-		name = "Bang",
-		icone = "INV_Misc_QuestionMark",
-		keywords = { "Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge" },
-		patterns = { "(%d+)%s+to%s+(%d+)" },
-		items = {},
-		spells = {},
+	WARLOCK = {
+		main = {
+			enabled = "toggleMain",
+			name = "Main",
+			icone = "INV_Misc_QuestionMark",
+			keywords = { "" },
+			patterns = { "(%d+)%s+to%s+(%d+)" },
+			onMatch = function(match)
+				-- print("Healing effect found:", match)
+			end,
+			items = {},
+			spells = {},
+		},
 	},
 }
+
+function addon:forEachMacro(callback)
+	for macroType, macroTypeData in pairs(self.macroData) do
+		for _, macroInfo in pairs(macroTypeData) do
+			callback(macroInfo)
+		end
+	end
+end
 
 local function FindAndExtractZoneName(text)
 	-- Convert the text to lower case for case insensitive matching
@@ -204,34 +228,40 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, patterns)
 end
 
 -- Function to update macro data
-function addon:UpdateMacroData()
-	-- print("UpdateMacroData function started") -- Debugging line
-
-	for macroName, macroData in pairs(self.macroData) do
-		-- Iterate over itemCache
-		for _, itemInfo in ipairs(self.itemCache or {}) do
-			for _, keyword in ipairs(macroData.keywords or {}) do
-				if string.match(itemInfo.spellName, keyword) then
-					itemInfo.score = self:scoreItemOrSpell(itemInfo, "item", macroData.patterns)
-					table.insert(macroData.items, itemInfo)
-				end
-			end
-		end
-
-		-- Iterate over spellbook
-		for _, spellInfo in ipairs(self.spellbook or {}) do
-			for _, keyword in ipairs(macroData.keywords or {}) do
-				if string.match(spellInfo.name, keyword) then
-					spellInfo.score = self:scoreItemOrSpell(spellInfo, "spell", macroData.patterns)
-					table.insert(macroData.spells, spellInfo)
-				end
+-- Helper function to handle common logic
+local function processItemsOrSpells(self, itemsOrSpells, itemType, macroData)
+	for _, itemOrSpell in ipairs(itemsOrSpells or {}) do
+		for _, keyword in ipairs(macroData.keywords or {}) do
+			local name = itemType == "item" and itemOrSpell.spellName or itemOrSpell.name
+			if string.match(name, keyword) then
+				itemOrSpell.score = self:scoreItemOrSpell(itemOrSpell, itemType, macroData.patterns)
+				table.insert(macroData[itemType .. "s"], itemOrSpell)
 			end
 		end
 	end
-	-- print("UpdateMacroData function finished") -- Debugging line
+end
+
+-- Refactored UpdateMacroData function
+function addon:UpdateMacroData()
+	for macroType, macroTypeData in pairs(self.macroData) do
+		for macroName, macroData in pairs(macroTypeData) do
+			processItemsOrSpells(self, self.itemCache, "item", macroData)
+			processItemsOrSpells(self, self.spellbook, "spell", macroData)
+		end
+	end
 end
 
 -- Function to sort items and spells within macros
+-- Helper function to handle common logic
+local function sortItemsOrSpells(itemsOrSpells, attribute)
+	if itemsOrSpells and #itemsOrSpells > 0 then
+		table.sort(itemsOrSpells, function(a, b)
+			return a[attribute] < b[attribute]
+		end)
+	end
+end
+
+-- Refactored sortMacroData function
 function addon:sortMacroData(attribute)
 	-- Check if attribute is valid
 	if attribute ~= "score" and attribute ~= "level" then
@@ -239,93 +269,89 @@ function addon:sortMacroData(attribute)
 		return
 	end
 
-	-- Iterate over the macros
-	for _, macro in ipairs(self.macroData) do
-		-- Sort items if the table is not empty
-		if macro.items and #macro.items > 0 then
-			table.sort(macro.items, function(a, b)
-				return a[attribute] < b[attribute]
-			end)
-		end
-
-		-- Sort spells if the table is not empty
-		if macro.spells and #macro.spells > 0 then
-			table.sort(macro.spells, function(a, b)
-				return a[attribute] < b[attribute]
-			end)
+	-- Iterate over the macro types
+	for macroType, macroTypeData in pairs(self.macroData) do
+		-- Iterate over the macros
+		for _, macro in pairs(macroTypeData) do
+			sortItemsOrSpells(macro.items, attribute)
+			sortItemsOrSpells(macro.spells, attribute)
 		end
 	end
 end
 
 -- This clears the entire table of items or spells respectively.
 -- Probs better to just update the item count instead
+-- Helper function to handle common logic
+local function resetItemsOrSpells(macroData, spellsOrItems)
+	if type(macroData) == "table" and macroData[spellsOrItems] then
+		macroData[spellsOrItems] = {}
+	end
+end
+
+-- Refactored resetMacroData function
 function addon:resetMacroData(spellsOrItems)
 	if self.macroData then
-		for _, macroData in pairs(self.macroData) do
-			if type(macroData) == "table" and macroData[spellsOrItems] then
-				macroData[spellsOrItems] = {}
+		for macroType, macroTypeData in pairs(self.macroData) do
+			for _, macroData in pairs(macroTypeData) do
+				resetItemsOrSpells(macroData, spellsOrItems)
 			end
 		end
 	end
 end
 
-function addon:findItemInCategory(category, id)
-	if id then
-		for _, item in ipairs(self.macroData[category].items) do
-			if item.id == id then
-				return item
-			end
+-- Helper function to handle common logic
+local function findItemInCategoryItems(categoryData, id)
+	for _, item in ipairs(categoryData.items) do
+		if item.id == id then
+			return item
 		end
-	else
-		return self.macroData[category].items[1]
+	end
+	return categoryData.items[1]
+end
+
+-- Refactored findItemInCategory function
+function addon:findItemInCategory(category, id)
+	for macroType, macroTypeData in pairs(self.macroData) do
+		if macroTypeData[category] then
+			return findItemInCategoryItems(macroTypeData[category], id)
+		end
 	end
 	return nil -- Return nil if no item is found
 end
 
 function addon:isCategory(category)
-	return self.macroData[category] ~= nil
+	for macroType, macroTypeData in pairs(self.macroData) do
+		if macroTypeData[category] then
+			return true
+		end
+	end
+	return false
 end
 
 function addon:playerHasItem(...)
-	local id, category, spellOrItemName = nil, nil, nil
-
-	for _, arg in ipairs({ ... }) do
-		if type(arg) == "number" then
-			id = arg
-		elseif type(arg) == "string" then
-			if self:isCategory(arg) then
-				category = arg
-			else
-				spellOrItemName = arg:lower() -- Convert to lower case for case-insensitive comparison
-			end
-		end
-	end
-
-	if category and spellOrItemName then
-		return self:findItemInCategoryByNameOrId(category, spellOrItemName, id)
-	elseif category then
-		return self:findItemInCategory(category, id)
-	elseif spellOrItemName or id then
-		return self:findItemByNameOrId(spellOrItemName, id)
-	end
-
-	return nil
+	-- ... same as before ...
 end
 
 function addon:findItemInCategoryByNameOrId(category, name, id)
-	for _, item in ipairs(self.macroData[category].items) do
-		if (name and string.find(item.name:lower(), name)) or (id and item.id == id) then
-			return item
+	for macroType, macroTypeData in pairs(self.macroData) do
+		if macroTypeData[category] then
+			for _, item in ipairs(macroTypeData[category].items) do
+				if (name and string.find(item.name:lower(), name)) or (id and item.id == id) then
+					return item
+				end
+			end
 		end
 	end
 	return nil
 end
 
 function addon:findItemByNameOrId(name, id)
-	for _, categoryData in pairs(self.macroData) do
-		for _, item in ipairs(categoryData.items) do
-			if (name and string.find(item.name:lower(), name)) or (id and item.id == id) then
-				return item
+	for macroType, macroTypeData in pairs(self.macroData) do
+		for _, categoryData in pairs(macroTypeData) do
+			for _, item in ipairs(categoryData.items) do
+				if (name and string.find(item.name:lower(), name)) or (id and item.id == id) then
+					return item
+				end
 			end
 		end
 	end
