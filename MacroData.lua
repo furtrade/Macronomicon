@@ -283,6 +283,9 @@ local function processItemsOrSpells(self, categoryKey, macroKey, macroData)
 	local keywords = macroData.keywords or {}
 	local entryTypes = { "item", "spell" }
 
+	-- Create a table to store the names of the items that have been matched
+	local matchedItems = {}
+
 	for _, entryType in ipairs(entryTypes) do
 		local entries = entryType == "item" and self.itemCache or self.spellbook
 
@@ -291,11 +294,17 @@ local function processItemsOrSpells(self, categoryKey, macroKey, macroData)
 			local isMatch = any(keywords, function(keyword) return string.match(name, keyword) end)
 
 			if isMatch then
-				entry.score = self:scoreItemOrSpell(entry, entryType, macroData)
-				if entryType == "item" then
-					self:addItem(categoryKey, macroKey, entry)
-				else
-					self:addSpell(categoryKey, macroKey, entry)
+				-- Check if the item has already been matched
+				if not matchedItems[name] then
+					-- If the item has not been matched, add it to the matchedItems table
+					matchedItems[name] = true
+
+					entry.score = self:scoreItemOrSpell(entry, entryType, macroData)
+					if entryType == "item" then
+						self:addItem(categoryKey, macroKey, entry)
+					else
+						self:addSpell(categoryKey, macroKey, entry)
+					end
 				end
 			end
 		end
@@ -332,17 +341,16 @@ end
 -- Refactored sortMacroData function
 function addon:sortMacroData(attribute)
 	-- Check if attribute is valid
-	if attribute ~= "score" and attribute ~= "level" then
-		-- print("Invalid attribute. Please use 'score' or 'level'.")
+	if attribute ~= ("score" or "level") then
 		return
 	end
 
 	-- Iterate over the macro types
-	for macroType, macroTypeData in pairs(self.macroData) do
+	for categoryKey, categoryData in pairs(self.macroData) do
 		-- Iterate over the macros
-		for _, macro in pairs(macroTypeData) do
-			sortItemsOrSpells(macro.items, attribute)
-			sortItemsOrSpells(macro.spells, attribute)
+		for macroKey, macroData in pairs(categoryData) do
+			sortItemsOrSpells(macroData.items, attribute)
+			sortItemsOrSpells(macroData.spells, attribute)
 		end
 	end
 end
@@ -434,7 +442,6 @@ function addon:spellsBy(category, type)
 	return self.macroData[category][type].spells
 end
 
--- Function to add an item to the macroData table with timestamp and duplicate removal
 function addon:addItem(categoryKey, macroKey, item)
 	-- Add a timestamp to the item
 	item.timestamp = GetTime()
@@ -442,9 +449,9 @@ function addon:addItem(categoryKey, macroKey, item)
 	-- Get the items for the given category and macroKey
 	local items = self.macroData[categoryKey][macroKey].items
 
-	-- Remove items with the same name that have an older timestamp
+	-- Remove items with the same name
 	for i = #items, 1, -1 do
-		if items[i].name == item.name and items[i].timestamp < item.timestamp then
+		if items[i].name == item.name then
 			table.remove(items, i)
 		end
 	end
@@ -455,19 +462,54 @@ end
 
 function addon:addSpell(categoryKey, macroKey, spell)
 	-- Add a timestamp to the item
-	-- local currentTime = GetTime()
 	spell.timestamp = GetTime()
 
 	-- Get the items for the given category and macroKey
 	local spells = self.macroData[categoryKey][macroKey].spells
 
-	-- Remove items with the same name that have an older timestamp
+	-- Remove items with the same name
 	for i = #spells, 1, -1 do
-		if spells[i].name == spell.name and spells[i].timestamp < spell.timestamp then
+		if spells[i].name == spell.name then
 			table.remove(spells, i)
 		end
 	end
 
 	-- Insert the item into the table
 	table.insert(spells, spell)
+end
+
+function addon:PrintItemLinks(categoryKey, macroKey)
+	-- Check if the items exist for the given categoryKey and macroKey
+	if self.macroData[categoryKey] and self.macroData[categoryKey][macroKey] and self.macroData[categoryKey][macroKey].items then
+		-- Print a header for the item links
+		print(string.format("=== Item Links for %s - %s ===", categoryKey, macroKey))
+
+		-- Iterate over the items
+		for i, item in ipairs(self.macroData[categoryKey][macroKey].items) do
+			-- Check if the item has a link and print it
+			if item.link then
+				print(string.format("Item %d: %s", i, item.link))
+			end
+		end
+
+		-- Print a footer for the item links
+		print("=== End of Item Links ===")
+	else
+		print(string.format("No items found for category: %s, macro: %s.", categoryKey, macroKey))
+	end
+end
+
+function addon:PrintAllItemLinks()
+	-- Check if macroData exists
+	if self.macroData then
+		-- Loop over the macroData table
+		for categoryKey, categoryValue in pairs(self.macroData) do
+			for macroKey, _ in pairs(categoryValue) do
+				-- Call the PrintItemLinks function for each categoryKey and macroKey
+				self:PrintItemLinks(categoryKey, macroKey)
+			end
+		end
+	else
+		print("No macro data found.")
+	end
 end

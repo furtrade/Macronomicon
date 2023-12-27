@@ -127,6 +127,7 @@ function addon:doTheThing()
 		addon:UpdateMacroData()
 		addon:sortMacroData("score")
 		addon:ProcessMacros()
+		addon:PrintAllItemLinks()
 		-- self:Print("Done.") -- debugging
 		return true
 	end
