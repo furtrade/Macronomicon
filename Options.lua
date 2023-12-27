@@ -11,81 +11,74 @@ addon.options = {
 	name = addon.title,
 	handler = addon,
 	args = {
-		toggleMain = {
-			type = "toggle",
-			order = 0,
-			name = "Main",
-			desc = "Primary spammable attack macro",
-			get = "GetValue",
-			set = "SetValue",
-		},
-		toggleHP = {
-			type = "toggle",
+		mainGroup = {
+			type = "group",
+			name = "Macros",
 			order = 1,
-			name = "Health Potion",
-			desc = "Manage health potions macro",
-			get = "GetValue",
-			set = "SetValue",
-			-- inline getter/setter example
-			-- get = function(info) return addon.db.profile.toggleHP end,
-			-- set = function(info, value) addon.db.profile.toggleHP = value end,
+			inline = true,
+			args = {
+				macroSelect = {
+					type = "select",
+					order = 0,
+					name = "Select Macro",
+					desc = "Select a macro to manage",
+					values = {
+						["toggleMain"] = "Main",
+						["toggleHP"] = "Health Potion",
+						["toggleMP"] = "Mana Potion",
+						["toggleFood"] = "Food",
+						["toggleDrink"] = "Drink",
+						["toggleBandage"] = "Bandage",
+						["toggleHS"] = "Healthstone",
+						["toggleBang"] = "Bang",
+					},
+					get = "GetSelectedMacro",
+					set = "SetSelectedMacro",
+				},
+			},
 		},
-		toggleMP = {
-			type = "toggle",
-			order = 1.2,
-			name = "Mana Potion",
-			desc = "Manage mana potions macro",
-			-- inline getter/setter example
-			get = "GetValue",
-			set = "SetValue",
-		},
-		toggleFood = {
-			type = "toggle",
-			order = 1.4,
-			name = "Food",
-			desc = "Manage food macro",
-			-- inline getter/setter example
-			get = "GetValue",
-			set = "SetValue",
-		},
-		toggleDrink = {
-			type = "toggle",
-			order = 1.6,
-			name = "Drink",
-			desc = "Manage drink macro",
-			-- inline getter/setter example
-			get = "GetValue",
-			set = "SetValue",
-		},
-		toggleBandage = {
-			type = "toggle",
-			order = 1.8,
-			name = "Bandage",
-			desc = "Manage bandage macro",
-			-- inline getter/setter example
-			get = "GetValue",
-			set = "SetValue",
-		},
-		toggleHS = {
-			type = "toggle",
+		optionsGroup = {
+			type = "group",
+			name = "Options",
 			order = 2,
-			name = "Healthstone",
-			desc = "Manage healthstone macro",
-			-- inline getter/setter example
-			get = "GetValue",
-			set = "SetValue",
-		},
-		toggleBang = {
-			type = "toggle",
-			order = 2.2,
-			name = "Bang",
-			desc = "Manage bang macro",
-			-- inline getter/setter example
-			get = "GetValue",
-			set = "SetValue",
+			inline = true,
+			args = {
+				-- Options for the selected macro
+				-- These options will be dynamically updated based on the selected macro
+			},
 		},
 	},
 }
+
+function addon:GetSelectedMacro(info)
+	return self.db.profile.selectedMacro
+end
+
+function addon:SetSelectedMacro(info, value)
+	self.db.profile.selectedMacro = value
+	-- Update the options for the selected macro
+	self:UpdateOptions(value)
+end
+
+function addon:UpdateOptions(selectedMacro)
+	-- Update the args of the optionsGroup based on the selected macro
+	self.options.args.optionsGroup.args = self:GetOptionsForMacro(selectedMacro)
+end
+
+function addon:GetOptionsForMacro(macro)
+	-- Return the options for the given macro
+	local options = {
+		toggleOption = {
+			type = "toggle",
+			order = 0,
+			name = macro,
+			desc = "Manage " .. macro .. " macro",
+			get = "GetValue",
+			set = "SetValue",
+		},
+	}
+	return options
+end
 
 function addon:GetValue(info)
 	return self.db.profile[info[#info]]
