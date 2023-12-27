@@ -79,8 +79,47 @@ function addon:GetOptionsForMacro(macro)
 			get = "GetToggle",
 			set = "SetToggle",
 		},
+		itemLinks = {
+			type = "input",
+			order = 1,
+			name = "Item Links",
+			desc = "The item links for the " .. macro .. " macro",
+			multiline = 10,
+			get = function() return self:GetItemLinksForMacro(macro) end,
+			set = function() end, -- Read-only, so no set function
+		},
 	}
 	return options
+end
+
+function addon:GetItemLinksForMacro(macro)
+	-- Initialize the item links string as empty
+	local itemLinksString = ""
+
+	-- Define the callback function
+	local function callback(macroInfo)
+		-- Check if the macroInfo is the selected macro
+		if macroInfo.name == macro and macroInfo.items then
+			-- Initialize an empty table to hold the item links
+			local itemLinks = {}
+
+			-- Extract the link from each item and add it to the itemLinks table
+			for i = 1, #macroInfo.items do
+				local item = macroInfo.items[i]
+				if item.link then
+					table.insert(itemLinks, item.link)
+				end
+			end
+
+			-- Convert the itemLinks table to a string
+			itemLinksString = table.concat(itemLinks, "\n")
+		end
+	end
+
+	-- Use the forEachMacro function to apply the callback to each macro
+	self:forEachMacro(callback)
+
+	return itemLinksString
 end
 
 function addon:GetToggle(info)
