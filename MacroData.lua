@@ -279,27 +279,42 @@ function addon:scoreItemOrSpell(itemOrSpell, isOfTypeItemOrSpell, macroInfo)
 	return average
 end
 
--- Function to update macro data
--- Helper function to handle common logic
-local function processItemsOrSpells(self, itemsOrSpells, itemType, macroData)
-	for _, itemOrSpell in ipairs(itemsOrSpells or {}) do
-		for _, keyword in ipairs(macroData.keywords or {}) do
-			local name = itemType == "item" and itemOrSpell.spellName or itemOrSpell.name
-			if string.match(name, keyword) then
-				itemOrSpell.score = self:scoreItemOrSpell(itemOrSpell, itemType, macroData)
-				table.insert(macroData[itemType .. "s"], itemOrSpell)
-				-- print(itemOrSpell.link, itemOrSpell.score)
+local function processItemsOrSpells(self, categoryKey, macroKey, macroData)
+	local keywords = macroData.keywords or {}
+	local entryTypes = { "item", "spell" }
+
+	for _, entryType in ipairs(entryTypes) do
+		local entries = entryType == "item" and self.itemCache or self.spellbook
+
+		for _, entry in ipairs(entries or {}) do
+			local name = entry.name
+			local isMatch = any(keywords, function(keyword) return string.match(name, keyword) end)
+
+			if isMatch then
+				entry.score = self:scoreItemOrSpell(entry, entryType, macroData)
+				if entryType == "item" then
+					self:addItem(categoryKey, macroKey, entry)
+				else
+					self:addSpell(categoryKey, macroKey, entry)
+				end
 			end
 		end
 	end
 end
 
+-- Helper function to check if any element in a table satisfies a condition
+function any(t, condition)
+	for _, v in ipairs(t) do
+		if condition(v) then return true end
+	end
+	return false
+end
+
 -- Refactored UpdateMacroData function
 function addon:UpdateMacroData()
-	for macroType, macroTypeData in pairs(self.macroData) do
-		for macroName, macroData in pairs(macroTypeData) do
-			processItemsOrSpells(self, self.itemCache, "item", macroData)
-			processItemsOrSpells(self, self.spellbook, "spell", macroData)
+	for categoryKey, categoryData in pairs(self.macroData) do
+		for macroKey, macroData in pairs(categoryData) do
+			processItemsOrSpells(self, categoryKey, macroKey, macroData)
 		end
 	end
 end
@@ -409,4 +424,50 @@ function addon:findItemByNameOrId(name, id)
 		end
 	end
 	return nil
+end
+
+function addon:itemsBy(category, type)
+	return self.macroData[category][type].items
+end
+
+function addon:spellsBy(category, type)
+	return self.macroData[category][type].spells
+end
+
+-- Function to add an item to the macroData table with timestamp and duplicate removal
+function addon:addItem(categoryKey, macroKey, item)
+	-- Add a timestamp to the item
+	item.timestamp = GetTime()
+
+	-- Get the items for the given category and macroKey
+	local items = self.macroData[categoryKey][macroKey].items
+
+	-- Remove items with the same name that have an older timestamp
+	for i = #items, 1, -1 do
+		if items[i].name == item.name and items[i].timestamp < item.timestamp then
+			table.remove(items, i)
+		end
+	end
+
+	-- Insert the item into the table
+	table.insert(items, item)
+end
+
+function addon:addSpell(categoryKey, macroKey, spell)
+	-- Add a timestamp to the item
+	-- local currentTime = GetTime()
+	spell.timestamp = GetTime()
+
+	-- Get the items for the given category and macroKey
+	local spells = self.macroData[categoryKey][macroKey].spells
+
+	-- Remove items with the same name that have an older timestamp
+	for i = #spells, 1, -1 do
+		if spells[i].name == spell.name and spells[i].timestamp < spell.timestamp then
+			table.remove(spells, i)
+		end
+	end
+
+	-- Insert the item into the table
+	table.insert(spells, spell)
 end
