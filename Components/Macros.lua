@@ -16,7 +16,20 @@ end
 
 -- Checks if a macro is enabled in the addon's settings (2nd to execute)
 function addon:isMacroEnabled(macroKey)
-	return addon.db.profile[macroKey]
+	-- Check if the database is initialized
+	if not self.db then
+		print("Error: Database is not initialized")
+		return false
+	end
+
+	-- Check if the macroKey exists in the profile
+	if self.db.profile[macroKey] == nil then
+		print("Error: Macro key '" .. macroKey .. "' does not exist in the profile")
+		return false
+	end
+
+	-- Return the value of the toggleOption for the macroKey
+	return self.db.profile[macroKey].toggleOption
 end
 
 -- Handles creation or update of a macro (3rd to execute)

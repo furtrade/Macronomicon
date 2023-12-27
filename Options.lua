@@ -2,7 +2,10 @@ local addonName, addon = ...
 
 addon.defaults = {
 	profile = {
-		["*"] = true,
+		["*"] = {
+			toggleOption = true
+		},
+		selectedMacro = "",
 	},
 }
 
@@ -23,14 +26,14 @@ addon.options = {
 					name = "Select Macro",
 					desc = "Select a macro to manage",
 					values = {
-						["toggleMain"] = "Main",
-						["toggleHP"] = "Health Potion",
-						["toggleMP"] = "Mana Potion",
-						["toggleFood"] = "Food",
-						["toggleDrink"] = "Drink",
-						["toggleBandage"] = "Bandage",
-						["toggleHS"] = "Healthstone",
-						["toggleBang"] = "Bang",
+						["Main"] = "Main",
+						["HP"] = "Health Potion",
+						["MP"] = "Mana Potion",
+						["Food"] = "Food",
+						["Drink"] = "Drink",
+						["Bandage"] = "Bandage",
+						["HS"] = "Healthstone",
+						["Bang"] = "Bang",
 					},
 					get = "GetSelectedMacro",
 					set = "SetSelectedMacro",
@@ -68,16 +71,29 @@ end
 function addon:GetOptionsForMacro(macro)
 	-- Return the options for the given macro
 	local options = {
-		toggleOption = {
+		["toggle" .. macro] = {
 			type = "toggle",
 			order = 0,
-			name = macro,
+			name = "Toggle",
 			desc = "Manage " .. macro .. " macro",
-			get = "GetValue",
-			set = "SetValue",
+			get = "GetToggle",
+			set = "SetToggle",
 		},
 	}
 	return options
+end
+
+function addon:GetToggle(info)
+	local macroKey = info[#info]
+	return self.db.profile[macroKey].toggleOption
+end
+
+function addon:SetToggle(info, value)
+	local macroKey = info[#info]
+	if not self.db.profile[macroKey] then
+		self.db.profile[macroKey] = {}
+	end
+	self.db.profile[macroKey].toggleOption = value
 end
 
 function addon:GetValue(info)
