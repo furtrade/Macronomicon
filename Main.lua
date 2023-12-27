@@ -125,10 +125,8 @@ function addon:doTheThing()
 		addon:UpdateItemCache()
 		addon:UpdateSpellbook()
 		addon:UpdateMacroData()
-		addon:sortMacroData("score")
 		addon:ProcessMacros()
-		addon:PrintAllItemLinks()
-		-- self:Print("Done.") -- debugging
+		--addon:PrintAllItemLinks()
 		return true
 	end
 end

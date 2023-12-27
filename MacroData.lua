@@ -326,6 +326,8 @@ function addon:UpdateMacroData()
 			processItemsOrSpells(self, categoryKey, macroKey, macroData)
 		end
 	end
+
+	addon:sortMacroData("level")
 end
 
 -- Function to sort items and spells within macros
