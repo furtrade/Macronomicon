@@ -79,14 +79,60 @@ function addon:GetOptionsForMacro(macro)
 			get = "GetToggle",
 			set = "SetToggle",
 		},
+		spacer1 = {
+			type = "description",
+			order = 1,
+			name = "",
+		},
 		itemLinks = {
 			type = "input",
-			order = 1,
+			order = 2,
 			name = "Item Links",
 			desc = "The item links for the " .. macro .. " macro",
 			multiline = 10,
 			get = function() return self:GetItemLinksForMacro(macro) end,
 			set = function() end, -- Read-only, so no set function
+		},
+		spacer2 = {
+			type = "description",
+			order = 3,
+			name = "",
+		},
+		customMacroHeader = {
+			type = "header",
+			order = 4,
+			name = "Custom Macro",
+		},
+		customMacro = {
+			name = "Toggle Custom Macro",
+			desc = "This will replace the default macro, granting you direct control over the macro string",
+			type = "toggle",
+			set = function(info, val) addon.db.profile[macro].customMacroEnabled = val end,
+			get = function(info) return addon.db.profile[macro].customMacroEnabled end,
+			order = 5,
+		},
+		spacer3 = {
+			type = "description",
+			order = 6,
+			name = "",
+		},
+		macroString = {
+			type = "input",
+			name = "Macro String",
+			desc = "Edit the macro string",
+			multiline = 10,
+			set = function(info, val) addon.db.profile[macro].macroString = val end,
+			get = function(info) return addon.db.profile[macro].macroString end,
+			order = 7,
+		},
+		parameters = {
+			type = "input",
+			name = "Parameters",
+			desc = "Add parameters separated by commas",
+			multiline = 10,
+			set = function(info, val) addon.db.profile[macro].parameters = val end,
+			get = function(info) return addon.db.profile[macro].parameters end,
+			order = 8,
 		},
 	}
 	return options
