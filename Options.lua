@@ -25,18 +25,16 @@ addon.options = {
 					order = 0,
 					name = "Select Macro",
 					desc = "Select a macro to manage",
-					values = {
-						["Main"] = "Main",
-						["HP"] = "Health Potion",
-						["MP"] = "Mana Potion",
-						["Food"] = "Food",
-						["Drink"] = "Drink",
-						["Bandage"] = "Bandage",
-						["HS"] = "Healthstone",
-						["Bang"] = "Bang",
-					},
+					values = function() return addon:GetMacroNames() end, -- Use the function here
 					get = "GetSelectedMacro",
 					set = "SetSelectedMacro",
+				},
+				createCustomMacro = {
+					type = "execute",
+					order = 1,
+					name = "Create Custom Macro",
+					desc = "Create a new custom macro",
+					func = "CreateCustomMacro",
 				},
 			},
 		},
@@ -52,6 +50,21 @@ addon.options = {
 		},
 	},
 }
+
+-- Define the function that returns a table of macro names
+function addon:GetMacroNames()
+	local macroNames = {}
+
+	-- Iterate over all categories of macros
+	for _, macroCategory in pairs(self.macroData) do
+		-- Add the names of the macros in the current category
+		for macroName, _ in pairs(macroCategory) do
+			macroNames[macroName] = macroName
+		end
+	end
+
+	return macroNames
+end
 
 function addon:GetSelectedMacro(info)
 	return self.db.profile.selectedMacro
@@ -87,8 +100,8 @@ function addon:GetOptionsForMacro(macro)
 		itemLinks = {
 			type = "input",
 			order = 2,
-			name = "Item Links",
-			desc = "The item links for the " .. macro .. " macro",
+			name = "Audit",
+			desc = "The items found for the " .. macro .. " macro",
 			multiline = 10,
 			get = function() return self:GetItemLinksForMacro(macro) end,
 			set = function() end, -- Read-only, so no set function
