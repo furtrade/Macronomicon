@@ -29,6 +29,7 @@ Options.lua
 MacroData.lua
 
 Components\Inventory.lua
+Components\MacroPatcher.lua
 Components\Macros.lua
 Components\Spellbook.lua
 Components\Tooltip.lua

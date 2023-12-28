@@ -2,7 +2,7 @@ local addonName, addon = ...
 
 -- Entry point for processing macros (1st to execute)
 -- Iterates over macro data and processes each macro
-function addon:ProcessMacros(macroTables)
+--[[ function addon:ProcessMacros(macroTables)
 	macroTables = macroTables or addon.macroData
 
 	for macroType, macroTypeData in pairs(macroTables) do
@@ -12,7 +12,7 @@ function addon:ProcessMacros(macroTables)
 			end
 		end
 	end
-end
+end ]]
 
 -- Checks if a macro is enabled in the addon's settings (2nd to execute)
 function addon:isMacroEnabled(macroKey)
@@ -60,10 +60,10 @@ function addon:createMacro(macroType, name)
 end
 
 -- Updates an existing macro with new content (7th to execute)
-function addon:updateMacro(macroName, macroInfo)
+--[[ function addon:updateMacro(macroName, macroInfo)
 	local macroString = self:buildMacroString(macroInfo)
 	EditMacro(macroName, macroName, macroInfo.icon, macroString)
-end
+end ]]
 
 function addon:selectElement(t)
 	local selectedElement = nil

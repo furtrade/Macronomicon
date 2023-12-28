@@ -36,6 +36,15 @@ addon.options = {
 					desc = "Create a new custom macro",
 					func = "CreateCustomMacro",
 				},
+				deleteCustomMacro = {
+					type = "execute",
+					order = 2,
+					name = "Delete Custom Macro",
+					desc = "Delete the selected custom macro",
+					func = "DeleteCustomMacro",
+					confirm = true,
+					confirmText = "Are you sure you want to delete the selected custom macro?",
+				},
 			},
 		},
 		optionsGroup = {
@@ -66,14 +75,107 @@ function addon:GetMacroNames()
 	return macroNames
 end
 
+local AceGUI = LibStub("AceGUI-3.0")
+
+function addon:CreateCustomMacro()
+	-- Create a new frame
+	local frame = AceGUI:Create("Frame")
+	frame:SetTitle("Enter Macro Name")
+	frame:SetWidth(200)
+	frame:SetHeight(100)
+
+	-- Create an edit box
+	local editBox = AceGUI:Create("EditBox")
+	editBox:SetLabel("Macro Name")
+	editBox:SetWidth(180)
+	frame:AddChild(editBox)
+
+	-- Set the callback for the edit box
+	editBox:SetCallback("OnEnterPressed", function(widget, event, text)
+		local macroKey = text
+
+		-- Check if the macroKey is not empty
+		if macroKey and macroKey ~= "" then
+			-- Create a new macroInfo table for the custom macro
+			local macroInfo = {
+				name = macroKey,
+				type = "custom",
+				icon = "Interface\\Icons\\INV_Misc_QuestionMark", -- Placeholder icon
+				superMacro = "",                      -- Placeholder super macro
+				enabled = true,
+			}
+
+			-- Save the new custom macro to the database
+			self.db.profile[macroKey] = macroInfo
+
+			-- Update the macroData table
+			self:loadCustomMacros()
+
+			-- Update the macroSelect values
+			self.options.args.mainGroup.args.macroSelect.values = self:GetMacroNames()
+
+			-- Select the new custom macro
+			if self.db.profile[macroKey] then
+				self:SetSelectedMacro(macroKey)
+			end
+
+			-- Close the frame
+			frame:Release()
+		else
+			print("Please enter a valid macro name.")
+		end
+	end)
+end
+
+function addon:DeleteCustomMacro()
+	local macroKey = self.db.profile.selectedMacro
+	if type(macroKey) == "table" and macroKey.name then
+		macroKey = macroKey.name
+	end
+	-- Check if macroKey is a string
+	if type(macroKey) ~= "string" then
+		print("Invalid macro key: " .. tostring(macroKey))
+		return
+	end
+
+	-- Check if the macro exists
+	if self.db.profile[macroKey] then
+		-- Delete the macro
+		self.db.profile[macroKey] = nil
+
+		-- Delete the macro from the macroData table
+		self.macroData.CUSTOM[macroKey] = nil
+
+		-- Update the macroData table
+		self:loadCustomMacros()
+
+		-- Update the macroSelect values
+		self.options.args.mainGroup.args.macroSelect.values = self:GetMacroNames()
+
+		-- Select a default macro after deletion
+		-- You can modify this part according to your needs
+		if next(self.db.profile) then
+			self:SetSelectedMacro(next(self.db.profile))
+		end
+	else
+		print("Macro does not exist: " .. macroKey)
+	end
+end
+
 function addon:GetSelectedMacro(info)
 	return self.db.profile.selectedMacro
 end
 
 function addon:SetSelectedMacro(info, value)
-	self.db.profile.selectedMacro = value
-	-- Update the options for the selected macro
-	self:UpdateOptions(value)
+	-- Check if the value is not nil and exists in the database
+	if value and self.db.profile[value] then
+		self.db.profile.selectedMacro = value
+		print(value)
+		-- Update the options for the selected macro
+		self:UpdateOptions(value)
+	else
+		print("Macro does not exist: " .. tostring(value))
+	end
 end
 
 function addon:UpdateOptions(selectedMacro)
