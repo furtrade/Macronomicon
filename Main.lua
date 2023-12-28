@@ -32,11 +32,8 @@ function addon:OnInitialize()
 	self:RegisterChatCommand(addon.title, "SlashCommand")
 	self:RegisterChatCommand("mbl", "SlashCommand")
 
-	-- Update the options for the selected macro
-	local selectedMacro = self.db.profile.selectedMacro
-	if selectedMacro then
-		self:UpdateOptions(selectedMacro)
-	end
+	-- initialize the selected macro
+	addon:InitializeSelectedMacro()
 end
 
 function addon:OnEnable()

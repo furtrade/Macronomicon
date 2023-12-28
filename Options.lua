@@ -87,7 +87,7 @@ function addon:CreateCustomMacro()
 	-- Create an edit box
 	local editBox = AceGUI:Create("EditBox")
 	editBox:SetLabel("Macro Name")
-	editBox:SetWidth(180)
+	editBox:SetWidth(300)
 	frame:AddChild(editBox)
 
 	-- Set the callback for the edit box
@@ -100,23 +100,26 @@ function addon:CreateCustomMacro()
 			local macroInfo = {
 				name = macroKey,
 				type = "custom",
-				icon = "Interface\\Icons\\INV_Misc_QuestionMark", -- Placeholder icon
-				superMacro = "",                      -- Placeholder super macro
+				icon = "INV_Misc_QuestionMark", -- Placeholder icon
+				superMacro = "",    -- Placeholder super macro
 				enabled = true,
 			}
 
 			-- Save the new custom macro to the database
 			self.db.profile[macroKey] = macroInfo
-
 			-- Update the macroData table
 			self:loadCustomMacros()
 
 			-- Update the macroSelect values
-			self.options.args.mainGroup.args.macroSelect.values = self:GetMacroNames()
+			addon.options.args.mainGroup.args.macroSelect.values = self:GetMacroNames()
+			-- print the values of the macroSelect
+			for k, v in pairs(self:GetMacroNames()) do
+				print(k, v)
+			end
 
 			-- Select the new custom macro
 			if self.db.profile[macroKey] then
-				self:SetSelectedMacro(macroKey)
+				self:SetSelectedMacro(nil, macroKey)
 			end
 
 			-- Close the frame
@@ -140,23 +143,12 @@ function addon:DeleteCustomMacro()
 
 	-- Check if the macro exists
 	if self.db.profile[macroKey] then
-		-- Delete the macro
 		self.db.profile[macroKey] = nil
 
-		-- Delete the macro from the macroData table
 		self.macroData.CUSTOM[macroKey] = nil
 
-		-- Update the macroData table
-		self:loadCustomMacros()
-
-		-- Update the macroSelect values
 		self.options.args.mainGroup.args.macroSelect.values = self:GetMacroNames()
-
-		-- Select a default macro after deletion
-		-- You can modify this part according to your needs
-		if next(self.db.profile) then
-			self:SetSelectedMacro(next(self.db.profile))
-		end
+		addon:InitializeSelectedMacro()
 	else
 		print("Macro does not exist: " .. macroKey)
 	end
@@ -167,20 +159,44 @@ function addon:GetSelectedMacro(info)
 end
 
 function addon:SetSelectedMacro(info, value)
-	-- Check if the value is not nil and exists in the database
-	if value and self.db.profile[value] then
-		self.db.profile.selectedMacro = value
-		print(value)
-		-- Update the options for the selected macro
-		self:UpdateOptions(value)
-	else
-		print("Macro does not exist: " .. tostring(value))
+	-- If no value is provided or the value does not exist in the database, select the next value in the db.profile table
+	if not value or not self.db.profile[value] then
+		value = next(self.db.profile)
+		if not value then
+			print("No macros available to select.")
+			return
+		end
 	end
+
+	-- Set the value as the selected macro and update the options
+	self.db.profile.selectedMacro = value
+	self:InsertOptioins(value)
 end
 
-function addon:UpdateOptions(selectedMacro)
+function addon:InsertOptioins(selectedMacro)
 	-- Update the args of the optionsGroup based on the selected macro
 	self.options.args.optionsGroup.args = self:GetOptionsForMacro(selectedMacro)
+end
+
+function addon:InitializeSelectedMacro()
+	-- Get the selected macro
+	local selectedMacro = self.db.profile.selectedMacro
+
+	-- If the selected macro is nil, initialize it with a default macro
+	if not selectedMacro then
+		-- Use the first macro in the database as the default macro
+		local defaultMacro = next(self.db.profile)
+		if defaultMacro then
+			self:SetSelectedMacro(nil, defaultMacro)
+			selectedMacro = defaultMacro
+		else
+			print("No macros available to select.")
+			return
+		end
+	end
+
+	-- Update the options for the selected macro
+	self:InsertOptioins(selectedMacro)
 end
 
 function addon:GetOptionsForMacro(macro)
