@@ -29,15 +29,17 @@ function addon:loadCustomMacros()
     self.macroData.CUSTOM = customMacros
 end
 
-function addon:updateMacro(macroName, macroInfo)
+function addon:updateMacro(macroInfo)
     local macroString
     if macroInfo.isCustom == true then
         -- If it's a custom macro, get the string from the super macro
-        macroString = self:patchMacro(macroInfo.superMacro)
+        macroString = self:patchMacro(macroInfo)
     else
         -- Otherwise, build the macro string as normal
         macroString = self:buildMacroString(macroInfo)
     end
+
+    local macroName = self:getMacroName(macroInfo.name)
     EditMacro(macroName, macroName, macroInfo.icon, macroString)
 end
 
@@ -71,10 +73,25 @@ end ]]
 addon.rules = {
     -- Define a rule for the "known" condition
     known = {
-        condition = "known:",
+        condition = "[Kk][Nn][Oo][Ww][Nn]:",
         onMatch = function(line)
-            -- Perform some manipulations on the line and return the new line
-            -- This is just a placeholder. Replace it with your actual implementation.
+            -- Extract the spell name from the line
+            local spellToCheck = line:match("[Kk][Nn][Oo][Ww][Nn]:([^,%]]+)")
+            -- Trim leading and trailing whitespace
+            spellToCheck = spellToCheck:match("^%s*(.-)%s*$"):lower()
+
+            -- Check if the spell name is in addon.spellbook
+            for _, spell in ipairs(addon.spellbook) do
+                if spell.name:lower() == spellToCheck then
+                    -- If the spell name is found, remove only the condition and the spell name
+                    local alteredLine = line:gsub(",?%s*[Kk][Nn][Oo][Ww][Nn]:%s*" .. spellToCheck .. "%s*,?", ",")
+                    return alteredLine
+                end
+            end
+
+            -- If the spell name is not found, remove the entire condition block
+            local alteredLine = line:gsub("%[[^%]]-[Kk][Nn][Oo][Ww][Nn]:[^;]*;", "")
+            return alteredLine
         end
     },
 
@@ -92,12 +109,13 @@ function addon:split(inputstr, sep)
     return t
 end
 
-function addon:patchMacro(superMacro)
-    -- Check if superMacro is nil or not a string
-    if not superMacro or type(superMacro) ~= "string" then
-        return ""
+function addon:patchMacro(macroInfo)
+    if macroInfo.isCustom ~= true then
+        print("Error: macroInfo is not a custom macro")
+        return
     end
 
+    local superMacro = self.db.profile.macroS[macroInfo.name].superMacro
     local macroLines = {}
 
     -- Split the super macro into lines
@@ -107,7 +125,7 @@ function addon:patchMacro(superMacro)
     for _, line in ipairs(superMacroLines) do
         -- Search for special conditions
         for ruleName, rule in pairs(self.rules) do
-            if line:find(rule.condition) then
+            if line:lower():find(rule.condition:lower()) then
                 -- If a special condition is found, run the corresponding function
                 line = rule.onMatch(line)
                 break
@@ -117,5 +135,5 @@ function addon:patchMacro(superMacro)
         table.insert(macroLines, line)
     end
 
-    return table.concat(macroLines, "\n")
+    return addon:formatMacro(table.concat(macroLines, "\n"))
 end

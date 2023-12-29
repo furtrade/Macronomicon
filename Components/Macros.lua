@@ -40,7 +40,7 @@ function addon:createOrUpdateMacro(macroType, macroInfo)
 	if not self:macroExists(macroName) then
 		self:createMacro(macroType, macroName)
 	end
-	self:updateMacro(macroName, macroInfo)
+	self:updateMacro(macroInfo)
 end
 
 -- Constructs the full macro name with a prefix (4th to execute)
@@ -54,7 +54,7 @@ function addon:standardizedName(text)
 	local formattedText = text:gsub("%s+", "")
 
 	-- Keep only the first 9 characters
-	formattedText = formattedText:sub(1, 9)
+	formattedText = formattedText:sub(1, 14)
 
 	return formattedText
 end
@@ -127,6 +127,28 @@ function addon:selectElement(t)
 	return selectedElement
 end
 
+function addon:formatMacro(macro)
+	-- Remove double spaces
+	local formattedMacro = macro:gsub("%s%s+", " ")
+
+	-- Remove spaces directly after a comma
+	formattedMacro = formattedMacro:gsub(",%s+", ",")
+
+	-- Remove spaces at the end of a line
+	formattedMacro = formattedMacro:gsub("%s+$", "")
+
+	-- Remove whitespace after ']'
+	formattedMacro = formattedMacro:gsub("%]%s+", "]")
+
+	-- Remove whitespace after '['
+	formattedMacro = formattedMacro:gsub("%[%s+", "[")
+
+	-- Remove a comma immediately before a ']'
+	formattedMacro = formattedMacro:gsub(",%]", "]")
+
+	return formattedMacro
+end
+
 -- Builds the macro string from the provided macro information (8th to execute)
 function addon:buildMacroString(macroDef)
 	local macroLines = { "#showtooltip" }
@@ -147,5 +169,5 @@ function addon:buildMacroString(macroDef)
 		macroDef.nuance(macroLines)
 	end
 
-	return table.concat(macroLines, "\n")
+	return addon:formatMacro(table.concat(macroLines, "\n"))
 end

@@ -58,9 +58,9 @@ addon.macroData = {
 			},
 			nuance = function(macroLines)
 				-- add a healthstone to our heal pot macro
-				local healthstone = addon:playerHasItem("HS", "Healthstone")
+				local healthstone = addon:playerHasItem("HS")
 				if healthstone then
-					local healthstoneLine = "/use " .. healthstone.name
+					local healthstoneLine = "/use " .. healthstone
 					table.insert(macroLines, 2, healthstoneLine)
 				end
 			end,
@@ -398,8 +398,24 @@ function addon:isCategory(category)
 	return false
 end
 
-function addon:playerHasItem(...)
-	-- ... same as before ...
+function addon:playerHasItem(macroKey)
+	local highestItem = nil
+	local highestScore = -1
+	local highestLevel = -1
+
+	for _, MACRO in pairs(self.macroData) do
+		if MACRO[macroKey] then
+			for _, item in pairs(MACRO[macroKey].items) do
+				if item.score > highestScore or (item.score == highestScore and item.level > highestLevel) then
+					highestItem = item.name
+					highestScore = item.score
+					highestLevel = item.level
+				end
+			end
+		end
+	end
+
+	return highestItem
 end
 
 function addon:findItemInCategoryByNameOrId(category, name, id)

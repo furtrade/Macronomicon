@@ -104,13 +104,13 @@ function addon:generateMacroGroups()
 
         -- If the macro is custom, add additional options
         if addon.db.profile.macroS[macroName].isCustom then
-            addon.options.args.macroS.args[macroName].args.macroString = {
+            addon.options.args.macroS.args[macroName].args.superMacro = {
                 type = "input",
                 name = "Macro String",
                 desc = "Edit the macro string",
                 multiline = 10,
-                set = function(info, val) addon.db.profile.macroS[macroName].macroString = val end,
-                get = function(info) return addon.db.profile.macroS[macroName].macroString end,
+                set = function(info, val) addon.db.profile.macroS[macroName].superMacro = val end,
+                get = function(info) return addon.db.profile.macroS[macroName].superMacro end,
                 order = 7,
             }
             addon.options.args.macroS.args[macroName].args.parameters = {
