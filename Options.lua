@@ -88,6 +88,17 @@ function addon:generateMacroGroups()
                     confirm = true,
                     confirmText = "Are you sure you want to delete this macro?",
                 },
+                spacer1 = {
+                    type = "description",
+                    order = 3,
+                    name = "",
+                },
+                itemLinks = {
+                    type = "description",
+                    order = 4,
+                    name = function() return self:GetItemLinksForMacro(macroName) end,
+                    fontSize = "medium",
+                },
             }
         }
 
@@ -176,4 +187,34 @@ function addon:DeleteCustomMacro(macroName)
     else
         print("Macro does not exist: " .. macroName)
     end
+end
+
+function addon:GetItemLinksForMacro(macroName)
+    -- Initialize the item links string as empty
+    local itemLinksString = ""
+
+    -- Define the callback function
+    local function callback(macroInfo)
+        -- Check if the macroInfo is the selected macro
+        if macroInfo.name == macroName and macroInfo.items then
+            -- Initialize an empty table to hold the item links
+            local itemLinks = {}
+
+            -- Extract the link from each item and add it to the itemLinks table
+            for i = 1, #macroInfo.items do
+                local item = macroInfo.items[i]
+                if item.link then
+                    table.insert(itemLinks, item.link)
+                end
+            end
+
+            -- Convert the itemLinks table to a string
+            itemLinksString = table.concat(itemLinks, "\n")
+        end
+    end
+
+    -- Use the forEachMacro function to apply the callback to each macro
+    self:forEachMacro(callback)
+
+    return itemLinksString
 end
