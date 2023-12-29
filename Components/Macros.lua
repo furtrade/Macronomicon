@@ -47,6 +47,16 @@ function addon:getMacroName(name)
 	return prefix .. name
 end
 
+function addon:standardizedName(text)
+	-- Remove white space
+	local formattedText = text:gsub("%s+", "")
+
+	-- Keep only the first 9 characters
+	formattedText = formattedText:sub(1, 9)
+
+	return formattedText
+end
+
 -- Checks if a macro already exists (5th to execute)
 function addon:macroExists(name)
 	return GetMacroInfo(name) ~= nil
@@ -57,6 +67,16 @@ function addon:createMacro(macroType, name)
 	local numGeneralMacros, numCharacterMacros = GetNumMacros()
 	local perCharacter = macroType ~= "GENERAL" and numCharacterMacros < MAX_CHARACTER_MACROS
 	CreateMacro(name, "INV_Misc_QuestionMark", nil, perCharacter)
+end
+
+function addon:DeleteGameMacro(macroName)
+	-- Get the index of the macro
+	local macroD = self:getMacroName(macroName)
+
+	-- If the macro exists, delete it
+	if macroD then
+		DeleteMacro(macroD)
+	end
 end
 
 -- Updates an existing macro with new content (7th to execute)

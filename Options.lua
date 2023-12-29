@@ -108,7 +108,7 @@ function addon:CreateCustomMacro()
 
     -- Set the callback for the edit box
     editBox:SetCallback("OnEnterPressed", function(widget, event, text)
-        local macroName = text
+        local macroName = self:standardizedName(text)
 
         -- Check if the macroName is not empty
         if macroName and macroName ~= "" then
@@ -126,7 +126,6 @@ function addon:CreateCustomMacro()
 
             -- Update the macroData table
             self:loadCustomMacros()
-
             self:generateMacroGroups()
             LibStub("AceConfigRegistry-3.0"):NotifyChange(addon.title .. "_options")
             -- Close the frame
@@ -143,6 +142,9 @@ function addon:DeleteCustomMacro(macroName)
         -- Remove from db and macroData tables
         self.db.profile.macroS[macroName] = nil
         self.macroData.CUSTOM[macroName] = nil
+
+        -- Delete the actual macro
+        self:DeleteGameMacro(macroName)
 
         self:loadCustomMacros()
         self:generateMacroGroups()
