@@ -6,8 +6,8 @@ local addonName, addon = ...
 	macroTables = macroTables or addon.macroData
 
 	for macroType, macroTypeData in pairs(macroTables) do
-		for _, macroInfo in pairs(macroTypeData) do
-			if self:isMacroEnabled(macroInfo.enabled) then
+		for macroKey, macroInfo in pairs(macroTypeData) do
+			if self:isMacroEnabled(macroKey) then
 				self:createOrUpdateMacro(macroType, macroInfo)
 			end
 		end
@@ -15,7 +15,9 @@ local addonName, addon = ...
 end ]]
 
 -- Checks if a macro is enabled in the addon's settings (2nd to execute)
-function addon:isMacroEnabled(macroKey)
+function addon:isMacroEnabled(key)
+	-- print("\n Checking if macro is Enabled: ", key)
+	-- local toggleKey = "toggle" .. key
 	-- Check if the database is initialized
 	if not self.db then
 		print("Error: Database is not initialized")
@@ -23,13 +25,13 @@ function addon:isMacroEnabled(macroKey)
 	end
 
 	-- Check if the macroKey exists in the profile
-	if self.db.profile.macroS[macroKey] == nil then
-		print("Error: Macro key '" .. macroKey .. "' does not exist in the profile")
+	if self.db.profile.macroS[key] == nil then
+		print("Error: Macro key does not exist in the profile")
 		return false
 	end
 
 	-- Return the value of the toggleOption for the macroKey
-	return self.db.profile.macroS[macroKey].toggleOption
+	return self.db.profile.macroS[key].toggleOption
 end
 
 -- Handles creation or update of a macro (3rd to execute)

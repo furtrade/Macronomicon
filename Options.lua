@@ -90,6 +90,29 @@ function addon:generateMacroGroups()
                 },
             }
         }
+
+        -- If the macro is custom, add additional options
+        if addon.db.profile.macroS[macroName].isCustom then
+            addon.options.args.macroS.args[macroName].args.macroString = {
+                type = "input",
+                name = "Macro String",
+                desc = "Edit the macro string",
+                multiline = 10,
+                set = function(info, val) addon.db.profile.macroS[macroName].macroString = val end,
+                get = function(info) return addon.db.profile.macroS[macroName].macroString end,
+                order = 7,
+            }
+            addon.options.args.macroS.args[macroName].args.parameters = {
+                type = "input",
+                name = "Parameters",
+                desc = "Add parameters separated by commas",
+                multiline = 10,
+                set = function(info, val) addon.db.profile.macroS[macroName].parameters = val end,
+                get = function(info) return addon.db.profile.macroS[macroName].parameters end,
+                order = 8,
+            }
+        end
+
         i = i + 1
     end
 end
@@ -117,11 +140,12 @@ function addon:CreateCustomMacro()
                 name = macroName,
                 isCustom = true,
                 icon = "INV_Misc_QuestionMark",
-                superMacro = "",
             }
             -- Save the new custom macro to the database
             local insertMacro = self.db.profile.macroS
             insertMacro[macroName] = macroInfo
+            insertMacro[macroName].superMacro = ""
+            insertMacro[macroName].parameters = ""
             insertMacro[macroName].toggleOption = true
 
             -- Update the macroData table

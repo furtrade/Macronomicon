@@ -3,6 +3,7 @@ local addonName, addon = ...
 -- TODO: this belongs in Macros.lua
 --=============================================================================
 function addon:getCustomMacrosFromDB()
+    -- print("starting up getCustomMacrosFromDB")
     -- Initialize an empty table for the custom macros
     local customMacros = {}
 
@@ -11,10 +12,12 @@ function addon:getCustomMacrosFromDB()
         -- Check if the key is a macro
         if type(macroValue) == "table" and macroValue.isCustom == true then
             -- If it is, add it to the customMacros table
+            -- print("getting macroKey: ", macroKey)
             customMacros[macroKey] = macroValue
         end
     end
 
+    -- print("handing keys to loadCustomMacros function")
     return customMacros
 end
 
@@ -44,8 +47,9 @@ function addon:ProcessMacros(macroTables)
     macroTables = macroTables or addon.macroData
 
     for macroType, macroTypeData in pairs(macroTables) do
-        for _, macroInfo in pairs(macroTypeData) do
-            if self:isMacroEnabled(macroInfo.enabled) then
+        for macroKey, macroInfo in pairs(macroTypeData) do
+            -- print("macroKey: ", macroKey)
+            if self:isMacroEnabled(macroKey) then
                 self:createOrUpdateMacro(macroType, macroInfo)
             end
         end
@@ -54,15 +58,15 @@ end
 
 --=============================================================================
 
-function addon:PatchMacros()
+--[[ function addon:PatchMacros()
     local customMacros = addon.customMacros
 
-    for _, macroInfo in pairs(customMacros) do
-        if self:isMacroEnabled(macroInfo.enabled) then
+    for macroKey, macroInfo in pairs(customMacros) do
+        if self:isMacroEnabled(macroKey) then
             self:createOrUpdateMacro(macroType, macroInfo)
         end
     end
-end
+end ]]
 
 addon.rules = {
     -- Define a rule for the "known" condition

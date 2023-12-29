@@ -44,7 +44,6 @@ addon.macroData = {
 	GENERAL = {
 		-- TODO: Add ability to combine categories in a single macro. e.g. HP & HS
 		HP = {
-			enabled = "toggleHP",
 			name = "Heal Pot",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Healing Potion" },
@@ -69,7 +68,6 @@ addon.macroData = {
 			items = {},
 		},
 		MP = {
-			enabled = "toggleMP",
 			name = "Mana Pot",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Mana Potion", "Restore Mana" },
@@ -86,7 +84,6 @@ addon.macroData = {
 			spells = {},
 		},
 		Food = {
-			enabled = "toggleFood",
 			name = "Food",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Food" },
@@ -103,7 +100,6 @@ addon.macroData = {
 			spells = {},
 		},
 		Drink = {
-			enabled = "toggleDrink",
 			name = "Drink",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Drink" },
@@ -120,7 +116,6 @@ addon.macroData = {
 			spells = {},
 		},
 		Bandage = {
-			enabled = "toggleBandage",
 			name = "Bandage",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "First Aid", "Bandage" },
@@ -137,7 +132,6 @@ addon.macroData = {
 			spells = {},
 		},
 		HS = {
-			enabled = "toggleHS",
 			name = "Healthstone",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Healthstone" },
@@ -154,7 +148,6 @@ addon.macroData = {
 			spells = {},
 		},
 		Bang = {
-			enabled = "toggleBang",
 			name = "Bang",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge" },
@@ -173,7 +166,6 @@ addon.macroData = {
 	},
 	WARLOCK = {
 		main = {
-			enabled = "toggleMain",
 			name = "Main",
 			icone = "INV_Misc_QuestionMark",
 			keywords = { "Master Channeler" },

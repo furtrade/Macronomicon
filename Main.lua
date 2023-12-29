@@ -33,8 +33,9 @@ function addon:OnInitialize()
 	self:RegisterChatCommand("mbl", "SlashCommand")
 
 	self.gui = LibStub("AceGUI-3.0")
-	
+
 	-- Generate the macro groups
+	self:loadCustomMacros()
 	self:generateMacroGroups()
 end
 
