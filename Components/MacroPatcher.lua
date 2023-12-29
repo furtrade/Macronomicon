@@ -7,9 +7,9 @@ function addon:getCustomMacrosFromDB()
     local customMacros = {}
 
     -- Iterate over all the keys in the profile
-    for macroKey, macroValue in pairs(self.db.profile) do
+    for macroKey, macroValue in pairs(self.db.profile.macroS) do
         -- Check if the key is a macro
-        if type(macroValue) == "table" and macroValue.type == "custom" then
+        if type(macroValue) == "table" and macroValue.isCustom == true then
             -- If it is, add it to the customMacros table
             customMacros[macroKey] = macroValue
         end
@@ -28,7 +28,7 @@ end
 
 function addon:updateMacro(macroName, macroInfo)
     local macroString
-    if macroInfo.type == "custom" then
+    if macroInfo.isCustom == true then
         -- If it's a custom macro, get the string from the super macro
         macroString = self:patchMacro(macroInfo.superMacro)
     else

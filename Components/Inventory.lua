@@ -45,7 +45,7 @@ local function itemizer(bagOrSlotIndex, slotIndex)
 				itemInfo.link = itemLink
 				itemInfo.name = C_Item.GetItemNameByID(itemID)
 				itemInfo.level = itemLevel
-				itemInfo.type = itemType
+				itemInfo.itemType = itemType
 				itemInfo.subType = itemSubType
 				itemInfo.equipLoc = equipLoc
 				itemInfo.spellName = itemSpell -- more reliable than the actual item name.

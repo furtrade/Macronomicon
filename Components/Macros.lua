@@ -23,13 +23,13 @@ function addon:isMacroEnabled(macroKey)
 	end
 
 	-- Check if the macroKey exists in the profile
-	if self.db.profile[macroKey] == nil then
+	if self.db.profile.macroS[macroKey] == nil then
 		print("Error: Macro key '" .. macroKey .. "' does not exist in the profile")
 		return false
 	end
 
 	-- Return the value of the toggleOption for the macroKey
-	return self.db.profile[macroKey].toggleOption
+	return self.db.profile.macroS[macroKey].toggleOption
 end
 
 -- Handles creation or update of a macro (3rd to execute)

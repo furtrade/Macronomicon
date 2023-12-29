@@ -15,16 +15,16 @@ local persistentTooltip = persistentTooltip
 	or CreateFrame("GameTooltip", "MyAddonPersistentTooltip", nil, "GameTooltipTemplate")
 
 -- Function to create a tooltip based on type and ID
-function addon:GetTooltipByType(id, type)
+function addon:GetTooltipByType(id, isType)
 	local tooltip = persistentTooltip
 	tooltip:SetOwner(UIParent, "ANCHOR_NONE")
 
 	-- Clearing lines before setting new data
 	tooltip:ClearLines()
 
-	if type == "item" then
+	if isType == "item" then
 		tooltip:SetItemByID(id)
-	elseif type == "spell" then
+	elseif isType == "spell" then
 		print(id)
 		tooltip:SetSpellByID(id)
 	else

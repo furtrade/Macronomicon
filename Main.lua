@@ -32,8 +32,10 @@ function addon:OnInitialize()
 	self:RegisterChatCommand(addon.title, "SlashCommand")
 	self:RegisterChatCommand("mbl", "SlashCommand")
 
-	-- initialize the selected macro
-	addon:InitializeSelectedMacro()
+	self.gui = LibStub("AceGUI-3.0")
+	
+	-- Generate the macro groups
+	self:generateMacroGroups()
 end
 
 function addon:OnEnable()
