@@ -181,23 +181,23 @@ addon.macroData = {
 			spells = {},
 		},
 	},
-	WARLOCK = {
-		main = {
-			name = "Main",
-			icone = "INV_Misc_QuestionMark",
-			keywords = { "Master Channeler" },
-			patterns = {
-				{
-					pattern = "(%d+)%s+to%s+(%d+)",
-					onMatch = function(match)
-						-- print("Healing effect found:", match)
-					end,
-				},
-			},
-			items = {},
-			spells = {},
-		},
-	},
+	-- WARLOCK = {
+	-- 	main = {
+	-- 		name = "Main",
+	-- 		icone = "INV_Misc_QuestionMark",
+	-- 		keywords = { "Master Channeler" },
+	-- 		patterns = {
+	-- 			{
+	-- 				pattern = "(%d+)%s+to%s+(%d+)",
+	-- 				onMatch = function(match)
+	-- 					-- print("Healing effect found:", match)
+	-- 				end,
+	-- 			},
+	-- 		},
+	-- 		items = {},
+	-- 		spells = {},
+	-- 	},
+	-- },
 }
 
 function addon:forEachMacro(callback)
