@@ -147,6 +147,7 @@
         "GameTooltip",
         "MAX_CHARACTER_MACROS",
         "any",
-        "enabled"
+        "enabled",
+        "WEAPON"
     ]
 }

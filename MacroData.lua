@@ -1,44 +1,61 @@
+--[[
+------------------------------------------------------------
+                          GENERAL
+
+✓ Food
+✓ Drink
+✓ HP Health Potion
+✓ HS Healthstone
+✓ MP Mana Potion
+✓ Bang explosive
+✓ Bandage
+
+TODO:
+× Combat Potion
+
+------------------------------------------------------------
+                      BUFF SEQUENCES
+
+TODO:
+× Item Enhancements
+× Food Buff
+× Elixir
+× Scroll
+
+------------------------------------------------------------
+                          SPELLS
+
+TODO:
+× Warlock: Create Healthstone
+× Mage: Create Food & Water
+
+
+------------------------------------------------------------
+                      WEAPON SWAPS
+
+This feature will require the use of my other addon "EZquip"
+as well as "Pawn" to sort through players' inventory to find
+and configure their best weapon combinations based on stats.
+
+For example:
+× DEFENSIVE weapon swap macros: EZquip will determine the
+  best mainhand+offhand combination to maximize defenses
+  like armor, dodge, etc.
+
+× OFFENSIVE weapon swap macros: These should have the most
+  damage potential based on players' stat priorities.
+
+× REGEN weapon swaps: These could potentially be used to
+  min/max players' health/mana regeneration.
+
+TODO:
+× Implement the integration with "EZquip" and "Pawn"
+× Develop the algorithm for determining the best weapon
+  combinations
+------------------------------------------------------------
+]]
+
 local addonName, addon = ...
-
--- ===========================================
--- Normal Macros:
--- ===========================================
--- (sit) food
--- (sit) drink
--- HP potion
--- healthstone (special case)
--- MP potion
--- explosive
--- (sit) bandages
---  TODO:Combat potion
--- ===========================================
--- Buff Sequences:
--- ===========================================
--- TODO:(sit) item enhancements
--- TODO:(sit) Food Buff (special case)
--- TODO:elixir
--- TODO:scroll
--- ===========================================
--- Weapon Swaps
--- ===========================================
---  TODO:Defensive
---  TODO:Offensive
-
--- ===========================================
--- Spells:
--- ===========================================
---  TODO: Add Warlock "Create Healthstone" line to auto update creating healthstones.
---  TODO: Add Mage Food & Water macros
---[[ addon.spellBook.heals = {
-    ["Crimson Vial"] = 185311, --Rogue
-    ["Renewal"] = 108238, --Druid
-    ["Exhilaration"] = 109304, --Hunter
-    ["Fortitude of the Bear"] = 272679, --Hunter
-    ["Bitter Immunity"] = 383762, --Warrior
-    ["Desperate Prayer"] = 19236, --Priest
-    ["Expel Harm"] = 322101, --Monk
-    ["Healing Elixir"] = 122281 --Monk
-} ]]
 
 addon.macroData = {
 	GENERAL = {

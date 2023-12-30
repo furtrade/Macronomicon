@@ -1,3 +1,33 @@
+--[[
+------------------------------------------------------------
+                          OPTIONS UI
+
+CURRENT STATE:
+- Using Ace3 framework for options UI in Blizzard options panel.
+- Current UI is basic and unresponsive.
+- "Create Custom Macro" button creates a macro but does not immediately reflect in the list of macros.
+- To see the newly created macro, the UI needs to be closed and reopened.
+- Deleting a macro updates the list immediately.
+
+HELP WANTED!
+
+DESIRED STATE:
+- A sleek, clean, responsive UI.
+- Centralize all UI components around a single panel.
+
+PREFERENCE 1:
+- Mimic the look and feel of a spellbook tab.
+- List all macros natively in the tab.
+- May require moving from Macro-based-system to SecureActionButton-based-system.
+- Dragging abilities onto bars should still be possible.
+- Right-click on Macros to show a contextual menu with "edit" or "delete".
+- "Edit" should reveal a new pane with all relevant options for that macro.
+
+PREFERENCE 2:
+- Create a sleek UI similar to "OmniCD".
+
+------------------------------------------------------------
+]]
 local addonName, addon = ...
 
 addon.defaults = {

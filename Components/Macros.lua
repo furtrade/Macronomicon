@@ -1,19 +1,5 @@
 local addonName, addon = ...
 
--- Entry point for processing macros (1st to execute)
--- Iterates over macro data and processes each macro
---[[ function addon:ProcessMacros(macroTables)
-	macroTables = macroTables or addon.macroData
-
-	for macroType, macroTypeData in pairs(macroTables) do
-		for macroKey, macroInfo in pairs(macroTypeData) do
-			if self:isMacroEnabled(macroKey) then
-				self:createOrUpdateMacro(macroType, macroInfo)
-			end
-		end
-	end
-end ]]
-
 -- Checks if a macro is enabled in the addon's settings (2nd to execute)
 function addon:isMacroEnabled(key)
 	-- print("\n Checking if macro is Enabled: ", key)
@@ -128,25 +114,77 @@ function addon:selectElement(t)
 end
 
 function addon:formatMacro(macro)
-	-- Remove double spaces
-	local formattedMacro = macro:gsub("%s%s+", " ")
+	local formattedMacro, n = macro
+		:gsub("%s%s+", " ") -- Remove double spaces
+		:gsub(",%s+", ",") -- Remove spaces directly after a comma
+		:gsub("%s+$", "") -- Remove spaces at the end of a line
+		:gsub("%]%s+", "]") -- Remove whitespace after ']'
+		:gsub("%[%s+", "[") -- Remove whitespace after '['
+		:gsub(",%]", "]") -- Remove a comma immediately before a ']'
 
-	-- Remove spaces directly after a comma
-	formattedMacro = formattedMacro:gsub(",%s+", ",")
+	-- If no changes were made, return the string
+	if n == 0 then
+		return formattedMacro
+	else
+		-- Otherwise, call the function again
+		return self:formatMacro(formattedMacro)
+	end
+end
 
-	-- Remove spaces at the end of a line
-	formattedMacro = formattedMacro:gsub("%s+$", "")
+function addon:getCustomMacrosFromDB()
+	-- print("starting up getCustomMacrosFromDB")
+	-- Initialize an empty table for the custom macros
+	local customMacros = {}
 
-	-- Remove whitespace after ']'
-	formattedMacro = formattedMacro:gsub("%]%s+", "]")
+	-- Iterate over all the keys in the profile
+	for macroKey, macroValue in pairs(self.db.profile.macroS) do
+		-- Check if the key is a macro
+		if type(macroValue) == "table" and macroValue.isCustom == true then
+			-- If it is, add it to the customMacros table
+			-- print("getting macroKey: ", macroKey)
+			customMacros[macroKey] = macroValue
+		end
+	end
 
-	-- Remove whitespace after '['
-	formattedMacro = formattedMacro:gsub("%[%s+", "[")
+	-- print("handing keys to loadCustomMacros function")
+	return customMacros
+end
 
-	-- Remove a comma immediately before a ']'
-	formattedMacro = formattedMacro:gsub(",%]", "]")
+function addon:loadCustomMacros()
+	-- Get the custom macros from the addon's database
+	local customMacros = self:getCustomMacrosFromDB()
 
-	return formattedMacro
+	-- Add the custom macros to the macroData.CUSTOM table
+	self.macroData.CUSTOM = customMacros
+end
+
+function addon:updateMacro(macroInfo)
+	local macroString
+	if macroInfo.isCustom == true then
+		-- If it's a custom macro, get the string from the super macro
+		macroString = self:patchMacro(macroInfo)
+	else
+		-- Otherwise, build the macro string as normal
+		macroString = self:buildMacroString(macroInfo)
+	end
+
+	local macroName = self:getMacroName(macroInfo.name)
+	EditMacro(macroName, macroName, macroInfo.icon, macroString)
+end
+
+function addon:ProcessMacros(macroTables)
+	self:loadCustomMacros()
+
+	macroTables = macroTables or addon.macroData
+
+	for macroType, macroTypeData in pairs(macroTables) do
+		for macroKey, macroInfo in pairs(macroTypeData) do
+			-- print("macroKey: ", macroKey)
+			if self:isMacroEnabled(macroKey) then
+				self:createOrUpdateMacro(macroType, macroInfo)
+			end
+		end
+	end
 end
 
 -- Builds the macro string from the provided macro information (8th to execute)
