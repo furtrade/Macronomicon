@@ -1,10 +1,12 @@
 local addonName, addon = ...
 
 addon.rules = {
-    -- Define a rule for the "known" condition
+    -- TODO: Add support for switching between shoot and throw in Classic
     known = {
         condition = "[Kk][Nn][Oo][Ww][Nn]:",
         onMatch = function(line)
+            -- TODO: add support for multiple instances ofthe 'known' in
+            -- a single condition AND multiple conditions in a single line.
             -- Check if "noknown" is the condition
             local isNoKnown = line:match("[Nn][Oo][Kk][Nn][Oo][Ww][Nn]:")
             local condition = isNoKnown and "[Nn][Oo][Kk][Nn][Oo][Ww][Nn]:" or "[Kk][Nn][Oo][Ww][Nn]:"

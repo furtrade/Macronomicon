@@ -299,15 +299,20 @@ local function processItemsOrSpells(self, categoryKey, macroKey, macroData)
 		local entries = entryType == "item" and self.itemCache or self.spellbook
 
 		for _, entry in ipairs(entries or {}) do
+			local spell = entry.spellName
+			if not spell then return end
+
 			local name = entry.name
-			local isMatch = any(keywords, function(keyword) return string.match(name, keyword) end)
+
+			local isMatch = any(keywords, function(keyword)
+				return string.match(spell, keyword)
+			end)
 
 			if isMatch then
 				-- Check if the item has already been matched
 				if not matchedItems[name] then
 					-- If the item has not been matched, add it to the matchedItems table
 					matchedItems[name] = true
-
 					entry.score = self:scoreItemOrSpell(entry, entryType, macroData)
 					if entryType == "item" then
 						self:addItem(categoryKey, macroKey, entry)

@@ -11,11 +11,12 @@ function addon:isMacroEnabled(key)
 	end
 
 	-- Check if the macroKey exists in the profile
-	if self.db.profile.macroS[key] == nil then
+	if self.db.profile.macroS[key].toggleOption == nil then
 		print("Error: Macro key does not exist in the profile")
 		return false
 	end
 
+	-- print(self.db.profile.macroS[key].toggleOption)
 	-- Return the value of the toggleOption for the macroKey
 	return self.db.profile.macroS[key].toggleOption
 end
@@ -23,6 +24,7 @@ end
 -- Handles creation or update of a macro (3rd to execute)
 function addon:createOrUpdateMacro(macroType, macroInfo)
 	local macroName = self:getMacroName(macroInfo.name)
+	-- print("macroName: ", macroName)
 	if not self:macroExists(macroName) then
 		self:createMacro(macroType, macroName)
 	end
@@ -80,8 +82,7 @@ function addon:selectElement(t)
 	-- Iterate over the elements
 	for _, element in ipairs(t) do
 		-- Debug: print element and its score
-		-- print("Element: ", element)
-		-- print("Score: ", element.score)
+		-- print("Element: ", element.link, "& Score: ", element.score)
 
 		-- Check if the score field is present and numeric
 		if element.score then
@@ -179,8 +180,9 @@ function addon:ProcessMacros(macroTables)
 
 	for macroType, macroTypeData in pairs(macroTables) do
 		for macroKey, macroInfo in pairs(macroTypeData) do
-			-- print("macroKey: ", macroKey)
 			if self:isMacroEnabled(macroKey) then
+				-- print(macroType, "macroKey: ", macroKey)
+
 				self:createOrUpdateMacro(macroType, macroInfo)
 			end
 		end
@@ -193,9 +195,9 @@ function addon:buildMacroString(macroDef)
 
 	-- Get the favored (highest scoring) item
 	local favoredItem = self:selectElement(macroDef.items)
-
 	-- Building the macro line for the favored item
 	if favoredItem then
+		-- print("favoredItem: ", favoredItem.link or favoredItem.name)
 		-- print(favoredItem.name)
 		local conditionPart = macroDef.condition and " [" .. macroDef.condition .. "]" or ""
 		local line = "/cast" .. conditionPart .. " " .. favoredItem.name
