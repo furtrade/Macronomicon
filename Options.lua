@@ -138,20 +138,21 @@ function addon:generateMacroGroups()
                 type = "input",
                 name = "Macro String",
                 desc = "Edit the macro string",
+                width = "full",
                 multiline = 10,
                 set = function(info, val) addon.db.profile.macroS[macroName].superMacro = val end,
                 get = function(info) return addon.db.profile.macroS[macroName].superMacro end,
                 order = 7,
             }
-            addon.options.args.macroS.args[macroName].args.parameters = {
-                type = "input",
-                name = "Parameters",
-                desc = "Add parameters separated by commas",
-                multiline = 10,
-                set = function(info, val) addon.db.profile.macroS[macroName].parameters = val end,
-                get = function(info) return addon.db.profile.macroS[macroName].parameters end,
-                order = 8,
-            }
+            -- addon.options.args.macroS.args[macroName].args.parameters = {
+            --     type = "input",
+            --     name = "Parameters",
+            --     desc = "Add parameters separated by commas",
+            --     multiline = 10,
+            --     set = function(info, val) addon.db.profile.macroS[macroName].parameters = val end,
+            --     get = function(info) return addon.db.profile.macroS[macroName].parameters end,
+            --     order = 8,
+            -- }
         end
 
         i = i + 1

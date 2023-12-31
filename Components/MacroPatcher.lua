@@ -5,22 +5,38 @@ addon.rules = {
     known = {
         condition = "[Kk][Nn][Oo][Ww][Nn]:",
         onMatch = function(line)
+            -- Check if "noknown" is the condition
+            local isNoKnown = line:match("[Nn][Oo][Kk][Nn][Oo][Ww][Nn]:")
+            local condition = isNoKnown and "[Nn][Oo][Kk][Nn][Oo][Ww][Nn]:" or "[Kk][Nn][Oo][Ww][Nn]:"
+
             -- Extract the spell name from the line
-            local spellToCheck = line:match("[Kk][Nn][Oo][Ww][Nn]:([^,%]]+)")
+            local spellToCheck = line:match(condition .. "([^,%]]+)")
             -- Trim leading and trailing whitespace
             spellToCheck = spellToCheck:match("^%s*(.-)%s*$"):lower()
 
             -- Check if the spell name is in addon.spellbook
             for _, spell in ipairs(addon.spellbook) do
                 if spell.name:lower() == spellToCheck then
-                    -- If the spell name is found, remove only the condition and the spell name
-                    local alteredLine = line:gsub(",?%s*[Kk][Nn][Oo][Ww][Nn]:%s*" .. spellToCheck .. "%s*,?", ",")
-                    return alteredLine
+                    if isNoKnown then
+                        -- If "no" precedes "known" and the spell name is found, remove the entire condition block
+                        local alteredLine = line:gsub("%[[^%]]-" .. condition .. "[^;]*;", "")
+                        return alteredLine
+                    else
+                        -- If "no" does not precede "known" and the spell name is found, remove only the condition and the spell name
+                        local alteredLine = line:gsub(",?%s*" .. condition .. "%s*" .. spellToCheck .. "%s*,?", ",")
+                        return alteredLine
+                    end
                 end
             end
 
-            -- If the spell name is not found, remove the entire condition block
-            local alteredLine = line:gsub("%[[^%]]-[Kk][Nn][Oo][Ww][Nn]:[^;]*;", "")
+            -- If the spell name is not found and "no" precedes "known", remove only the condition
+            if isNoKnown then
+                local alteredLine = line:gsub(",?%s*" .. condition .. "%s*" .. spellToCheck .. "%s*,?", ",")
+                return alteredLine
+            end
+
+            -- If the spell name is not found and "no" does not precede "known", remove the entire condition block
+            local alteredLine = line:gsub("%[[^%]]-" .. condition .. "[^;]*;", "")
             return alteredLine
         end
     },
