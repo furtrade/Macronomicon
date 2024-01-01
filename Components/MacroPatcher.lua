@@ -5,48 +5,30 @@ addon.rules = {
     known = {
         condition = "[Kk][Nn][Oo][Ww][Nn]:",
         onMatch = function(chunk)
-            -- Example1: /cast [known:Throw] Throw
-            -- Example2: /cast [noknown:Throw] Shoot
-            -- Check if "noknown" is the condition
-            local isNoKnown = chunk:match("[Nn][Oo][Kk][Nn][Oo][Ww][Nn]:")
-            local condition = isNoKnown and "[Nn][Oo][Kk][Nn][Oo][Ww][Nn]:" or "[Kk][Nn][Oo][Ww][Nn]:"
+            chunk = chunk:lower()
+            print("\nBefore: ", chunk)
+            local isNoKnown = chunk:lower():find("noknown:") ~= nil
+            local condition = isNoKnown and "noknown:" or "known:"
 
-            -- Extract the spell name from the line
-            local spellToCheck = chunk:match(condition .. "([^,%]]+)")
-            -- Trim leading and trailing whitespace
-            spellToCheck = spellToCheck:match("^%s*(.-)%s*$"):lower()
+            local spellToCheck = chunk:lower():match(condition .. "([^,%]]+)")
+            spellToCheck = spellToCheck:match("^%s*(.-)%s*$")
 
-            -- Check if the spell name is in addon.spellbook
+            local conditionPattern = ",?%s*" .. condition .. "%s*" .. spellToCheck .. "%s*,?"
+            local blockPattern = "%[.*" .. condition .. ".*$"
+
             for _, spell in ipairs(addon.spellbook) do
                 if spell.name:lower() == spellToCheck then
-                    if isNoKnown then
-                        -- If "noknown" and the spell is found, remove the entire condition block
-                        -- Example1: /cast [known:Throw] Throw NOT APPLICABLE (INCORRECT CONDITION)
-                        -- Example2: /cast [noknown:Throw] Shoot CHANGED TO /cast  REMOVED ENTIRE CONDITION BLOCK
-                        local newChunk = chunk:gsub("%[.*" .. condition .. ".*$", "") -- ENTIRE BLOCK REMOVED
-                        return newChunk
-                    else
-                        -- If "known" and the spell name is found, remove only the condition and the spell name
-                        -- Example1: /cast [known:Throw] Throw CHANGED TO /cast Throw CONDITION REMOVED
-                        -- Example2: /cast [noknown:Throw] Shoot NOT APPLICABLE (INCORRECT CONDITION)
-                        local newChunk = chunk:gsub(",?%s*" .. condition .. "%s*" .. spellToCheck .. "%s*,?", ",") -- CONDITION REMOVED
-                        return newChunk
-                    end
+                    print("Spell found: ", spell.name)
+                    local newChunk = chunk:gsub(isNoKnown and blockPattern or conditionPattern, ",")
+                    print("Is gsub replacing anything? ", newChunk ~= chunk)
+                    print("New chunk after spell match: ", newChunk)
+                    return newChunk
                 end
             end
 
-            if isNoKnown then
-                -- If "noknown" and the spell name is not found, remove only the condition
-                -- Example1: /cast [known:Throw] Throw NOT APPLICABLE (INCORRECT CONDITION)
-                -- Example2: /cast [noknown:Throw] Shoot CHANGED TO /cast Shoot CONDITION REMOVED
-                local newChunk = chunk:gsub(",?%s*" .. condition .. "%s*" .. spellToCheck .. "%s*,?", ",") -- CONDITION REMOVED
-                return newChunk
-            end
-
-            -- If "known" and the spell name is not found, remove the entire condition block
-            -- Example1: /cast [known:Throw] Throw CHANGED TO /cast  REMOVED ENTIRE CONDITION BLOCK
-            -- Example2: /cast [noknown:Throw] Shoot NOT APPLICABLE (INCORRECT CONDITION)
-            local newChunk = chunk:gsub("%[.*" .. condition .. ".*$", "") -- ENTIRE BLOCK REMOVED
+            local newChunk = chunk:gsub(isNoKnown and conditionPattern or blockPattern, ",")
+            print("Is gsub replacing anything? ", newChunk ~= chunk)
+            print("New chunk after spell match: ", newChunk)
             return newChunk
         end
     },
@@ -89,7 +71,8 @@ function addon:patchMacro(macroInfo)
                 if chunk:lower():find(rule.condition:lower()) then
                     -- If a special condition is found, run the corresponding function
                     chunks[i] = rule.onMatch(chunk)
-                    break
+                    print("After: ", chunks[i])
+                    -- break
                 end
             end
         end
