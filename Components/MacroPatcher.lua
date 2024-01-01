@@ -4,15 +4,15 @@ addon.rules = {
     -- TODO: Add support for switching between shoot and throw in Classic
     known = {
         condition = "[Kk][Nn][Oo][Ww][Nn]:",
-        onMatch = function(line)
-            -- TODO: add support for multiple instances ofthe 'known' in
-            -- a single condition AND multiple conditions in a single line.
+        onMatch = function(chunk)
+            -- Example1: /cast [known:Throw] Throw
+            -- Example2: /cast [noknown:Throw] Shoot
             -- Check if "noknown" is the condition
-            local isNoKnown = line:match("[Nn][Oo][Kk][Nn][Oo][Ww][Nn]:")
+            local isNoKnown = chunk:match("[Nn][Oo][Kk][Nn][Oo][Ww][Nn]:")
             local condition = isNoKnown and "[Nn][Oo][Kk][Nn][Oo][Ww][Nn]:" or "[Kk][Nn][Oo][Ww][Nn]:"
 
             -- Extract the spell name from the line
-            local spellToCheck = line:match(condition .. "([^,%]]+)")
+            local spellToCheck = chunk:match(condition .. "([^,%]]+)")
             -- Trim leading and trailing whitespace
             spellToCheck = spellToCheck:match("^%s*(.-)%s*$"):lower()
 
@@ -20,26 +20,34 @@ addon.rules = {
             for _, spell in ipairs(addon.spellbook) do
                 if spell.name:lower() == spellToCheck then
                     if isNoKnown then
-                        -- If "no" precedes "known" and the spell name is found, remove the entire condition block
-                        local alteredLine = line:gsub("%[[^%]]-" .. condition .. "[^;]*;", "")
-                        return alteredLine
+                        -- If "noknown" and the spell is found, remove the entire condition block
+                        -- Example1: /cast [known:Throw] Throw NOT APPLICABLE (INCORRECT CONDITION)
+                        -- Example2: /cast [noknown:Throw] Shoot CHANGED TO /cast  REMOVED ENTIRE CONDITION BLOCK
+                        local newChunk = chunk:gsub("%[.*" .. condition .. ".*$", "") -- ENTIRE BLOCK REMOVED
+                        return newChunk
                     else
-                        -- If "no" does not precede "known" and the spell name is found, remove only the condition and the spell name
-                        local alteredLine = line:gsub(",?%s*" .. condition .. "%s*" .. spellToCheck .. "%s*,?", ",")
-                        return alteredLine
+                        -- If "known" and the spell name is found, remove only the condition and the spell name
+                        -- Example1: /cast [known:Throw] Throw CHANGED TO /cast Throw CONDITION REMOVED
+                        -- Example2: /cast [noknown:Throw] Shoot NOT APPLICABLE (INCORRECT CONDITION)
+                        local newChunk = chunk:gsub(",?%s*" .. condition .. "%s*" .. spellToCheck .. "%s*,?", ",") -- CONDITION REMOVED
+                        return newChunk
                     end
                 end
             end
 
-            -- If the spell name is not found and "no" precedes "known", remove only the condition
             if isNoKnown then
-                local alteredLine = line:gsub(",?%s*" .. condition .. "%s*" .. spellToCheck .. "%s*,?", ",")
-                return alteredLine
+                -- If "noknown" and the spell name is not found, remove only the condition
+                -- Example1: /cast [known:Throw] Throw NOT APPLICABLE (INCORRECT CONDITION)
+                -- Example2: /cast [noknown:Throw] Shoot CHANGED TO /cast Shoot CONDITION REMOVED
+                local newChunk = chunk:gsub(",?%s*" .. condition .. "%s*" .. spellToCheck .. "%s*,?", ",") -- CONDITION REMOVED
+                return newChunk
             end
 
-            -- If the spell name is not found and "no" does not precede "known", remove the entire condition block
-            local alteredLine = line:gsub("%[[^%]]-" .. condition .. "[^;]*;", "")
-            return alteredLine
+            -- If "known" and the spell name is not found, remove the entire condition block
+            -- Example1: /cast [known:Throw] Throw CHANGED TO /cast  REMOVED ENTIRE CONDITION BLOCK
+            -- Example2: /cast [noknown:Throw] Shoot NOT APPLICABLE (INCORRECT CONDITION)
+            local newChunk = chunk:gsub("%[.*" .. condition .. ".*$", "") -- ENTIRE BLOCK REMOVED
+            return newChunk
         end
     },
 
@@ -71,16 +79,23 @@ function addon:patchMacro(macroInfo)
 
     -- Process each line in the super macro
     for _, line in ipairs(superMacroLines) do
-        -- Search for special conditions
-        for ruleName, rule in pairs(self.rules) do
-            if line:lower():find(rule.condition:lower()) then
-                -- If a special condition is found, run the corresponding function
-                line = rule.onMatch(line)
-                break
+        -- Split the line into chunks
+        local chunks = self:split(line, ";")
+
+        -- Process each chunk in the line
+        for i, chunk in ipairs(chunks) do
+            -- Search for special conditions
+            for ruleName, rule in pairs(self.rules) do
+                if chunk:lower():find(rule.condition:lower()) then
+                    -- If a special condition is found, run the corresponding function
+                    chunks[i] = rule.onMatch(chunk)
+                    break
+                end
             end
         end
 
-        table.insert(macroLines, line)
+        -- Reassemble the chunks into a line and insert it into macroLines
+        table.insert(macroLines, table.concat(chunks, ";"))
     end
 
     return addon:formatMacro(table.concat(macroLines, "\n"))
