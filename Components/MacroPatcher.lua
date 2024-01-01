@@ -6,7 +6,6 @@ addon.rules = {
         condition = "[Kk][Nn][Oo][Ww][Nn]:",
         onMatch = function(chunk)
             chunk = chunk:lower()
-            print("\nBefore: ", chunk)
             local isNoKnown = chunk:lower():find("noknown:") ~= nil
             local condition = isNoKnown and "noknown:" or "known:"
 
@@ -18,17 +17,12 @@ addon.rules = {
 
             for _, spell in ipairs(addon.spellbook) do
                 if spell.name:lower() == spellToCheck then
-                    print("Spell found: ", spell.name)
                     local newChunk = chunk:gsub(isNoKnown and blockPattern or conditionPattern, ",")
-                    print("Is gsub replacing anything? ", newChunk ~= chunk)
-                    print("New chunk after spell match: ", newChunk)
                     return newChunk
                 end
             end
 
             local newChunk = chunk:gsub(isNoKnown and conditionPattern or blockPattern, ",")
-            print("Is gsub replacing anything? ", newChunk ~= chunk)
-            print("New chunk after spell match: ", newChunk)
             return newChunk
         end
     },
@@ -71,7 +65,6 @@ function addon:patchMacro(macroInfo)
                 if chunk:lower():find(rule.condition:lower()) then
                     -- If a special condition is found, run the corresponding function
                     chunks[i] = rule.onMatch(chunk)
-                    print("After: ", chunks[i])
                     -- break
                 end
             end
