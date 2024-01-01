@@ -117,6 +117,7 @@ function addon:generateMacroGroups()
                     func = function() addon:DeleteCustomMacro(macroName) end,
                     confirm = true,
                     confirmText = "Are you sure you want to delete this macro?",
+                    hidden = not self.db.profile.macroS[macroName].isCustom, -- Hide if the macro is not custom
                 },
                 spacer1 = {
                     type = "description",
@@ -144,15 +145,6 @@ function addon:generateMacroGroups()
                 get = function(info) return addon.db.profile.macroS[macroName].superMacro end,
                 order = 7,
             }
-            -- addon.options.args.macroS.args[macroName].args.parameters = {
-            --     type = "input",
-            --     name = "Parameters",
-            --     desc = "Add parameters separated by commas",
-            --     multiline = 10,
-            --     set = function(info, val) addon.db.profile.macroS[macroName].parameters = val end,
-            --     get = function(info) return addon.db.profile.macroS[macroName].parameters end,
-            --     order = 8,
-            -- }
         end
 
         i = i + 1
