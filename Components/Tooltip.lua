@@ -42,10 +42,11 @@ function addon:GetTooltipByType(id, isType)
 end
 
 -- Function to extract text from a tooltip
-function addon:TableOfContents(aTooltip, retryCount)
+function addon:TableOfContents(aTooltip, retryCount, prevLength)
 	-- Maximum number of retries
 	local maxRetries = 5
 	retryCount = retryCount or 0
+	prevLength = prevLength or { left = 0, right = 0 }
 
 	if not aTooltip or not aTooltip:IsShown() then
 		print("Error: Invalid or hidden tooltip.")
@@ -73,10 +74,10 @@ function addon:TableOfContents(aTooltip, retryCount)
 		end
 	end
 
-	-- If tooltip is empty and retries are not exhausted, wait and retry
-	if atyp.onLeftSide == "" and atyp.onRightSide == "" and retryCount < maxRetries then
+	-- If tooltip text length is the same as previous and retries are not exhausted, wait and retry
+	if #atyp.onLeftSide == prevLength.left and #atyp.onRightSide == prevLength.right and retryCount < maxRetries then
 		C_Timer.After(0.05, function()
-			addon:TableOfContents(aTooltip, retryCount + 1)
+			addon:TableOfContents(aTooltip, retryCount + 1, { left = #atyp.onLeftSide, right = #atyp.onRightSide })
 		end)
 	else
 		if atyp.onLeftSide == "" and atyp.onRightSide == "" then

@@ -58,6 +58,10 @@ function addon:OnEnable()
 	self:RegisterEvent("ITEM_LOCK_CHANGED", sendIt)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", sendIt)
 	self:RegisterEvent("PLAYER_MONEY", sendIt)
+	-- new spell learned
+	self:RegisterEvent("SPELLS_CHANGED", sendIt)
+	self:RegisterEvent("LEARNED_SPELL_IN_TAB", sendIt)
+	self:RegisterEvent("SKILL_LINES_CHANGED", sendIt)
 end
 
 local lastTrigger = 0
@@ -89,7 +93,7 @@ function addon:tryAction()
 		return
 	end
 
-	local success = self:doTheThing()
+	local success = self:ProcessAll()
 	if success then
 		lastTrigger = GetTime()
 	end
@@ -100,7 +104,7 @@ function addon:SlashCommand(input, editbox)
 	input = input:trim()
 	if input == "run" then
 		self:Print("Running...") -- debugging
-		self:doTheThing()
+		self:ProcessAll()
 	elseif input == "enable" then
 		self:Enable()
 		self:Print("Enabled.")
@@ -118,7 +122,7 @@ function addon:SlashCommand(input, editbox)
 end
 
 -- function to run the addon and create the macros
-function addon:doTheThing()
+function addon:ProcessAll()
 	if InCombatLockdown() then
 		return false
 	else
