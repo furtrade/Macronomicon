@@ -116,14 +116,15 @@ end
 
 function addon:formatMacro(macro)
 	local formattedMacro, n = macro
-		:gsub(";+", ";") -- Removes multiple semicolons
-		:gsub("%s%s+", " ") -- Remove double spaces
-		:gsub(",%s+", ",") -- Remove spaces directly after a comma
-		:gsub("%s+$", "") -- Remove spaces at the end of a line
-		:gsub("%]%s+", "]") -- Remove whitespace after ']'
-		:gsub("%[%s+", "[") -- Remove whitespace after '['
-		:gsub(",%]", "]") -- Remove a comma immediately before a ']'
-		:gsub(";+$", "") -- Remove semicolons at the end of a line
+		:gsub(";+", ";")                                             -- Removes multiple semicolons
+		:gsub("%s%s+", " ")                                          -- Remove double spaces
+		:gsub(",%s+", ",")                                           -- Remove spaces directly after a comma
+		:gsub("%s+$", "")                                            -- Remove spaces at the end of a line
+		:gsub("%]%s+", "]")                                          -- Remove whitespace after ']'
+		:gsub("%[%s+", "[")                                          -- Remove whitespace after '['
+		:gsub(",%]", "]")                                            -- Remove a comma immediately before a ']'
+		:gsub(";+$", "")                                             -- Remove semicolons at the end of a line
+		:gsub("([/#]%w+%s;)", function(match) return match:sub(1, -2) end) -- Remove semicolon after special command
 
 	-- If no changes were made, return the string
 	if n == 0 then
