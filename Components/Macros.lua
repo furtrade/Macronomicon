@@ -115,24 +115,27 @@ function addon:selectElement(t)
 end
 
 function addon:formatMacro(macro)
-	local formattedMacro, n = macro
-		:gsub(";+", ";") -- Removes multiple semicolons
-		:gsub("%s%s+", " ") -- Remove double spaces
-		:gsub(",%s+", ",") -- Remove spaces directly after a comma
-		:gsub("%s+$", "") -- Remove spaces at the end of a line
-		:gsub("%]%s+", "]") -- Remove whitespace after ']'
-		:gsub("%[%s+", "[") -- Remove whitespace after '['
-		:gsub(",%]", "]") -- Remove a comma immediately before a ']'
-		:gsub(";+$", "") -- Remove semicolons at the end of a line
-		:gsub("([/#]%w+%s[;,])", function(match) return match:sub(1, -2) end)
+	local formattedMacro = macro
+	local previousMacro
 
-	-- If no changes were made, return the string
-	if n == 0 then
-		return formattedMacro
-	else
-		-- Otherwise, call the function again
-		return self:formatMacro(formattedMacro)
-	end
+	repeat
+		previousMacro = formattedMacro
+		formattedMacro = formattedMacro
+			:gsub(",;", ";")                    -- Remove commas before semicolons
+			:gsub(";,", ";")                    -- Remove commas after semicolons
+			:gsub(";+", ";")                    -- Removes multiple semicolons
+			:gsub("%s%s+", " ")                 -- Remove double spaces
+			:gsub(",%s+", ",")                  -- Remove spaces directly after a comma
+			:gsub("%s+$", "")                   -- Remove spaces at the end of a line
+			:gsub("%][ \t]+", "]")              -- Remove spaces and tabs after ']'
+			:gsub("%[%s+", "[")                 -- Remove whitespace after '['
+			:gsub(",%]", "]")                   -- Remove a comma immediately before a ']'
+			:gsub(";+$", "")                    -- Remove semicolons at the end of a line
+			:gsub("([/#]%w+%s[;,])", function(match) return match:sub(1, -2) end)
+		formattedMacro = formattedMacro:lower() -- Convert to lowercase
+	until formattedMacro == previousMacro
+
+	return formattedMacro
 end
 
 function addon:getCustomMacrosFromDB()
