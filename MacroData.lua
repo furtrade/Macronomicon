@@ -301,10 +301,6 @@ local function processItemsOrSpells(self, categoryKey, macroKey, macroData)
 		for _, entry in ipairs(entries or {}) do
 			local spell = entry.spellName
 			if not spell then return end
-			if entry.count and entry.count == 0 then
-				-- We've run out of this.
-				return
-			end
 
 			local name = entry.name
 

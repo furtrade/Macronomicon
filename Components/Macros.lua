@@ -81,35 +81,16 @@ function addon:selectElement(t)
 
 	-- Iterate over the elements
 	for _, element in ipairs(t) do
-		-- Debug: print element and its score
-		-- print("Element: ", element.link, "& Score: ", element.score)
-
 		-- Check if the score field is present and numeric
-		if element.score then
-			-- print("Score field is present.")
-
-			if type(element.score) == "number" then
-				-- print("Score field is a number.")
-
-				-- Check if the element's score is higher than the current highest score
-				if element.score > highestScore then
-					highestScore = element.score
-					selectedElement = element
-
-					-- Debug: print new highest score and selected element
-					-- print("New highest score: ", highestScore)
-					-- print("Selected element: ", selectedElement)
-				end
-			else
-				-- print("Score field is not a number.")
+		if element.score and type(element.score) == "number" then
+			-- Check if the element's score is higher than the current highest score
+			-- and if the count is not present or not equal to 0
+			if element.score > highestScore and (not element.count or element.count ~= 0) then
+				highestScore = element.score
+				selectedElement = element
 			end
-		else
-			-- print("Score field is not present.")
 		end
 	end
-
-	-- Debug: print selected element before returning
-	-- print("Final selected element: ", selectedElement)
 
 	return selectedElement
 end
@@ -121,16 +102,16 @@ function addon:formatMacro(macro)
 	repeat
 		previousMacro = formattedMacro
 		formattedMacro = formattedMacro
-			:gsub(",;", ";")                    -- Remove commas before semicolons
-			:gsub(";,", ";")                    -- Remove commas after semicolons
-			:gsub(";+", ";")                    -- Removes multiple semicolons
-			:gsub("%s%s+", " ")                 -- Remove double spaces
-			:gsub(",%s+", ",")                  -- Remove spaces directly after a comma
-			:gsub("%s+$", "")                   -- Remove spaces at the end of a line
-			:gsub("%][ \t]+", "]")              -- Remove spaces and tabs after ']'
-			:gsub("%[%s+", "[")                 -- Remove whitespace after '['
-			:gsub(",%]", "]")                   -- Remove a comma immediately before a ']'
-			:gsub(";+$", "")                    -- Remove semicolons at the end of a line
+			:gsub(",;", ";")              -- Remove commas before semicolons
+			:gsub(";,", ";")              -- Remove commas after semicolons
+			:gsub(";+", ";")              -- Removes multiple semicolons
+			:gsub("%s%s+", " ")           -- Remove double spaces
+			:gsub(",%s+", ",")            -- Remove spaces directly after a comma
+			:gsub("%s+$", "")             -- Remove spaces at the end of a line
+			:gsub("%][ \t]+", "]")        -- Remove spaces and tabs after ']'
+			:gsub("%[%s+", "[")           -- Remove whitespace after '['
+			:gsub(",%]", "]")             -- Remove a comma immediately before a ']'
+			:gsub(";+$", "")              -- Remove semicolons at the end of a line
 			:gsub("([/#]%w+%s[;,])", function(match) return match:sub(1, -2) end)
 		formattedMacro = formattedMacro:lower() -- Convert to lowercase
 	until formattedMacro == previousMacro
