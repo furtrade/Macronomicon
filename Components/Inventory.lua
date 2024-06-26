@@ -32,7 +32,7 @@ local function itemizer(bagOrSlotIndex, slotIndex)
         spellId = itemSpellId,
         rank = GetSpellSubtext(itemSpellId),
         count = GetItemCount(itemID),
-        reviewed = true
+        found = true
     }
 end
 
@@ -45,7 +45,7 @@ local function addItemToCache(bagOrSlotIndex, slotIndex)
         local cachedItem = cache[i]
         if cachedItem.link == itemLink then
             cachedItem.count = GetItemCount(cachedItem.id)
-            cachedItem.reviewed = true
+            cachedItem.found = true
             return
         end
     end
@@ -59,9 +59,9 @@ end
 function addon:UpdateItemCache()
     local cache = addon.itemCache
 
-    -- Mark all items in the cache as not reviewed
+    -- Mark all items in the cache as not found
     for i = 1, #cache do
-        cache[i].reviewed = false
+        cache[i].found = false
     end
 
     -- Update equipped items
@@ -78,9 +78,9 @@ function addon:UpdateItemCache()
         end
     end
 
-    -- Remove items from the cache that were not reviewed
+    -- Remove items from the cache that were not found
     for i = #cache, 1, -1 do
-        if not cache[i].reviewed then
+        if not cache[i].found then
             table.remove(cache, i)
         end
     end
