@@ -115,9 +115,8 @@ function addon:SlashCommand(input, editbox)
 	elseif input == "message" then
 		print("this is our saved message:", self.db.profile.someInput)
 	else
-		-- https://github.com/Stanzilla/WoWUIBugs/issues/89
-		InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
-		InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
+		Settings.OpenToCategory(self.optionsFrame.name)
+
 	end
 end
 
