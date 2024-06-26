@@ -1,4 +1,4 @@
-## Interface: 100200
+## Interface: 100207, 110000
 ## Title: Macrobial
 ## Author: Principium-Caelestrasz
 ## Notes: Maintains macros based on item availability. 
