@@ -6,7 +6,7 @@
 ## X-Wago-ID: 
 ## SavedVariables: MacrobialDB
 
-
+# Ace3 Libraries
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
 Libs\AceAddon-3.0\AceAddon-3.0.xml
@@ -24,13 +24,20 @@ Libs\AceComm-3.0\AceComm-3.0.xml
 Libs\AceTab-3.0\AceTab-3.0.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 
-
-Main.lua
-Options.lua
-MacroData.lua
-
+# Core files
 Components\Inventory.lua
 Components\MacroPatcher.lua
 Components\Macros.lua
 Components\Spellbook.lua
 Components\Tooltip.lua
+
+# Spellbook components
+UI\SpellbookTab.lua
+UI\SpellbookButtons.lua
+UI\SpellbookFrame.lua
+UI\PageNavigation.lua
+
+# Entry point
+Main.lua
+Options.lua
+MacroData.lua
