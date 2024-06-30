@@ -1,7 +1,7 @@
 local addonName, addon = ...
 
 -- Positioning options table
-local positionOptions = {
+addon.positionOptions = {
     startX1 = 0.18, -- Column 1 X position as a percentage of frame width
     startX2 = 0.58, -- Column 2 X position as a percentage of frame width
     margin = 0.14, -- Top and bottom margin as a percentage of frame height
@@ -9,6 +9,7 @@ local positionOptions = {
     maxRows = 6, -- Maximum number of rows per column
     buttonsPerPage = 12 -- Number of buttons per page (2 columns * 6 rows)
 }
+local positionOptions = addon.positionOptions
 
 local function CreateMacrobialSpellbookFrame()
     local frame = CreateFrame("Frame", "MacrobialSpellbookFrame", SpellBookFrame, "BackdropTemplate")
@@ -59,6 +60,8 @@ local function CreateMacrobialSpellbookFrame()
     local paddingY = (usableHeight - (positionOptions.maxRows * positionOptions.iconSize)) /
                          (positionOptions.maxRows - 1)
 
+    addon.spellButtons = {}
+
     for i, spellID in ipairs(validSpells) do
         local buttonName = "MacrobialSpellButton" .. i
         local button = addon.CreateDraggableButton(buttonName, frame, spellID, positionOptions.iconSize)
@@ -67,11 +70,17 @@ local function CreateMacrobialSpellbookFrame()
         local xOffset = column == 0 and startX1 or startX2
         local yOffset = -margin - (row * (positionOptions.iconSize + paddingY)) + frame:GetHeight() * 0.01
         button:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
-        button:Show()
+        table.insert(addon.spellButtons, button)
     end
+
+    -- Create page navigation buttons
+    addon.CreatePaginationButtons(frame, math.ceil(#validSpells / positionOptions.buttonsPerPage))
 
     MacrobialSpellbookFrame = frame
     frame:Hide()
+
+    -- Show the first page initially
+    addon.UpdateSpellbookPage(0)
 end
 
 addon.CreateMacrobialSpellbookFrame = CreateMacrobialSpellbookFrame
