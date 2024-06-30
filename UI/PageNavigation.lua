@@ -1,21 +1,19 @@
 local addonName, addon = ...
 
-local positionOptions = addon.positionOptions
-
 local function CreatePaginationButtons(frame, maxPages)
-    local prevButton = CreateFrame("Button", "MacrobialSpellbookPrevPageButton", frame, "UIPanelButtonTemplate")
-    prevButton:SetSize(32, 32)
-    prevButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -50, 15)
-    prevButton:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up")
-    prevButton:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down")
-    prevButton:SetDisabledTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Disabled")
-
     local nextButton = CreateFrame("Button", "MacrobialSpellbookNextPageButton", frame, "UIPanelButtonTemplate")
     nextButton:SetSize(32, 32)
-    nextButton:SetPoint("BOTTOMRIGHT", prevButton, "BOTTOMLEFT", -5, 0)
+    nextButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -50, 15)
     nextButton:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
     nextButton:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down")
     nextButton:SetDisabledTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Disabled")
+
+    local prevButton = CreateFrame("Button", "MacrobialSpellbookPrevPageButton", frame, "UIPanelButtonTemplate")
+    prevButton:SetSize(32, 32)
+    prevButton:SetPoint("BOTTOMRIGHT", nextButton, "BOTTOMLEFT", -5, 0)
+    prevButton:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up")
+    prevButton:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down")
+    prevButton:SetDisabledTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Disabled")
 
     prevButton:SetScript("OnClick", function()
         addon.UpdateSpellbookPage(-1)
@@ -51,8 +49,8 @@ function addon.UpdateSpellbookPage(direction)
         MacrobialSpellbookFrame.nextButton:Enable()
     end
 
-    local startIndex = (currentPage - 1) * positionOptions.buttonsPerPage + 1
-    local endIndex = startIndex + positionOptions.buttonsPerPage - 1
+    local startIndex = (currentPage - 1) * addon.positionOptions.buttonsPerPage + 1
+    local endIndex = startIndex + addon.positionOptions.buttonsPerPage - 1
 
     for i, button in ipairs(addon.spellButtons) do
         if i >= startIndex and i <= endIndex then
