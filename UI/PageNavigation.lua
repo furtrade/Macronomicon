@@ -1,26 +1,34 @@
 local _, addon = ...
 
+-- Ensure positionOptions and CalculateButtonPosition are available
+if not addon.positionOptions or not addon.CalculateButtonPosition then
+    error("positionOptions or CalculateButtonPosition is not defined. Ensure ButtonPosition.lua is loaded first.")
+end
+
 local function CreatePaginationButtons(frame, maxPages)
-    local nextButton = CreateFrame("Button", "MacrobialSpellbookNextPageButton", frame, "UIPanelButtonTemplate")
-    nextButton:SetSize(32, 32)
-    nextButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -50, 15)
-    nextButton:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
-    nextButton:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down")
-    nextButton:SetDisabledTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Disabled")
+    local function createButton(name, point, relativeFrame, relativePoint, offsetX, offsetY, textureUp, textureDown,
+        textureDisabled, onClick)
+        local button = CreateFrame("Button", name, frame, "UIPanelButtonTemplate")
+        button:SetSize(32, 32)
+        button:SetPoint(point, relativeFrame, relativePoint, offsetX, offsetY)
+        button:SetNormalTexture(textureUp)
+        button:SetPushedTexture(textureDown)
+        button:SetDisabledTexture(textureDisabled)
+        button:SetScript("OnClick", onClick)
+        return button
+    end
 
-    local prevButton = CreateFrame("Button", "MacrobialSpellbookPrevPageButton", frame, "UIPanelButtonTemplate")
-    prevButton:SetSize(32, 32)
-    prevButton:SetPoint("BOTTOMRIGHT", nextButton, "BOTTOMLEFT", -5, 0)
-    prevButton:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up")
-    prevButton:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down")
-    prevButton:SetDisabledTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Disabled")
+    local nextButton = createButton("MacrobialSpellbookNextPageButton", "BOTTOMRIGHT", frame, "BOTTOMRIGHT", -50, 15,
+        "Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up", "Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down",
+        "Interface\\Buttons\\UI-SpellbookIcon-NextPage-Disabled", function()
+            addon.UpdateSpellbookPage(1)
+        end)
 
-    prevButton:SetScript("OnClick", function()
-        addon.UpdateSpellbookPage(-1)
-    end)
-    nextButton:SetScript("OnClick", function()
-        addon.UpdateSpellbookPage(1)
-    end)
+    local prevButton = createButton("MacrobialSpellbookPrevPageButton", "BOTTOMRIGHT", nextButton, "BOTTOMLEFT", -5, 0,
+        "Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up", "Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down",
+        "Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Disabled", function()
+            addon.UpdateSpellbookPage(-1)
+        end)
 
     frame.prevButton = prevButton
     frame.nextButton = nextButton
@@ -54,6 +62,9 @@ function addon.UpdateSpellbookPage(direction)
 
     for i, button in ipairs(addon.spellButtons) do
         if i >= startIndex and i <= endIndex then
+            local xOffset, yOffset = addon.CalculateButtonPosition(i - startIndex + 1, button:GetParent():GetWidth(),
+                button:GetParent():GetHeight())
+            button:SetPoint("TOPLEFT", button:GetParent(), "TOPLEFT", xOffset, yOffset)
             button:Show()
         else
             button:Hide()

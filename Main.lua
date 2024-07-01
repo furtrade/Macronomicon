@@ -18,9 +18,10 @@ addon.player = {
 
 addon.spellbook = {}
 addon.itemCache = {}
+addon.spellButtons = {} -- Initialize spellButtons table
 
 function addon:OnInitialize()
-    self.db = LibStub("AceDB-3.0"):New(addon.title .. "DB", self.defaults)
+    self.db = LibStub("AceDB-3.0"):New(addonName .. "DB", self.defaults)
     AceConfig:RegisterOptionsTable(addon.title .. "_Options", self.options)
     self.optionsFrame = AceConfigDialog:AddToBlizOptions(addon.title .. "_Options", addon.title)
     self:RegisterChatCommand(addon.title, "SlashCommand")
@@ -29,18 +30,19 @@ function addon:OnInitialize()
     self.gui = LibStub("AceGUI-3.0")
 
     -- Ensure the Spellbook tab is created
-    if addon.CreateSpellbookTab then
-        addon.CreateSpellbookTab()
+    if self.CreateSpellbookTab then
+        self.CreateSpellbookTab()
     end
+
+    -- Load custom buttons and process scripts
+    self:LoadCustomButtonScripts()
 
     -- Generate the macro groups
     self:loadCustomMacros()
     self:generateMacroGroups()
 
-    -- Ensure custom scripts are processed after DB is initialized
-    if addon.SaveAllCustomButtonScripts then
-        addon:SaveAllCustomButtonScripts()
-    end
+    -- Ensure the Spellbook frame is created
+    self:CreateMacrobialSpellbookFrame()
 end
 
 function addon:OnEnable()
@@ -57,7 +59,6 @@ function addon:OnEnable()
     self:RegisterEvent("BANKFRAME_CLOSED", sendIt)
     self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED", sendIt)
     self:RegisterEvent("ITEM_LOCK_CHANGED", sendIt)
-    self:RegisterEvent("PLAYER_ENTERING_WORLD", sendIt)
     self:RegisterEvent("PLAYER_MONEY", sendIt)
     self:RegisterEvent("SPELLS_CHANGED", sendIt)
     self:RegisterEvent("LEARNED_SPELL_IN_TAB", sendIt)
@@ -119,15 +120,11 @@ function addon:ProcessAll()
     if InCombatLockdown() then
         return false
     else
-        addon:UpdateItemCache()
-        addon:UpdateSpellbook()
-        addon:UpdateMacroData()
-        addon:ProcessMacros()
+        self:UpdateItemCache()
+        self:UpdateSpellbook()
+        self:UpdateMacroData()
+        self:ProcessMacros()
+        self:processCustomScripts()
         return true
     end
-end
-
--- Ensure the Spellbook tab is created on load
-if addon.CreateSpellbookTab then
-    addon.CreateSpellbookTab()
 end

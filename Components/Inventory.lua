@@ -3,14 +3,30 @@ local _, addon = ...
 addon.itemCache = addon.itemCache or {}
 
 -- Function to get the best item based on score
-function addon:getBestItem(items)
-    local best, highScore = nil, -math.huge
-    for _, item in ipairs(items) do
-        if item.score and item.score > highScore and (not item.count or item.count ~= 0) then
-            best, highScore = item, item.score
+function addon:getBestItem(t)
+    if not t then
+        print("Error: items is nil")
+        return nil
+    end
+
+    local selectedElement = nil
+    local highestScore = -math.huge -- Initialize to lowest possible value
+
+    -- Iterate over the elements
+    for _, element in ipairs(t) do
+        -- Check if the score field is present and numeric
+        if element.score and type(element.score) == "number" then
+            -- Check if the element's score is higher than the current highest score
+            -- and if the count is not present or not equal to 0
+            if element.score > highestScore and (not element.count or element.count ~= 0) then
+                highestScore = element.score
+                selectedElement = element
+            end
         end
     end
-    return best
+
+    return selectedElement
+
 end
 
 local function getItemLink(bagOrSlotIndex, slotIndex)

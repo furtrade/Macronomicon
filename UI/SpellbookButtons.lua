@@ -1,53 +1,68 @@
 local _, addon = ...
 
-addon.spellButtons = addon.spellButtons or {}
+local positionOptions = addon.positionOptions -- Ensure positionOptions is referenced correctly
 
-local function CreateDraggableButton(name, parentFrame, actionType, actionData, iconSize)
+-- Utility function to find a macro by name
+local function FindMacroByName(name)
+    for i = 1, MAX_ACCOUNT_MACROS + MAX_CHARACTER_MACROS do
+        local macroName = GetMacroInfo(i)
+        if macroName == name then
+            return i
+        end
+    end
+    return nil
+end
+
+function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, iconSize)
     local button = CreateFrame("Button", name, parentFrame, "SecureActionButtonTemplate, ActionButtonTemplate")
     button:SetSize(iconSize, iconSize)
+    button.icon = _G[name .. "Icon"]
+
+    local function setButtonAttributes(type, data)
+        button:SetAttribute("type", type)
+        button:SetAttribute(type, data)
+    end
+
+    local function setButtonScripts(pickupFunc, placeFunc)
+        button:SetScript("OnDragStart", function(self)
+            pickupFunc(actionData)
+        end)
+        button:SetScript("OnReceiveDrag", function(self)
+            placeFunc()
+            ClearCursor()
+        end)
+    end
 
     if actionType == "spell" then
-        button:SetAttribute("type", "spell")
-        button:SetAttribute("spell", actionData)
-        button.icon = _G[name .. "Icon"]
+        setButtonAttributes("spell", actionData)
         button.icon:SetTexture(GetSpellTexture(actionData))
-
-        button:SetScript("OnDragStart", function(self)
-            PickupSpell(actionData)
-        end)
-
-        button:SetScript("OnReceiveDrag", function(self)
-            PlaceAction(GetCursorInfo())
-            ClearCursor()
-        end)
+        setButtonScripts(PickupSpell, PlaceAction)
     elseif actionType == "macro" then
-        button:SetAttribute("type", "macro")
-        button:SetAttribute("macro", actionData)
-        button.icon = _G[name .. "Icon"]
-        button.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark") -- Placeholder texture, replace as needed
-
-        button:SetScript("OnDragStart", function(self)
-            PickupMacro(actionData)
-        end)
-
-        button:SetScript("OnReceiveDrag", function(self)
-            PlaceAction(GetCursorInfo())
-            ClearCursor()
-        end)
+        setButtonAttributes("macro", actionData)
+        button.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+        setButtonScripts(PickupMacro, PlaceAction)
     elseif actionType == "custom" then
-        button:SetAttribute("type", "macro")
-        button:SetAttribute("macrotext", actionData.macroText)
-        button.icon = _G[name .. "Icon"]
-        button.icon:SetTexture(actionData.icon or "Interface\\Icons\\INV_Misc_QuestionMark") -- Placeholder texture, replace as needed
-
+        button.icon:SetTexture(actionData.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
         button:SetScript("OnDragStart", function(self)
-            PickupMacro(actionData.macroText)
+            if not actionData.macroID then
+                local macroName = "CustomMacro_" .. name
+                local macroID = FindMacroByName(macroName)
+                if not macroID then
+                    macroID = CreateMacro(macroName, "INV_Misc_QuestionMark", actionData.macroText, true)
+                    print("Created macro with ID:", macroID)
+                else
+                    EditMacro(macroID, macroName, "INV_Misc_QuestionMark", actionData.macroText)
+                    print("Updated macro with ID:", macroID)
+                end
+                actionData.macroID = macroID
+            end
+            if actionData.macroID then
+                PickupMacro(actionData.macroID)
+            else
+                print("Error: No macro ID for custom script")
+            end
         end)
-
-        button:SetScript("OnReceiveDrag", function(self)
-            PlaceAction(GetCursorInfo())
-            ClearCursor()
-        end)
+        setButtonScripts(PickupMacro, PlaceAction)
     end
 
     button:SetScript("OnEnter", function(self)
@@ -67,9 +82,45 @@ local function CreateDraggableButton(name, parentFrame, actionType, actionData, 
     end)
 
     button:RegisterForDrag("LeftButton")
-
-    addon.spellButtons[name] = button
     return button
 end
 
-addon.CreateDraggableButton = CreateDraggableButton
+function addon:FindButtonByName(name)
+    for _, button in ipairs(self.spellButtons or {}) do
+        if button:GetName() == name then
+            return button
+        end
+    end
+    return nil
+end
+
+function addon:CreateButtons(frame)
+    local frameWidth = frame:GetWidth()
+    local frameHeight = frame:GetHeight()
+
+    local customButtons = self.db.profile.customButtons or {}
+    print("Entering addon:CreateButtons...")
+    print(string.format("Frame dimensions - Width: %f, Height: %f", frameWidth, frameHeight))
+
+    for _, custom in ipairs(customButtons) do
+        print("Creating button:", custom.name)
+        local buttonName = custom.name or "unknown" .. _
+        local button = self:FindButtonByName(buttonName)
+        if not button then
+            button = self:CreateDraggableButton(buttonName, frame, "custom", custom, positionOptions.iconSize)
+            table.insert(self.spellButtons, button)
+        end
+    end
+
+    for i, button in ipairs(self.spellButtons) do
+        print(string.format("Button index: %d", i))
+        local xOffset, yOffset = addon.CalculateButtonPosition(i, frameWidth, frameHeight)
+        print(string.format("Button position - Name: %s, X: %f, Y: %f", button:GetName(), xOffset, yOffset))
+        button:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
+        button:Hide()
+    end
+
+    local totalButtons = #self.spellButtons
+    local maxPages = math.ceil(totalButtons / positionOptions.buttonsPerPage)
+    addon.CreatePaginationButtons(frame, maxPages)
+end
