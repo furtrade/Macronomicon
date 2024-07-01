@@ -1,52 +1,12 @@
+-- ScriptLogic.lua
+-- Description:
+-- This file contains functions to generate the script text for custom buttons. 
+-- It is responsible for constructing the script content that will be used by the 
+-- SpellbookButtons.lua file to create draggable buttons.
 local addonName, addon = ...
 
--- Table to store custom buttons temporarily
-addon.customButtons = {}
-
--- Function to check if a custom button already exists
-function addon:customButtonExists(name)
-    return self.db and self.db.profile.customButtons[name] ~= nil
-end
-
--- Function to create or update a custom button
-function addon:createOrUpdateCustomButton(name, script, icon)
-    if not self:customButtonExists(name) then
-        self:createCustomButton(name, script, icon)
-    else
-        self:updateCustomButton(name, script, icon)
-    end
-end
-
--- Function to create a new custom button
-function addon:createCustomButton(name, script, icon)
-    if not self.db then
-        return
-    end
-    self.db.profile.customButtons[name] = {
-        script = script,
-        icon = icon or "Interface\\Icons\\INV_Misc_QuestionMark"
-    }
-    self.customButtons[name] = self.db.profile.customButtons[name]
-    -- Create the button
-    addon.CreateDraggableButton(name, UIParent, "custom", name, addon.positionOptions.iconSize)
-end
-
--- Function to update an existing custom button
-function addon:updateCustomButton(name, script, icon)
-    if not self.db then
-        return
-    end
-    if self:customButtonExists(name) then
-        self.db.profile.customButtons[name].script = script
-        if icon then
-            self.db.profile.customButtons[name].icon = icon
-        end
-        self.customButtons[name] = self.db.profile.customButtons[name]
-    end
-end
-
--- Function to build the custom button script
-function addon:buildCustomButtonScript(scriptDef)
+-- Function to generate script text for custom buttons
+function addon:BuildScriptText(scriptDef)
     local scriptLines = {scriptDef.header or ""}
     if scriptDef.body then
         table.insert(scriptLines, scriptDef.body)
@@ -54,18 +14,45 @@ function addon:buildCustomButtonScript(scriptDef)
     return table.concat(scriptLines, "\n")
 end
 
--- Function to load custom buttons from the database
-function addon:loadCustomButtons()
+-- Function to save or update a custom button script
+function addon:SaveCustomButtonScript(name, scriptDef, icon)
     if not self.db then
+        print("Error: Database is not initialized")
         return
     end
+
+    local scriptText = self:BuildScriptText(scriptDef)
+    local buttonData = {
+        name = name,
+        scriptText = scriptText,
+        icon = icon or "Interface\\Icons\\INV_Misc_QuestionMark"
+    }
+    print("Saving Custom Button Script: ", name) -- Logging
+    self.db.profile.customButtons[name] = buttonData
+end
+
+-- Function to load custom button scripts from the database
+function addon:LoadCustomButtonScripts()
+    if not self.db then
+        print("Error: Database is not initialized")
+        return
+    end
+
     self.customButtons = self.db.profile.customButtons or {}
 end
 
--- Function to process all custom buttons
-function addon:processCustomButtons()
-    self:loadCustomButtons()
-    for name, buttonInfo in pairs(self.customButtons) do
-        self:createOrUpdateCustomButton(name, buttonInfo.script, buttonInfo.icon)
+-- Function to save all custom button scripts
+function addon:SaveAllCustomButtonScripts()
+    self:LoadCustomButtonScripts()
+
+    for scriptType, scriptTypeData in pairs(addon.macroData) do
+        for scriptKey, scriptInfo in pairs(scriptTypeData) do
+            self:SaveCustomButtonScript(scriptInfo.name, scriptInfo, scriptInfo.icon)
+        end
     end
 end
+
+-- Initialize custom button scripts
+-- if addon.SaveAllCustomButtonScripts then
+--     addon:SaveAllCustomButtonScripts()
+-- end

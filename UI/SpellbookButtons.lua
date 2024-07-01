@@ -1,5 +1,7 @@
 local addonName, addon = ...
 
+addon.spellButtons = addon.spellButtons or {}
+
 local function CreateDraggableButton(name, parentFrame, actionType, actionData, iconSize)
     local button = CreateFrame("Button", name, parentFrame, "SecureActionButtonTemplate, ActionButtonTemplate")
     button:SetSize(iconSize, iconSize)
@@ -33,14 +35,13 @@ local function CreateDraggableButton(name, parentFrame, actionType, actionData, 
             ClearCursor()
         end)
     elseif actionType == "custom" then
-        local scriptInfo = addon:GetScriptInfo(actionData)
         button:SetAttribute("type", "macro")
-        button:SetAttribute("macrotext", scriptInfo.script)
+        button:SetAttribute("macrotext", actionData.macroText)
         button.icon = _G[name .. "Icon"]
-        button.icon:SetTexture(scriptInfo.icon)
+        button.icon:SetTexture(actionData.icon or "Interface\\Icons\\INV_Misc_QuestionMark") -- Placeholder texture, replace as needed
 
         button:SetScript("OnDragStart", function(self)
-            PickupMacro(scriptInfo.script)
+            PickupMacro(actionData.macroText)
         end)
 
         button:SetScript("OnReceiveDrag", function(self)
@@ -55,9 +56,8 @@ local function CreateDraggableButton(name, parentFrame, actionType, actionData, 
             GameTooltip:SetSpellByID(actionData)
         elseif actionType == "macro" then
             GameTooltip:SetText("Macro")
-        elseif actionType == "custom" then
-            local scriptInfo = addon:GetScriptInfo(actionData)
-            GameTooltip:SetText(scriptInfo.tooltip)
+        elseif actionType == "custom" and actionData.tooltip then
+            GameTooltip:SetText(actionData.tooltip)
         end
         GameTooltip:Show()
     end)
@@ -67,30 +67,9 @@ local function CreateDraggableButton(name, parentFrame, actionType, actionData, 
     end)
 
     button:RegisterForDrag("LeftButton")
+
+    addon.spellButtons[name] = button
     return button
 end
 
 addon.CreateDraggableButton = CreateDraggableButton
-
-function addon:GetScriptInfo(name)
-    return self.db.profile.customButtons[name]
-end
-
-function addon:CreateAndStoreCustomButton(name, script, iconSize, iconTexture, tooltip)
-    -- Store button info in AceDB
-    self.db.profile.customButtons[name] = {
-        script = script,
-        iconSize = iconSize,
-        icon = iconTexture,
-        tooltip = tooltip
-    }
-
-    -- Create the button
-    self:CreateDraggableButton(name, UIParent, "custom", name, iconSize)
-end
-
-function addon:LoadCustomButtons()
-    for name, buttonInfo in pairs(self.db.profile.customButtons) do
-        self:CreateDraggableButton(name, UIParent, "custom", name, buttonInfo.iconSize)
-    end
-end

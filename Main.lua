@@ -37,8 +37,10 @@ function addon:OnInitialize()
     self:loadCustomMacros()
     self:generateMacroGroups()
 
-    -- Process custom buttons after DB is initialized
-    self:processCustomButtons()
+    -- Ensure custom scripts are processed after DB is initialized
+    if addon.SaveAllCustomButtonScripts then
+        addon:SaveAllCustomButtonScripts()
+    end
 end
 
 function addon:OnEnable()
