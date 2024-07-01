@@ -27,7 +27,7 @@ PREFERENCE 2:
 - Create a sleek UI similar to "OmniCD".
 
 ------------------------------------------------------------
-]] local addonName, addon = ...
+]] local _, addon = ...
 
 addon.defaults = {
     profile = {

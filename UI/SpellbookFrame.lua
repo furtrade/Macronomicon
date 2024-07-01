@@ -1,4 +1,4 @@
-local addonName, addon = ...
+local _, addon = ...
 
 -- Positioning options table
 addon.positionOptions = {
@@ -11,6 +11,23 @@ addon.positionOptions = {
 }
 local positionOptions = addon.positionOptions
 
+-- Function to create and position buttons
+local function CreateButtons(frame, buttonsData, startX1, startX2, margin, paddingY, frameHeight)
+    addon.spellButtons = {}
+
+    for index, buttonData in ipairs(buttonsData) do
+        local buttonName = "MacrobialCustomButton" .. index
+        local button = addon.CreateDraggableButton(buttonName, frame, "custom", buttonData, positionOptions.iconSize)
+        local column = math.floor((index - 1) % positionOptions.buttonsPerPage / positionOptions.maxRows)
+        local row = (index - 1) % positionOptions.maxRows
+        local xOffset = column == 0 and startX1 or startX2
+        local yOffset = -margin - (row * (positionOptions.iconSize + paddingY)) + frameHeight * 0.01
+        button:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
+        table.insert(addon.spellButtons, button)
+    end
+end
+
+-- Main function to create the spellbook frame
 local function CreateMacrobialSpellbookFrame()
     local frame = CreateFrame("Frame", "MacrobialSpellbookFrame", SpellBookFrame, "BackdropTemplate")
     frame:SetPoint("TOPLEFT", SpellBookFrame, "TOPLEFT", 0, 0)
@@ -34,36 +51,6 @@ local function CreateMacrobialSpellbookFrame()
     frame:SetToplevel(true)
     frame:SetFrameLevel(SpellBookFrame:GetFrameLevel() + 3)
 
-    local spells = {6603, 312411, 368896, 312425, 312724, 125439, 309819, 312411, 34091, 233368, -- Original Spells
-    172, 686, 688, 697, 1454, 5697, 6201, 6353, 6360, 691, 712, 5138, 6229, 1949, 698 -- Additional Spells
-    }
-
-    -- Custom scripts for testing (if needed, otherwise remove this part)
-    local customScripts = {{
-        macroText = "/run print('Custom button 1 clicked!')",
-        tooltip = "This is custom button 1.",
-        icon = "Interface\\Icons\\INV_Misc_QuestionMark"
-    }, {
-        macroText = "/run print('Custom button 2 clicked!')",
-        tooltip = "This is custom button 2.",
-        icon = "Interface\\Icons\\INV_Misc_QuestionMark"
-    }}
-
-    -- Filter out invalid spell IDs
-    local validSpells = {}
-    for _, spellID in ipairs(spells) do
-        local spellName = GetSpellInfo(spellID)
-        if spellName then
-            table.insert(validSpells, spellID)
-        end
-    end
-
-    table.sort(validSpells, function(a, b)
-        local nameA = GetSpellInfo(a)
-        local nameB = GetSpellInfo(b)
-        return nameA > nameB
-    end)
-
     local frameWidth = frame:GetWidth()
     local frameHeight = frame:GetHeight()
     local startX1 = frameWidth * positionOptions.startX1
@@ -73,33 +60,14 @@ local function CreateMacrobialSpellbookFrame()
     local paddingY = (usableHeight - (positionOptions.maxRows * positionOptions.iconSize)) /
                          (positionOptions.maxRows - 1)
 
-    addon.spellButtons = {}
+    -- Load custom buttons from the database
+    local customButtons = addon.db.profile.customButtons or {}
 
-    for i, spellID in ipairs(validSpells) do
-        local buttonName = "MacrobialSpellButton" .. i
-        local button = addon.CreateDraggableButton(buttonName, frame, "spell", spellID, positionOptions.iconSize)
-        local column = math.floor((i - 1) % positionOptions.buttonsPerPage / positionOptions.maxRows)
-        local row = (i - 1) % positionOptions.maxRows
-        local xOffset = column == 0 and startX1 or startX2
-        local yOffset = -margin - (row * (positionOptions.iconSize + paddingY)) + frame:GetHeight() * 0.01
-        button:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
-        table.insert(addon.spellButtons, button)
-    end
-
-    -- Add custom script buttons if needed
-    for i, custom in ipairs(customScripts) do
-        local buttonName = "MacrobialCustomButton" .. i
-        local button = addon.CreateDraggableButton(buttonName, frame, "custom", custom, positionOptions.iconSize)
-        local column = math.floor((#validSpells + i - 1) % positionOptions.buttonsPerPage / positionOptions.maxRows)
-        local row = (#validSpells + i - 1) % positionOptions.maxRows
-        local xOffset = column == 0 and startX1 or startX2
-        local yOffset = -margin - (row * (positionOptions.iconSize + paddingY)) + frame:GetHeight() * 0.01
-        button:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
-        table.insert(addon.spellButtons, button)
-    end
+    -- Create the buttons with the pre-calculated dimensions
+    CreateButtons(frame, customButtons, startX1, startX2, margin, paddingY, frameHeight)
 
     -- Create page navigation buttons
-    addon.CreatePaginationButtons(frame, math.ceil((#validSpells + #customScripts) / positionOptions.buttonsPerPage))
+    addon.CreatePaginationButtons(frame, math.ceil(#customButtons / positionOptions.buttonsPerPage))
 
     MacrobialSpellbookFrame = frame
     frame:Hide()

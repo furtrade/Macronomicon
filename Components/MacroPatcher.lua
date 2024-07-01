@@ -1,4 +1,4 @@
-local addonName, addon = ...
+local _, addon = ...
 
 addon.rules = {
     -- TODO: Add support for switching between shoot and throw in Classic
@@ -25,7 +25,7 @@ addon.rules = {
             local newChunk = chunk:gsub(isNoKnown and conditionPattern or blockPattern, ",")
             return newChunk
         end
-    },
+    }
 
     -- Define more rules as needed...
 }

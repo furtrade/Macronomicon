@@ -4,7 +4,7 @@
 -- It ensures that each button is up-to-date with the latest script version and manages 
 -- the creation and update process of the buttons based on their scripts. It also interacts 
 -- with the database to store and retrieve button information.
-local addonName, addon = ...
+local _, addon = ...
 
 -- Function to check if a custom button already exists
 function addon:customButtonExists(name)

@@ -1,22 +1,39 @@
-local addonName, addon = ...
+local _, addon = ...
 
 addon.itemCache = addon.itemCache or {}
 
+-- Function to get the best item based on score
+function addon:getBestItem(items)
+    local best, highScore = nil, -math.huge
+    for _, item in ipairs(items) do
+        if item.score and item.score > highScore and (not item.count or item.count ~= 0) then
+            best, highScore = item, item.score
+        end
+    end
+    return best
+end
+
 local function getItemLink(bagOrSlotIndex, slotIndex)
-    return slotIndex and C_Container.GetContainerItemLink(bagOrSlotIndex, slotIndex)
-           or GetInventoryItemLink("player", bagOrSlotIndex)
+    return slotIndex and C_Container.GetContainerItemLink(bagOrSlotIndex, slotIndex) or
+               GetInventoryItemLink("player", bagOrSlotIndex)
 end
 
 local function itemizer(bagOrSlotIndex, slotIndex)
     local itemLink = getItemLink(bagOrSlotIndex, slotIndex)
-    if not itemLink then return nil end
+    if not itemLink then
+        return nil
+    end
 
     local itemID = tonumber(string.match(itemLink, "item:(%d+):"))
-    if not itemID then return nil end
+    if not itemID then
+        return nil
+    end
 
     local canUse = C_PlayerInfo.CanUseItem(itemID)
     local itemSpell, itemSpellId = GetItemSpell(itemID)
-    if not (canUse and itemSpell) then return nil end
+    if not (canUse and itemSpell) then
+        return nil
+    end
 
     local itemLevel, _, itemType, itemSubType, _, equipLoc = select(4, GetItemInfo(itemID))
 
@@ -38,7 +55,9 @@ end
 
 local function addItemToCache(bagOrSlotIndex, slotIndex)
     local itemLink = getItemLink(bagOrSlotIndex, slotIndex)
-    if not itemLink then return end
+    if not itemLink then
+        return
+    end
 
     local cache = addon.itemCache
     for i = 1, #cache do
