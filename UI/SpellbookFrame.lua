@@ -34,8 +34,8 @@ local function CreateMacrobialSpellbookFrame()
     frame:SetToplevel(true)
     frame:SetFrameLevel(SpellBookFrame:GetFrameLevel() + 3)
 
-    local spells = {6603, 312411, 368896, 312425, 312724, 125439, 309819, 312411, 34091, 233368, 172, 686, 688, 697,
-                    1454, 5697, 6201, 6353, 6360, 691, 712, 5138, 6229, 1949, 698}
+    local spells = {6603, 312411, 368896, 312425, 312724, 125439, 309819, 312411, 34091, 233368, 59752, 69041, 20594,
+                    20549, 58984, 20572, 7744, 20577, 26297, 20589}
 
     -- Filter out invalid spell IDs
     local validSpells = {}
@@ -74,22 +74,11 @@ local function CreateMacrobialSpellbookFrame()
         table.insert(addon.spellButtons, button)
     end
 
-    -- Add custom script buttons
-    addon:processCustomButtons()
-    local customButtons = addon.customButtons
-    for name, buttonInfo in pairs(customButtons) do
-        local buttonName = "MacrobialCustomButton" .. name
-        local button = addon.CreateDraggableButton(buttonName, frame, "custom", buttonInfo, positionOptions.iconSize)
-        local column = math.floor((#validSpells + i - 1) % positionOptions.buttonsPerPage / positionOptions.maxRows)
-        local row = (#validSpells + i - 1) % positionOptions.maxRows
-        local xOffset = column == 0 and startX1 or startX2
-        local yOffset = -margin - (row * (positionOptions.iconSize + paddingY)) + frame:GetHeight() * 0.01
-        button:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
-        table.insert(addon.spellButtons, button)
-    end
+    -- Load custom buttons
+    addon:LoadCustomButtons()
 
     -- Create page navigation buttons
-    addon.CreatePaginationButtons(frame, math.ceil((#validSpells + #customButtons) / positionOptions.buttonsPerPage))
+    addon.CreatePaginationButtons(frame, math.ceil(#validSpells / positionOptions.buttonsPerPage))
 
     MacrobialSpellbookFrame = frame
     frame:Hide()

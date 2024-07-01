@@ -1,11 +1,11 @@
 local addonName, addon = ...
 
--- Table to store custom buttons and their scripts
+-- Table to store custom buttons temporarily
 addon.customButtons = {}
 
 -- Function to check if a custom button already exists
 function addon:customButtonExists(name)
-    return self.customButtons[name] ~= nil
+    return self.db and self.db.profile.customButtons[name] ~= nil
 end
 
 -- Function to create or update a custom button
@@ -19,19 +19,29 @@ end
 
 -- Function to create a new custom button
 function addon:createCustomButton(name, script, icon)
-    self.customButtons[name] = {
+    if not self.db then
+        return
+    end
+    self.db.profile.customButtons[name] = {
         script = script,
         icon = icon or "Interface\\Icons\\INV_Misc_QuestionMark"
     }
+    self.customButtons[name] = self.db.profile.customButtons[name]
+    -- Create the button
+    addon.CreateDraggableButton(name, UIParent, "custom", name, addon.positionOptions.iconSize)
 end
 
 -- Function to update an existing custom button
 function addon:updateCustomButton(name, script, icon)
+    if not self.db then
+        return
+    end
     if self:customButtonExists(name) then
-        self.customButtons[name].script = script
+        self.db.profile.customButtons[name].script = script
         if icon then
-            self.customButtons[name].icon = icon
+            self.db.profile.customButtons[name].icon = icon
         end
+        self.customButtons[name] = self.db.profile.customButtons[name]
     end
 end
 
@@ -46,10 +56,10 @@ end
 
 -- Function to load custom buttons from the database
 function addon:loadCustomButtons()
-    local customButtonsFromDB = self.db.profile.customButtons or {}
-    for name, buttonInfo in pairs(customButtonsFromDB) do
-        self:createOrUpdateCustomButton(name, buttonInfo.script, buttonInfo.icon)
+    if not self.db then
+        return
     end
+    self.customButtons = self.db.profile.customButtons or {}
 end
 
 -- Function to process all custom buttons

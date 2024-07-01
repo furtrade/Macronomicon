@@ -36,6 +36,9 @@ function addon:OnInitialize()
     -- Generate the macro groups
     self:loadCustomMacros()
     self:generateMacroGroups()
+
+    -- Process custom buttons after DB is initialized
+    self:processCustomButtons()
 end
 
 function addon:OnEnable()

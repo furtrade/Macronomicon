@@ -27,17 +27,17 @@ PREFERENCE 2:
 - Create a sleek UI similar to "OmniCD".
 
 ------------------------------------------------------------
-]]
-local addonName, addon = ...
+]] local addonName, addon = ...
 
 addon.defaults = {
     profile = {
         ["macroS"] = {
             ["*"] = {
                 toggleOption = true
-            },
+            }
         },
-    },
+        customButtons = {}
+    }
 }
 
 addon.options = {
@@ -56,9 +56,9 @@ addon.options = {
                     order = 1,
                     name = "Create Custom Macro",
                     desc = "Create a new custom macro",
-                    func = "CreateCustomMacro",
-                },
-            },
+                    func = "CreateCustomMacro"
+                }
+            }
         },
         macroS = {
             type = "group",
@@ -68,9 +68,9 @@ addon.options = {
             args = {
                 -- Options for the selected macro
                 -- These options will be dynamically updated based on the selected macro
-            },
-        },
-    },
+            }
+        }
+    }
 }
 
 function addon:GetMacroNames()
@@ -106,30 +106,38 @@ function addon:generateMacroGroups()
                     order = 0,
                     name = "Enable",
                     desc = "Enable or disable this macro",
-                    get = function() return addon.db.profile.macroS[macroName].toggleOption end,
-                    set = function(_, value) addon.db.profile.macroS[macroName].toggleOption = value end,
+                    get = function()
+                        return addon.db.profile.macroS[macroName].toggleOption
+                    end,
+                    set = function(_, value)
+                        addon.db.profile.macroS[macroName].toggleOption = value
+                    end
                 },
                 ["delete" .. macroName] = {
                     type = "execute",
                     order = 2,
                     name = "Delete",
                     desc = "Delete this macro",
-                    func = function() addon:DeleteCustomMacro(macroName) end,
+                    func = function()
+                        addon:DeleteCustomMacro(macroName)
+                    end,
                     confirm = true,
                     confirmText = "Are you sure you want to delete this macro?",
-                    hidden = not self.db.profile.macroS[macroName].isCustom, -- Hide if the macro is not custom
+                    hidden = not self.db.profile.macroS[macroName].isCustom -- Hide if the macro is not custom
                 },
                 spacer1 = {
                     type = "description",
                     order = 3,
-                    name = "",
+                    name = ""
                 },
                 itemLinks = {
                     type = "description",
                     order = 4,
-                    name = function() return self:GetItemLinksForMacro(macroName) end,
-                    fontSize = "medium",
-                },
+                    name = function()
+                        return self:GetItemLinksForMacro(macroName)
+                    end,
+                    fontSize = "medium"
+                }
             }
         }
 
@@ -141,9 +149,13 @@ function addon:generateMacroGroups()
                 desc = "Edit the macro string",
                 width = "full",
                 multiline = 10,
-                set = function(info, val) addon.db.profile.macroS[macroName].superMacro = val end,
-                get = function(info) return addon.db.profile.macroS[macroName].superMacro end,
-                order = 7,
+                set = function(info, val)
+                    addon.db.profile.macroS[macroName].superMacro = val
+                end,
+                get = function(info)
+                    return addon.db.profile.macroS[macroName].superMacro
+                end,
+                order = 7
             }
         end
 
@@ -173,7 +185,7 @@ function addon:CreateCustomMacro()
             local macroInfo = {
                 name = macroName,
                 isCustom = true,
-                icon = "INV_Misc_QuestionMark",
+                icon = "INV_Misc_QuestionMark"
             }
             -- Save the new custom macro to the database
             local insertMacro = self.db.profile.macroS

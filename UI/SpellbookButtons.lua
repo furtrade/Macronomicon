@@ -33,13 +33,14 @@ local function CreateDraggableButton(name, parentFrame, actionType, actionData, 
             ClearCursor()
         end)
     elseif actionType == "custom" then
+        local scriptInfo = addon:GetScriptInfo(actionData)
         button:SetAttribute("type", "macro")
-        button:SetAttribute("macrotext", actionData.macroText)
+        button:SetAttribute("macrotext", scriptInfo.script)
         button.icon = _G[name .. "Icon"]
-        button.icon:SetTexture(actionData.icon or "Interface\\Icons\\INV_Misc_QuestionMark") -- Placeholder texture, replace as needed
+        button.icon:SetTexture(scriptInfo.icon)
 
         button:SetScript("OnDragStart", function(self)
-            PickupMacro(actionData.macroText)
+            PickupMacro(scriptInfo.script)
         end)
 
         button:SetScript("OnReceiveDrag", function(self)
@@ -54,8 +55,9 @@ local function CreateDraggableButton(name, parentFrame, actionType, actionData, 
             GameTooltip:SetSpellByID(actionData)
         elseif actionType == "macro" then
             GameTooltip:SetText("Macro")
-        elseif actionType == "custom" and actionData.tooltip then
-            GameTooltip:SetText(actionData.tooltip)
+        elseif actionType == "custom" then
+            local scriptInfo = addon:GetScriptInfo(actionData)
+            GameTooltip:SetText(scriptInfo.tooltip)
         end
         GameTooltip:Show()
     end)
@@ -69,3 +71,26 @@ local function CreateDraggableButton(name, parentFrame, actionType, actionData, 
 end
 
 addon.CreateDraggableButton = CreateDraggableButton
+
+function addon:GetScriptInfo(name)
+    return self.db.profile.customButtons[name]
+end
+
+function addon:CreateAndStoreCustomButton(name, script, iconSize, iconTexture, tooltip)
+    -- Store button info in AceDB
+    self.db.profile.customButtons[name] = {
+        script = script,
+        iconSize = iconSize,
+        icon = iconTexture,
+        tooltip = tooltip
+    }
+
+    -- Create the button
+    self:CreateDraggableButton(name, UIParent, "custom", name, iconSize)
+end
+
+function addon:LoadCustomButtons()
+    for name, buttonInfo in pairs(self.db.profile.customButtons) do
+        self:CreateDraggableButton(name, UIParent, "custom", name, buttonInfo.iconSize)
+    end
+end
