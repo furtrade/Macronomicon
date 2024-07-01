@@ -25,6 +25,7 @@ Libs\AceTab-3.0\AceTab-3.0.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 
 # Core files
+Components\CustomButtons.lua
 Components\Inventory.lua
 Components\MacroPatcher.lua
 Components\Macros.lua
