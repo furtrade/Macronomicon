@@ -23,8 +23,9 @@ function addon:createOrUpdateMacro(info)
     local macroName = self:getMacroName(info.name)
     if not self:macroExists(macroName) then
         self:createMacro(info)
+    else
+        self:updateMacro(info)
     end
-    self:updateMacro(info)
 end
 
 -- Constructs the full macro name with a prefix

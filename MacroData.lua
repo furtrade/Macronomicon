@@ -123,6 +123,7 @@ end
 
 -- Score an item or spell
 function addon:scoreItemOrSpell(itemOrSpell, isItem, macroInfo)
+    print(itemOrSpell.id, " ", itemOrSpell.name)
     if not itemOrSpell.id or type(itemOrSpell.id) ~= "number" then
         return 0
     end

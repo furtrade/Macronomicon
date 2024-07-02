@@ -3,15 +3,14 @@ local _, addon = ...
 
 function addon:CreateButtons()
     self.spellButtons = self.spellButtons or {}
-    local customButtons = self.db.profile.customButtons or {}
     print("Entering addon:CreateButtons...")
 
-    for i, custom in ipairs(customButtons) do
-        local buttonName = custom.name or "unknown" .. i
+    for macroHeader, macroData in pairs(self.macroData) do
+        local buttonName = macroData.name
         local button = self:FindButtonByName(buttonName)
         if not button then
             print("Creating button:", buttonName)
-            button = self:CreateDraggableButton(buttonName, self.MacrobialSpellbookFrame, "custom", custom,
+            button = self:CreateDraggableButton(buttonName, self.MacrobialSpellbookFrame, "custom", macroData,
                 addon.positionOptions.iconSize)
             table.insert(self.spellButtons, button)
         end
@@ -58,21 +57,15 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
     elseif actionType == "custom" then
         button.icon:SetTexture(actionData.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
         button:SetScript("OnDragStart", function(self)
-            local macroName = name
-            addon:createMacro(actionData)
-            -- if not addon:macroExists(macroName) then
-            --     addon:createMacro("GENERAL", macroName)
-            --     print("Created macro:", macroName)
-            -- else
-            --     addon:updateMacro(macroName, actionData)
-            --     print("Updated macro:", macroName)
-            -- end
-            PickupMacro(addon:getMacroIDByName(macroName))
+            if not addon:macroExists(name) then
+                addon:createOrUpdateMacro(actionData)
+            end
+            PickupMacro(addon:getMacroIDByName(name))
         end)
         button:SetScript("OnReceiveDrag", function(self)
             local _, _, _, id = GetCursorInfo()
             if id then
-                actionData.macroID = id
+                -- actionData.macroID = id
                 ClearCursor()
             end
         end)
