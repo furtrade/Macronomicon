@@ -1,4 +1,3 @@
--- ButtonPosition.lua
 local _, addon = ...
 
 addon.positionOptions = {
@@ -10,30 +9,35 @@ addon.positionOptions = {
     buttonsPerPage = 12 -- Number of buttons per page (2 columns * 6 rows)
 }
 
-function addon.CalculateButtonPosition(index)
-    local frameWidth = addon.spellbookWidth
-    local frameHeight = addon.spellbookHeight
+local function CalculateButtonPosition(index, frameWidth, frameHeight)
+    local opt = addon.positionOptions
+    local column = math.floor((index - 1) / opt.maxRows) % 2
+    local row = (index - 1) % opt.maxRows
 
-    local positionOptions = addon.positionOptions
-    local columns = 2
-    local rows = positionOptions.maxRows
-    local marginX1 = frameWidth * positionOptions.startX1
-    local marginX2 = frameWidth * positionOptions.startX2
-    local marginY = frameHeight * positionOptions.margin
-    local iconSize = positionOptions.iconSize
-    local paddingY = (frameHeight - 2 * marginY - rows * iconSize) / (rows - 1)
+    local marginX = frameWidth * (column == 0 and opt.startX1 or opt.startX2)
+    local marginY = frameHeight * opt.margin
+    local paddingY = (frameHeight - 2 * marginY - opt.maxRows * opt.iconSize) / (opt.maxRows - 1)
 
-    local column = (index - 1) % columns
-    local row = math.floor((index - 1) / columns)
-    local xOffset = column == 0 and marginX1 or marginX2
-    local yOffset = -marginY - row * (iconSize + paddingY)
+    local xOffset = marginX
+    local yOffset = -marginY - row * (opt.iconSize + paddingY)
 
     return xOffset, yOffset
 end
 
+local function SortButtonsAlphabetically()
+    table.sort(addon.spellButtons, function(a, b)
+        return a:GetName() < b:GetName()
+    end)
+end
+
 function addon.PositionButtonsInGrid()
+    local frameWidth = addon.spellbookWidth
+    local frameHeight = addon.spellbookHeight
+
+    SortButtonsAlphabetically() -- Sort buttons before positioning them
+
     for i, button in ipairs(addon.spellButtons) do
-        local xOffset, yOffset = addon.CalculateButtonPosition(i)
+        local xOffset, yOffset = CalculateButtonPosition(i, frameWidth, frameHeight)
         button:SetPoint("TOPLEFT", addon.MacrobialSpellbookFrame, "TOPLEFT", xOffset, yOffset)
         button:Hide()
     end
