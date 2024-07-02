@@ -69,7 +69,7 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
         button.icon:SetTexture(actionData.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
         button:SetScript("OnDragStart", function(self)
             if not actionData.macroID then
-                local macroName = "CustomMacro_" .. name
+                local macroName = name
                 local macroID = FindMacroByName(macroName)
                 if not macroID then
                     macroID = CreateMacro(macroName, "INV_Misc_QuestionMark", actionData.macroText, true)
@@ -86,7 +86,13 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
                 print("Error: No macro ID for custom script")
             end
         end)
-        setButtonScripts(PickupMacro, PlaceAction)
+        button:SetScript("OnReceiveDrag", function(self)
+            local _, _, _, id = GetCursorInfo()
+            if id then
+                actionData.macroID = id
+                ClearCursor()
+            end
+        end)
     end
 
     button:SetScript("OnEnter", function(self)
