@@ -5,7 +5,7 @@ local _, addon = ...
 addon.macroData = {
     HP = {
         name = "Heal Pot",
-        icone = "INV_Misc_QuestionMark",
+        icon = "INV_Misc_QuestionMark",
         keywords = {"Healing Potion"},
         valuation = {"(%d+)%s+to%s+(%d+) health"},
         patterns = {{
@@ -27,7 +27,7 @@ addon.macroData = {
     },
     MP = {
         name = "Mana Pot",
-        icone = "INV_Misc_QuestionMark",
+        icon = "INV_Misc_QuestionMark",
         keywords = {"Mana Potion", "Restore Mana"},
         valuation = {"(%d+)%s+to%s+(%d+) mana"},
         patterns = {{
@@ -41,7 +41,7 @@ addon.macroData = {
     },
     Food = {
         name = "Food",
-        icone = "INV_Misc_QuestionMark",
+        icon = "INV_Misc_QuestionMark",
         keywords = {"Food"},
         valuation = {"(%d+) health over %d+ sec"},
         patterns = {{
@@ -55,7 +55,7 @@ addon.macroData = {
     },
     Drink = {
         name = "Drink",
-        icone = "INV_Misc_QuestionMark",
+        icon = "INV_Misc_QuestionMark",
         keywords = {"Drink"},
         valuation = {"(%d+) mana over %d+ sec"},
         patterns = {{
@@ -69,7 +69,7 @@ addon.macroData = {
     },
     Bandage = {
         name = "Bandage",
-        icone = "INV_Misc_QuestionMark",
+        icon = "INV_Misc_QuestionMark",
         keywords = {"First Aid", "Bandage"},
         valuation = {"Heals (%d+)"},
         patterns = {{
@@ -83,7 +83,7 @@ addon.macroData = {
     },
     HS = {
         name = "Healthstone",
-        icone = "INV_Misc_QuestionMark",
+        icon = "INV_Misc_QuestionMark",
         keywords = {"Healthstone"},
         valuation = {"(%d+) life"},
         patterns = {{
@@ -97,7 +97,7 @@ addon.macroData = {
     },
     Bang = {
         name = "Bang",
-        icone = "INV_Misc_QuestionMark",
+        icon = "INV_Misc_QuestionMark",
         keywords = {"Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge"},
         valuation = {"(%d+)%s+to%s+(%d+)"},
         patterns = {{
@@ -110,6 +110,16 @@ addon.macroData = {
         spells = {}
     }
 }
+
+-- Helper function to check if any element in a table satisfies a condition
+local function any(t, condition)
+    for _, v in ipairs(t) do
+        if condition(v) then
+            return true
+        end
+    end
+    return false
+end
 
 -- Score an item or spell
 function addon:scoreItemOrSpell(itemOrSpell, isItem, macroInfo)
