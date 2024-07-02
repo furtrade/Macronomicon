@@ -122,9 +122,9 @@ function addon:ProcessAll()
     else
         self:UpdateItemCache()
         self:UpdateSpellbook()
-        self:UpdateMacroData()
-        self:ProcessMacros()
-        self:processCustomScripts()
+        self:updateMacroData()
+        self:processMacros()
+        -- self:processCustomScripts()
         return true
     end
 end

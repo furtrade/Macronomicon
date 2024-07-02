@@ -1,3 +1,4 @@
+-- SpellbookButtons.lua
 local _, addon = ...
 
 function addon:CreateButtons()
@@ -21,17 +22,6 @@ function addon:FindButtonByName(name)
     for _, button in ipairs(self.spellButtons or {}) do
         if button:GetName() == name then
             return button
-        end
-    end
-    return nil
-end
-
--- Utility function to find a macro by name
-local function FindMacroByName(name)
-    for i = 1, MAX_ACCOUNT_MACROS + MAX_CHARACTER_MACROS do
-        local macroName = GetMacroInfo(i)
-        if macroName == name then
-            return i
         end
     end
     return nil
@@ -68,23 +58,16 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
     elseif actionType == "custom" then
         button.icon:SetTexture(actionData.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
         button:SetScript("OnDragStart", function(self)
-            if not actionData.macroID then
-                local macroName = name
-                local macroID = FindMacroByName(macroName)
-                if not macroID then
-                    macroID = CreateMacro(macroName, "INV_Misc_QuestionMark", actionData.macroText, true)
-                    print("Created macro with ID:", macroID)
-                else
-                    EditMacro(macroID, macroName, "INV_Misc_QuestionMark", actionData.macroText)
-                    print("Updated macro with ID:", macroID)
-                end
-                actionData.macroID = macroID
-            end
-            if actionData.macroID then
-                PickupMacro(actionData.macroID)
-            else
-                print("Error: No macro ID for custom script")
-            end
+            local macroName = name
+            addon:createMacro(actionData)
+            -- if not addon:macroExists(macroName) then
+            --     addon:createMacro("GENERAL", macroName)
+            --     print("Created macro:", macroName)
+            -- else
+            --     addon:updateMacro(macroName, actionData)
+            --     print("Updated macro:", macroName)
+            -- end
+            PickupMacro(addon:getMacroIDByName(macroName))
         end)
         button:SetScript("OnReceiveDrag", function(self)
             local _, _, _, id = GetCursorInfo()

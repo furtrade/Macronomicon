@@ -2,6 +2,20 @@ local _, addon = ...
 
 addon.itemCache = addon.itemCache or {}
 
+-- Add item to macro data
+function addon:addItem(macroKey, item)
+    item.timestamp = GetTime()
+    local items = self.macroData[macroKey].items
+
+    for i = #items, 1, -1 do
+        if items[i].name == item.name then
+            table.remove(items, i)
+        end
+    end
+
+    table.insert(items, item)
+end
+
 -- Function to get the best item based on score
 function addon:getBestItem(t)
     if not t then

@@ -1,175 +1,126 @@
+-- Macros.lua
+-- A file for managing creation or updating of macros within the addon
 local _, addon = ...
 
--- Checks if a macro is enabled in the addon's settings (2nd to execute)
+-- Checks if a macro is enabled in the addon's settings
 function addon:isMacroEnabled(key)
-    -- print("\n Checking if macro is Enabled: ", key)
-    -- local toggleKey = "toggle" .. key
-    -- Check if the database is initialized
     if not self.db then
         print("Error: Database is not initialized")
         return false
     end
 
-    -- Check if the macroKey exists in the profile
-    if self.db.profile.macroS[key].toggleOption == nil then
+    local setting = self.db.profile.macroS[key]
+    if not setting or setting.toggleOption == nil then
         print("Error: Macro key does not exist in the profile")
         return false
     end
 
-    -- print(self.db.profile.macroS[key].toggleOption)
-    -- Return the value of the toggleOption for the macroKey
-    return self.db.profile.macroS[key].toggleOption
+    return setting.toggleOption
 end
 
--- Handles creation or update of a macro (3rd to execute)
-function addon:createOrUpdateMacro(macroType, macroInfo)
-    local macroName = self:getMacroName(macroInfo.name)
-    -- print("macroName: ", macroName)
+-- Handles creation or update of a macro
+function addon:createOrUpdateMacro(info)
+    local macroName = self:getMacroName(info.name)
     if not self:macroExists(macroName) then
-        self:createMacro(macroType, macroName)
+        self:createMacro(info)
     end
-    self:updateMacro(macroInfo)
+    self:updateMacro(info)
 end
 
--- Constructs the full macro name with a prefix (4th to execute)
+-- Constructs the full macro name with a prefix
 function addon:getMacroName(name)
-    local prefix = "!" -- Make this configurable if needed
-    return prefix .. name
+    return "!" .. name -- Prefix is configurable if needed
 end
 
-function addon:standardizedName(text)
-    -- Remove white space
-    local formattedText = text:gsub("%s+", "")
-
-    -- Keep only the first 9 characters
-    formattedText = formattedText:sub(1, 14)
-
-    return formattedText
+-- Standardizes a given text by removing white spaces and limiting length
+function addon:standardizeName(text)
+    return text:gsub("%s+", ""):sub(1, 14)
 end
 
--- Checks if a macro already exists (5th to execute)
+-- Checks if a macro already exists by name
 function addon:macroExists(name)
-    return GetMacroInfo(name) ~= nil
+    return self:getMacroIDByName(name) ~= nil
 end
 
--- Creates a new macro in the game (6th to execute)
-function addon:createMacro(macroType, name)
-    local numGeneralMacros, numCharacterMacros = GetNumMacros()
-    local perCharacter = macroType ~= "GENERAL" and numCharacterMacros < MAX_CHARACTER_MACROS
-    CreateMacro(name, "INV_Misc_QuestionMark", nil, perCharacter)
-end
-
-function addon:DeleteGameMacro(macroName)
-    -- Get the index of the macro
-    local macroD = self:getMacroName(macroName)
-
-    -- If the macro exists, delete it
-    if macroD then
-        DeleteMacro(macroD)
-    end
-end
-
-function addon:formatMacro(macro)
-    local formattedMacro = macro
-    local previousMacro
-
-    repeat
-        previousMacro = formattedMacro
-        formattedMacro = formattedMacro:gsub(",;", ";") -- Remove commas before semicolons
-        :gsub(";,", ";") -- Remove commas after semicolons
-        :gsub(";+", ";") -- Removes multiple semicolons
-        :gsub("%s%s+", " ") -- Remove double spaces
-        :gsub(",%s+", ",") -- Remove spaces directly after a comma
-        :gsub("%s+$", "") -- Remove spaces at the end of a line
-        :gsub("%][ \t]+", "]") -- Remove spaces and tabs after ']'
-        :gsub("%[%s+", "[") -- Remove whitespace after '['
-        :gsub(",%]", "]") -- Remove a comma immediately before a ']'
-        :gsub(";+$", "") -- Remove semicolons at the end of a line
-        :gsub("([/#]%w+%s[;,])", function(match)
-            return match:sub(1, -2)
-        end)
-        formattedMacro = formattedMacro:lower() -- Convert to lowercase
-    until formattedMacro == previousMacro
-
-    return formattedMacro
-end
-
-function addon:getCustomMacrosFromDB()
-    -- print("starting up getCustomMacrosFromDB")
-    -- Initialize an empty table for the custom macros
-    local customMacros = {}
-
-    -- Iterate over all the keys in the profile
-    for macroKey, macroValue in pairs(self.db.profile.macroS) do
-        -- Check if the key is a macro
-        if type(macroValue) == "table" and macroValue.isCustom == true then
-            -- If it is, add it to the customMacros table
-            -- print("getting macroKey: ", macroKey)
-            customMacros[macroKey] = macroValue
+-- Gets the macro ID by name
+function addon:getMacroIDByName(name)
+    for i = 1, MAX_ACCOUNT_MACROS + MAX_CHARACTER_MACROS do
+        local macroName = GetMacroInfo(i)
+        if macroName == self:getMacroName(name) then
+            return i
         end
     end
-
-    -- print("handing keys to loadCustomMacros function")
-    return customMacros
+    return nil
 end
 
-function addon:loadCustomMacros()
-    -- Get the custom macros from the addon's database
-    local customMacros = self:getCustomMacrosFromDB()
-
-    -- Add the custom macros to the macroData.CUSTOM table
-    self.macroData.CUSTOM = customMacros
+-- Creates a new macro in the game
+function addon:createMacro(info)
+    local perCharacter = false -- Always create in the general tab
+    CreateMacro(self:getMacroName(info.name), info.icon or "INV_Misc_QuestionMark", info.macroText, perCharacter)
 end
 
-function addon:updateMacro(macroInfo)
-    local macroString
-    if macroInfo.isCustom == true then
-        -- If it's a custom macro, get the string from the super macro
-        macroString = self:patchMacro(macroInfo)
-    else
-        -- Otherwise, build the macro string as normal
-        macroString = self:buildMacroString(macroInfo)
+-- Deletes a game macro by name
+function addon:deleteMacro(name)
+    local macroID = self:getMacroIDByName(name)
+    if macroID then
+        DeleteMacro(macroID)
     end
-
-    local macroName = self:getMacroName(macroInfo.name)
-    EditMacro(macroName, macroName, macroInfo.icon, macroString)
 end
 
-function addon:ProcessMacros(macroTables)
+-- Formats a macro string for consistency
+function addon:formatMacro(macro)
+    local formatted = macro
+    repeat
+        macro = formatted
+        formatted = formatted:gsub(",;", ";"):gsub(";,", ";"):gsub(";+", ";"):gsub("%s%s+", " "):gsub(",%s+", ","):gsub(
+            "%s+$", ""):gsub("%][ \t]+", "]"):gsub("%[%s+", "["):gsub(",%]", "]"):gsub(";+$", ""):gsub(
+            "([/#]%w+%s[;,])", function(match)
+                return match:sub(1, -2)
+            end):lower()
+    until formatted == macro
+    return formatted
+end
+
+-- Retrieves user-made macros from the database and inserts them into the existing macroData table
+function addon:loadCustomMacros()
+    for header, info in pairs(self.db.profile.macroS) do
+        if type(info) == "table" and info.isCustom then
+            self.macroData[header] = info
+        end
+    end
+end
+
+-- Updates a macro with new information
+function addon:updateMacro(info)
+    local macroID = self:getMacroIDByName(info.name)
+    local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
+    EditMacro(macroID, self:getMacroName(info.name), info.icon, macroString)
+end
+
+-- Processes macros from the provided macro tables
+function addon:processMacros()
     self:loadCustomMacros()
 
-    macroTables = macroTables or addon.macroData
-
-    for macroType, macroTypeData in pairs(macroTables) do
-        for macroKey, macroInfo in pairs(macroTypeData) do
-            if self:isMacroEnabled(macroKey) then
-                -- print(macroType, "macroKey: ", macroKey)
-
-                self:createOrUpdateMacro(macroType, macroInfo)
-            end
+    for header, info in pairs(self.macroData) do
+        if self:isMacroEnabled(header) then
+            self:createOrUpdateMacro(info)
         end
     end
 end
 
--- Builds the macro string from the provided macro information (8th to execute)
-function addon:buildMacroString(macroDef)
-    local macroLines = {"#showtooltip"}
+-- Builds the macro string from the provided macro information
+function addon:buildMacroString(info)
+    local lines = {"#showtooltip"}
 
-    -- Get the favored (highest scoring) item
-    local favoredItem = self:getBestItem(macroDef.items)
-    -- Building the macro line for the favored item
-    if favoredItem then
-        -- print("favoredItem: ", favoredItem.link or favoredItem.name)
-        -- print(favoredItem.name)
-        local conditionPart = macroDef.condition and " [" .. macroDef.condition .. "]" or ""
-        local line = "/cast" .. conditionPart .. " " .. favoredItem.name
-        table.insert(macroLines, line)
+    local item = self:getBestItem(info.items)
+    if item then
+        local condition = info.condition and " [" .. info.condition .. "]" or ""
+        table.insert(lines, "/cast" .. condition .. " " .. item.name)
     end
 
-    -- Process nuances for the macro definition
-    if macroDef.nuance and type(macroDef.nuance) == "function" then
-        macroDef.nuance(macroLines)
+    if info.nuance and type(info.nuance) == "function" then
+        info.nuance(lines)
     end
 
-    return addon:formatMacro(table.concat(macroLines, "\n"))
+    return self:formatMacro(table.concat(lines, "\n"))
 end

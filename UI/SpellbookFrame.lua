@@ -34,7 +34,7 @@ function addon:CreateMacrobialSpellbookFrame()
         addon.spellbookWidth = tonumber(frame:GetWidth())
         addon.spellbookHeight = tonumber(frame:GetHeight())
 
-        print("Frame shown, creating and positioning buttons...")
+        print("Frame shown")
         addon:CreateButtons()
         addon:PositionButtonsInGrid()
         addon:CreatePaginationButtons(frame, math.ceil(#addon.spellButtons / addon.positionOptions.buttonsPerPage))
