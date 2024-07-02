@@ -31,6 +31,7 @@ Components\Inventory.lua
 Components\MacroPatcher.lua
 Components\Macros.lua
 Components\Spellbook.lua
+Components\Score.lua
 Components\Tooltip.lua
 
 # Spellbook components

@@ -1,3 +1,4 @@
+-- Tooltip.lua
 local _, addon = ...
 
 -- `GetTooltipByType(id, type)`: Creates/uses a tooltip for a given item or spell ID.
