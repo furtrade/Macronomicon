@@ -34,11 +34,11 @@ Components\Spellbook.lua
 Components\Tooltip.lua
 
 # Spellbook components
+UI\SpellbookFrame.lua
 UI\ButtonPosition.lua
 UI\SpellbookTab.lua
 UI\SpellbookButtons.lua
 UI\PageNavigation.lua
-UI\SpellbookFrame.lua
 
 # Entry point
 Main.lua

@@ -1,32 +1,28 @@
 local _, addon = ...
 
--- Ensure positionOptions and CalculateButtonPosition are available
-if not addon.positionOptions or not addon.CalculateButtonPosition then
-    error("positionOptions or CalculateButtonPosition is not defined. Ensure ButtonPosition.lua is loaded first.")
+-- Helper function to create navigation buttons
+local function createButton(name, parent, texture, point, offsetX, offsetY, onClick)
+    local button = CreateFrame("Button", name, parent, "UIPanelButtonTemplate")
+    button:SetSize(32, 32)
+    button:SetPoint(point, parent, point, offsetX, offsetY)
+    button:SetNormalTexture(texture)
+    button:SetPushedTexture(texture .. "-Down")
+    button:SetDisabledTexture(texture .. "-Disabled")
+    button:SetHighlightTexture(texture .. "-Highlight")
+    button:SetScript("OnClick", onClick)
+    return button
 end
 
-local function CreatePaginationButtons(frame, maxPages)
-    local function createButton(name, point, relativeFrame, relativePoint, offsetX, offsetY, textureUp, textureDown,
-        textureDisabled, onClick)
-        local button = CreateFrame("Button", name, frame, "UIPanelButtonTemplate")
-        button:SetSize(32, 32)
-        button:SetPoint(point, relativeFrame, relativePoint, offsetX, offsetY)
-        button:SetNormalTexture(textureUp)
-        button:SetPushedTexture(textureDown)
-        button:SetDisabledTexture(textureDisabled)
-        button:SetScript("OnClick", onClick)
-        return button
-    end
-
-    local nextButton = createButton("MacrobialSpellbookNextPageButton", "BOTTOMRIGHT", frame, "BOTTOMRIGHT", -50, 15,
-        "Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up", "Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down",
-        "Interface\\Buttons\\UI-SpellbookIcon-NextPage-Disabled", function()
+-- Function to create pagination buttons
+function addon:CreatePaginationButtons(frame, maxPages)
+    local nextButton = createButton("MacrobialSpellbookNextPageButton", frame,
+        "Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up", "BOTTOMRIGHT", -50, 15, function()
             addon.UpdateSpellbookPage(1)
         end)
 
-    local prevButton = createButton("MacrobialSpellbookPrevPageButton", "BOTTOMRIGHT", nextButton, "BOTTOMLEFT", -5, 0,
-        "Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up", "Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down",
-        "Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Disabled", function()
+    local prevButton = createButton("MacrobialSpellbookPrevPageButton", frame,
+        "Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up", "BOTTOMRIGHT", -87, -- Adjusted to align next to nextButton
+        15, function()
             addon.UpdateSpellbookPage(-1)
         end)
 
@@ -41,20 +37,20 @@ local currentPage = 1
 
 function addon.UpdateSpellbookPage(direction)
     currentPage = currentPage + direction
-    local maxPages = MacrobialSpellbookFrame.maxPages
+    local maxPages = addon.MacrobialSpellbookFrame.maxPages
 
     if currentPage <= 1 then
         currentPage = 1
-        MacrobialSpellbookFrame.prevButton:Disable()
+        addon.MacrobialSpellbookFrame.prevButton:Disable()
     else
-        MacrobialSpellbookFrame.prevButton:Enable()
+        addon.MacrobialSpellbookFrame.prevButton:Enable()
     end
 
     if currentPage >= maxPages then
         currentPage = maxPages
-        MacrobialSpellbookFrame.nextButton:Disable()
+        addon.MacrobialSpellbookFrame.nextButton:Disable()
     else
-        MacrobialSpellbookFrame.nextButton:Enable()
+        addon.MacrobialSpellbookFrame.nextButton:Enable()
     end
 
     local startIndex = (currentPage - 1) * addon.positionOptions.buttonsPerPage + 1
@@ -62,14 +58,9 @@ function addon.UpdateSpellbookPage(direction)
 
     for i, button in ipairs(addon.spellButtons) do
         if i >= startIndex and i <= endIndex then
-            local xOffset, yOffset = addon.CalculateButtonPosition(i - startIndex + 1, button:GetParent():GetWidth(),
-                button:GetParent():GetHeight())
-            button:SetPoint("TOPLEFT", button:GetParent(), "TOPLEFT", xOffset, yOffset)
             button:Show()
         else
             button:Hide()
         end
     end
 end
-
-addon.CreatePaginationButtons = CreatePaginationButtons

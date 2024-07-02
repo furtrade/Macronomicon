@@ -1,3 +1,4 @@
+-- ButtonPosition.lua
 local _, addon = ...
 
 addon.positionOptions = {
@@ -9,7 +10,10 @@ addon.positionOptions = {
     buttonsPerPage = 12 -- Number of buttons per page (2 columns * 6 rows)
 }
 
-function addon.CalculateButtonPosition(index, frameWidth, frameHeight)
+function addon.CalculateButtonPosition(index)
+    local frameWidth = addon.spellbookWidth
+    local frameHeight = addon.spellbookHeight
+
     local positionOptions = addon.positionOptions
     local columns = 2
     local rows = positionOptions.maxRows
@@ -24,8 +28,13 @@ function addon.CalculateButtonPosition(index, frameWidth, frameHeight)
     local xOffset = column == 0 and marginX1 or marginX2
     local yOffset = -marginY - row * (iconSize + paddingY)
 
-    print(string.format("CalculateButtonPosition - Index: %d, Column: %d, Row: %d, XOffset: %f, YOffset: %f", index,
-        column, row, xOffset, yOffset))
-
     return xOffset, yOffset
+end
+
+function addon.PositionButtonsInGrid()
+    for i, button in ipairs(addon.spellButtons) do
+        local xOffset, yOffset = addon.CalculateButtonPosition(i)
+        button:SetPoint("TOPLEFT", addon.MacrobialSpellbookFrame, "TOPLEFT", xOffset, yOffset)
+        button:Hide()
+    end
 end

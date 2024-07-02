@@ -1,6 +1,30 @@
 local _, addon = ...
 
-local positionOptions = addon.positionOptions -- Ensure positionOptions is referenced correctly
+function addon:CreateButtons()
+    self.spellButtons = self.spellButtons or {}
+    local customButtons = self.db.profile.customButtons or {}
+    print("Entering addon:CreateButtons...")
+
+    for i, custom in ipairs(customButtons) do
+        local buttonName = custom.name or "unknown" .. i
+        local button = self:FindButtonByName(buttonName)
+        if not button then
+            print("Creating button:", buttonName)
+            button = self:CreateDraggableButton(buttonName, self.MacrobialSpellbookFrame, "custom", custom,
+                addon.positionOptions.iconSize)
+            table.insert(self.spellButtons, button)
+        end
+    end
+end
+
+function addon:FindButtonByName(name)
+    for _, button in ipairs(self.spellButtons or {}) do
+        if button:GetName() == name then
+            return button
+        end
+    end
+    return nil
+end
 
 -- Utility function to find a macro by name
 local function FindMacroByName(name)
@@ -83,44 +107,4 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
 
     button:RegisterForDrag("LeftButton")
     return button
-end
-
-function addon:FindButtonByName(name)
-    for _, button in ipairs(self.spellButtons or {}) do
-        if button:GetName() == name then
-            return button
-        end
-    end
-    return nil
-end
-
-function addon:CreateButtons(frame)
-    local frameWidth = frame:GetWidth()
-    local frameHeight = frame:GetHeight()
-
-    local customButtons = self.db.profile.customButtons or {}
-    print("Entering addon:CreateButtons...")
-    print(string.format("Frame dimensions - Width: %f, Height: %f", frameWidth, frameHeight))
-
-    for _, custom in ipairs(customButtons) do
-        print("Creating button:", custom.name)
-        local buttonName = custom.name or "unknown" .. _
-        local button = self:FindButtonByName(buttonName)
-        if not button then
-            button = self:CreateDraggableButton(buttonName, frame, "custom", custom, positionOptions.iconSize)
-            table.insert(self.spellButtons, button)
-        end
-    end
-
-    for i, button in ipairs(self.spellButtons) do
-        print(string.format("Button index: %d", i))
-        local xOffset, yOffset = addon.CalculateButtonPosition(i, frameWidth, frameHeight)
-        print(string.format("Button position - Name: %s, X: %f, Y: %f", button:GetName(), xOffset, yOffset))
-        button:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
-        button:Hide()
-    end
-
-    local totalButtons = #self.spellButtons
-    local maxPages = math.ceil(totalButtons / positionOptions.buttonsPerPage)
-    addon.CreatePaginationButtons(frame, maxPages)
 end

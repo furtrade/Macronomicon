@@ -1,6 +1,7 @@
+-- SpellBookFrame.lua
 local _, addon = ...
 
-local positionOptions = addon.positionOptions
+addon.spellbookWidth, addon.spellbookHeight = nil, nil
 
 function addon:CreateMacrobialSpellbookFrame()
     if self.MacrobialSpellbookFrame then
@@ -30,8 +31,13 @@ function addon:CreateMacrobialSpellbookFrame()
     frame:SetFrameLevel(SpellBookFrame:GetFrameLevel() + 3)
 
     frame:SetScript("OnShow", function()
-        print("Frame shown, creating buttons...")
-        addon:CreateButtons(frame)
+        addon.spellbookWidth = tonumber(frame:GetWidth())
+        addon.spellbookHeight = tonumber(frame:GetHeight())
+
+        print("Frame shown, creating and positioning buttons...")
+        addon:CreateButtons()
+        addon:PositionButtonsInGrid()
+        addon:CreatePaginationButtons(frame, math.ceil(#addon.spellButtons / addon.positionOptions.buttonsPerPage))
     end)
 
     print("Creating Macrobial spellbook frame...")
