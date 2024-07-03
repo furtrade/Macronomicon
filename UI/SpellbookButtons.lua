@@ -12,6 +12,7 @@ local GetCursorInfo = GetCursorInfo
 
 -- Constants
 local DEFAULT_ICON = "INV_Misc_QuestionMark"
+local FONT = "Fonts\\FRIZQT__.TTF" -- Default WoW font
 
 local function GetButtonIcon(macroInfo, name)
     local macroID = addon:getMacroIDByName(name)
@@ -32,6 +33,12 @@ local function CreateDraggableButton(name, parentFrame, macroInfo, iconSize)
 
     local icon = GetButtonIcon(macroInfo, name)
     button.icon:SetTexture(icon)
+
+    -- Add a font string for the button name
+    button.nameText = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    button.nameText:SetFont(FONT, 12) -- Match the default spellbook font size
+    button.nameText:SetPoint("LEFT", button, "RIGHT", 7, 0)
+    button.nameText:SetText(name)
 
     local actionType = macroInfo.actionType or "custom"
     local actionData = macroInfo.actionData or macroInfo
