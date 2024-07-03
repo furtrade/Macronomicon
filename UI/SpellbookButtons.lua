@@ -11,7 +11,7 @@ local ClearCursor = ClearCursor
 local GetCursorInfo = GetCursorInfo
 
 -- Constants
-local DEFAULT_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
+local DEFAULT_ICON = "INV_Misc_QuestionMark"
 
 local function GetButtonIcon(macroInfo, name)
     local macroID = addon:getMacroIDByName(name)
