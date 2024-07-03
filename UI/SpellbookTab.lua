@@ -9,6 +9,64 @@ local function GetNumSpellTabs()
     return numTabs
 end
 
+-- Function to dynamically get the number of spellbook pages
+local function GetNumSpellbookPages()
+    local numPages = 0
+    while _G["SpellBookFrameTabButton" .. (numPages + 1)] do
+        numPages = numPages + 1
+    end
+    return numPages
+end
+
+-- Function to dynamically get the number of spellbook buttons
+local function GetNumSpellbookButtons()
+    local numButtons = 0
+    while _G["SpellButton" .. (numButtons + 1)] do
+        numButtons = numButtons + 1
+    end
+    return numButtons
+end
+
+-- Function to hide default spellbook content
+local function HideDefaultSpellbookContent()
+    local numPages = GetNumSpellbookPages()
+    local numButtons = GetNumSpellbookButtons()
+
+    for i = 1, numPages do
+        local tabButton = _G["SpellBookFrameTabButton" .. i]
+        if tabButton then
+            tabButton:Hide()
+        end
+    end
+
+    for i = 1, numButtons do
+        local spellButton = _G["SpellButton" .. i]
+        if spellButton then
+            spellButton:Hide()
+        end
+    end
+end
+
+-- Function to show default spellbook content
+local function ShowDefaultSpellbookContent()
+    local numPages = GetNumSpellbookPages()
+    local numButtons = GetNumSpellbookButtons()
+
+    for i = 1, numPages do
+        local tabButton = _G["SpellBookFrameTabButton" .. i]
+        if tabButton then
+            tabButton:Show()
+        end
+    end
+
+    for i = 1, numButtons do
+        local spellButton = _G["SpellButton" .. i]
+        if spellButton then
+            spellButton:Show()
+        end
+    end
+end
+
 -- Create a new tab in the spellbook
 function CreateSpellbookTab()
     -- Determine the number of existing tabs
@@ -21,6 +79,9 @@ function CreateSpellbookTab()
 
     tab:SetScript("OnClick", function(self)
         -- Hide default spellbook content
+        HideDefaultSpellbookContent()
+
+        -- Uncheck other tabs
         for i = 1, numTabs do
             local defaultTab = _G["SpellBookSkillLineTab" .. i]
             if defaultTab then
@@ -57,6 +118,7 @@ function CreateSpellbookTab()
                 if MacrobialSpellbookFrame then
                     MacrobialSpellbookFrame:Hide()
                 end
+                ShowDefaultSpellbookContent()
                 -- Set checked state to the clicked tab
                 for j = 1, numTabs do
                     local otherTab = _G["SpellBookSkillLineTab" .. j]

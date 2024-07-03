@@ -23,7 +23,8 @@ function addon:CreateMacrobialSpellbookFrame()
             bottom = 11
         }
     })
-    frame:SetBackdropColor(0, 0, 0, 1)
+    -- Set the frame's background to be fully transparent
+    frame:SetBackdropColor(0, 0, 0, 0)
     frame:SetBackdropBorderColor(1, 1, 1, 1)
     frame:EnableMouse(true)
     frame:SetToplevel(true)
