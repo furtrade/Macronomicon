@@ -19,7 +19,7 @@ function addon:isMacroEnabled(key)
 end
 
 -- Constructs the full macro name with a prefix
-function addon:getMacroName(name)
+function addon:prefixedMacroName(name)
     return "!" .. name -- Prefix is configurable if needed
 end
 
@@ -36,7 +36,7 @@ end
 -- Gets the macro ID by name
 function addon:getMacroIDByName(name)
     print("searching for: ", name)
-    local searchName = self:getMacroName(name)
+    local searchName = self:prefixedMacroName(name)
     for i = 1, MAX_ACCOUNT_MACROS + MAX_CHARACTER_MACROS do
         local macroSearch = GetMacroInfo(i)
         if macroSearch == searchName or macroSearch == name then
@@ -49,9 +49,9 @@ end
 
 -- Creates a new macro in the game
 function addon:createMacro(info)
+    local name = self:prefixedMacroName(info.name)
     local perCharacter = false -- Always create in the general tab
-    local id = CreateMacro(self:getMacroName(info.name), info.icon or "INV_Misc_QuestionMark", info.macroText,
-        perCharacter)
+    local id = CreateMacro(name, "INV_Misc_QuestionMark", info.macroText, perCharacter)
 
     return id
 end
@@ -90,8 +90,10 @@ end
 -- Updates a macro with new information
 function addon:updateMacro(info, id)
     local macroID = id or self:getMacroIDByName(info.name)
+    local name = self:prefixedMacroName(info.name)
     local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
-    EditMacro(macroID, self:getMacroName(info.name), info.icon, macroString)
+
+    EditMacro(macroID, name, "INV_Misc_QuestionMark", macroString)
 
     return macroID
 end

@@ -1,50 +1,44 @@
 -- SpellbookButtons.lua
 local _, addon = ...
 
-function addon:CreateButtons()
-    self.spellButtons = self.spellButtons or {}
-    print("Entering addon:CreateButtons...")
+-- Cache frequently used functions
+local CreateFrame = CreateFrame
+local GetMacroInfo = GetMacroInfo
+local PickupSpell = PickupSpell
+local PickupMacro = PickupMacro
+local PlaceAction = PlaceAction
+local ClearCursor = ClearCursor
+local GetCursorInfo = GetCursorInfo
 
-    for macroHeader, macroInfo in pairs(self.macroData) do
-        local buttonName = macroInfo.name
-        local button = self:FindButtonByName(buttonName)
-        if not button then
-            local icon = self:GetMacroIcon(macroInfo, buttonName)
-            button = self:CreateDraggableButton(buttonName, self.MacrobialSpellbookFrame, "custom", macroInfo, icon,
-                addon.positionOptions.iconSize)
-            table.insert(self.spellButtons, button)
-        end
-    end
-end
+-- Constants
+local DEFAULT_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 
-function addon:FindButtonByName(name)
-    for _, button in ipairs(self.spellButtons or {}) do
-        if button:GetName() == name then
-            return button
-        end
-    end
-    return nil
-end
-
-function addon:GetMacroIcon(macroInfo, name)
-    local macroID = self:getMacroIDByName(name)
+local function GetButtonIcon(macroInfo, name)
+    local macroID = addon:getMacroIDByName(name)
     if macroID then
-        local _, icon = GetMacroInfo(macroID)
-        return icon
-    else
-        return macroInfo.icon or "Interface\\Icons\\INV_Misc_QuestionMark"
+        local _, iconTexture = GetMacroInfo(macroID)
+        if iconTexture then
+            return iconTexture
+        end
     end
+    return macroInfo.icon or DEFAULT_ICON
 end
 
-function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, icon, iconSize)
+local function CreateDraggableButton(name, parentFrame, macroInfo, iconSize)
     local button = CreateFrame("Button", name, parentFrame, "SecureActionButtonTemplate, ActionButtonTemplate")
     button:SetSize(iconSize, iconSize)
-    button.icon = _G[name .. "Icon"]
+    button.icon = button:CreateTexture(nil, "BACKGROUND")
+    button.icon:SetAllPoints(button)
+
+    local icon = GetButtonIcon(macroInfo, name)
     button.icon:SetTexture(icon)
 
-    local function setButtonAttributes(type, data)
-        button:SetAttribute("type", type)
-        button:SetAttribute(type, data)
+    local actionType = macroInfo.actionType or "custom"
+    local actionData = macroInfo.actionData or macroInfo
+
+    local function setButtonAttributes(attrType, data)
+        button:SetAttribute("type", attrType)
+        button:SetAttribute(attrType, data)
     end
 
     local function setButtonScripts(pickupFunc, placeFunc)
@@ -64,18 +58,21 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
         setButtonAttributes("macro", actionData)
         setButtonScripts(PickupMacro, PlaceAction)
     elseif actionType == "custom" then
+        setButtonAttributes("macro", actionData)
         button:SetScript("OnDragStart", function(self)
-            local macroName = addon:getMacroName(name)
+            local macroName = addon:prefixedMacroName(name)
             local macroID = addon:getMacroIDByName(name)
 
             if not macroID then
                 macroID = addon:createMacro(actionData)
-                print("created macro with id ", macroID, " called ", macroName)
             end
             macroID = addon:updateMacro(actionData, macroID)
-            print("updated macro with id ", macroID, " called ", macroName)
 
             PickupMacro(macroID)
+
+            -- Update button icon after creating or updating macro
+            local newIcon = GetButtonIcon(macroInfo, name)
+            button.icon:SetTexture(newIcon)
         end)
         button:SetScript("OnReceiveDrag", function(self)
             local _, _, _, id = GetCursorInfo()
@@ -86,7 +83,7 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
     end
 
     button:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
         if actionType == "spell" then
             GameTooltip:SetSpellByID(actionData)
         elseif actionType == "macro" then
@@ -105,56 +102,27 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
     return button
 end
 
-function addon:getMacroIDByName(name)
-    for i = 1, MAX_ACCOUNT_MACROS + MAX_CHARACTER_MACROS do
-        local macroName, _, icon = GetMacroInfo(i)
-        if macroName == self:getMacroName(name) or macroName == name then
-            return i, icon
+function addon:CreateButtons()
+    self.spellButtons = self.spellButtons or {}
+    local buttonCache = {}
+
+    -- Pre-populate button cache
+    for _, button in ipairs(self.spellButtons) do
+        buttonCache[button:GetName()] = button
+    end
+
+    for macroHeader, macroInfo in pairs(self.macroData) do
+        local buttonName = macroInfo.name
+        local button = buttonCache[buttonName]
+
+        if not button then
+            button = CreateDraggableButton(buttonName, self.MacrobialSpellbookFrame, macroInfo,
+                self.positionOptions.iconSize)
+            table.insert(self.spellButtons, button)
+        else
+            -- Update existing button icon
+            local icon = GetButtonIcon(macroInfo, buttonName)
+            button.icon:SetTexture(icon)
         end
     end
-    return nil
-end
-
-function addon:getMacroName(name)
-    return "!" .. name -- Prefix is configurable if needed
-end
-
-function addon:createMacro(info)
-    local perCharacter = false
-    return CreateMacro(self:getMacroName(info.name), info.icon or "INV_Misc_QuestionMark", info.macroText, perCharacter)
-end
-
-function addon:updateMacro(info, macroID)
-    local macroString = self:buildMacroString(info)
-    EditMacro(macroID, self:getMacroName(info.name), info.icon, macroString)
-    return macroID
-end
-
-function addon:buildMacroString(info)
-    local lines = {"#showtooltip"}
-
-    local item = self:getBestItem(info.items)
-    if item then
-        local condition = info.condition and " [" .. info.condition .. "]" or ""
-        table.insert(lines, "/cast" .. condition .. " " .. item.name)
-    end
-
-    if info.nuance and type(info.nuance) == "function" then
-        info.nuance(lines)
-    end
-
-    return self:formatMacro(table.concat(lines, "\n"))
-end
-
-function addon:formatMacro(macro)
-    local formattedMacro = macro
-    repeat
-        macro = formattedMacro
-        formattedMacro = formattedMacro:gsub(",;", ";"):gsub(";,", ";"):gsub(";+", ";"):gsub("%s%s+", " "):gsub(",%s+",
-            ","):gsub("%s+$", ""):gsub("%][ \t]+", "]"):gsub("%[%s+", "["):gsub(",%]", "]"):gsub(";+$", ""):gsub(
-            "([/#]%w+%s[;,])", function(match)
-                return match:sub(1, -2)
-            end):lower()
-    until formattedMacro == macro
-    return formattedMacro
 end
