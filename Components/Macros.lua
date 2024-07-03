@@ -18,18 +18,6 @@ function addon:isMacroEnabled(key)
     return setting.toggleOption
 end
 
--- Handles creation or update of a macro
-function addon:createOrUpdateMacro(info)
-    local macroName = self:getMacroName(info.name)
-    local macroID = info.id
-
-    if not self:macroExists(macroName) then
-        self:createMacro(info)
-    else
-        self:updateMacro(info)
-    end
-end
-
 -- Constructs the full macro name with a prefix
 function addon:getMacroName(name)
     return "!" .. name -- Prefix is configurable if needed
@@ -47,9 +35,12 @@ end
 
 -- Gets the macro ID by name
 function addon:getMacroIDByName(name)
+    print("searching for: ", name)
+    local searchName = self:getMacroName(name)
     for i = 1, MAX_ACCOUNT_MACROS + MAX_CHARACTER_MACROS do
-        local macroName = GetMacroInfo(i)
-        if macroName == self:getMacroName(name) then
+        local macroSearch = GetMacroInfo(i)
+        if macroSearch == searchName or macroSearch == name then
+            print("matched ", macroSearch, " with ", name, " at index: ", i)
             return i
         end
     end
@@ -97,8 +88,8 @@ function addon:loadCustomMacros()
 end
 
 -- Updates a macro with new information
-function addon:updateMacro(info)
-    local macroID = self:getMacroIDByName(info.name)
+function addon:updateMacro(info, id)
+    local macroID = id or self:getMacroIDByName(info.name)
     local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
     EditMacro(macroID, self:getMacroName(info.name), info.icon, macroString)
 
@@ -110,9 +101,7 @@ function addon:processMacros()
     self:loadCustomMacros()
 
     for header, info in pairs(self.macroData) do
-        if self:isMacroEnabled(header) then
-            self:createOrUpdateMacro(info)
-        end
+        self:updateMacro(info)
     end
 end
 

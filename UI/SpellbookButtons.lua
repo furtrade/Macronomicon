@@ -57,17 +57,16 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
     elseif actionType == "custom" then
         button.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
         button:SetScript("OnDragStart", function(self)
-            local macroID = nil
             local macroName = addon:getMacroName(name)
-            print("\ncreateDraggableButton NAME: ", name, " MACRONAME: ", macroName)
+            local macroID = addon:getMacroIDByName(name)
 
-            if not addon:macroExists(macroName) then
+            if not macroID then
                 macroID = addon:createMacro(actionData)
-            else
-                macroID = addon:updateMacro(actionData)
+                print("created macro with id ", macroID, " called ", macroName)
             end
+            macroID = addon:updateMacro(actionData, macroID)
+            print("updated macro with id ", macroID, " called ", macroName)
 
-            print("id: ", macroID, "name: ", name, "; actionData.name: ", actionData.name)
             PickupMacro(macroID)
         end)
         button:SetScript("OnReceiveDrag", function(self)
