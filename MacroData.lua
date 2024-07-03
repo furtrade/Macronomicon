@@ -5,7 +5,7 @@ local _, addon = ...
 addon.macroData = {
     HP = {
         name = "Heal Pot",
-        icon = "INV_Misc_QuestionMark",
+        icon = "Interface\\Icons\\INV_Misc_QuestionMark",
         keywords = {"Healing Potion"},
         valuation = {"(%d+)%s+to%s+(%d+) health"},
         patterns = {{
@@ -26,7 +26,7 @@ addon.macroData = {
     },
     MP = {
         name = "Mana Pot",
-        icon = "INV_Misc_QuestionMark",
+        icon = "Interface\\Icons\\INV_Misc_QuestionMark",
         keywords = {"Mana Potion", "Restore Mana"},
         valuation = {"(%d+)%s+to%s+(%d+) mana"},
         patterns = {{
@@ -40,7 +40,7 @@ addon.macroData = {
     },
     Food = {
         name = "Food",
-        icon = "INV_Misc_QuestionMark",
+        icon = "Interface\\Icons\\INV_Misc_QuestionMark",
         keywords = {"Food"},
         valuation = {"(%d+) health over %d+ sec"},
         patterns = {{
@@ -54,7 +54,7 @@ addon.macroData = {
     },
     Drink = {
         name = "Drink",
-        icon = "INV_Misc_QuestionMark",
+        icon = "Interface\\Icons\\INV_Misc_QuestionMark",
         keywords = {"Drink"},
         valuation = {"(%d+) mana over %d+ sec"},
         patterns = {{
@@ -68,7 +68,7 @@ addon.macroData = {
     },
     Bandage = {
         name = "Bandage",
-        icon = "INV_Misc_QuestionMark",
+        icon = "Interface\\Icons\\INV_Misc_QuestionMark",
         keywords = {"First Aid", "Bandage"},
         valuation = {"Heals (%d+)"},
         patterns = {{
@@ -82,7 +82,7 @@ addon.macroData = {
     },
     HS = {
         name = "Healthstone",
-        icon = "INV_Misc_QuestionMark",
+        icon = "Interface\\Icons\\INV_Misc_QuestionMark",
         keywords = {"Healthstone"},
         valuation = {"(%d+) life"},
         patterns = {{
@@ -96,7 +96,7 @@ addon.macroData = {
     },
     Bang = {
         name = "Bang",
-        icon = "INV_Misc_QuestionMark",
+        icon = "Interface\\Icons\\INV_Misc_QuestionMark",
         keywords = {"Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge"},
         valuation = {"(%d+)%s+to%s+(%d+)"},
         patterns = {{

@@ -9,8 +9,8 @@ function addon:CreateButtons()
         local buttonName = macroInfo.name
         local button = self:FindButtonByName(buttonName)
         if not button then
-            print("Creating button:", buttonName)
-            button = self:CreateDraggableButton(buttonName, self.MacrobialSpellbookFrame, "custom", macroInfo,
+            local icon = self:GetMacroIcon(macroInfo, buttonName)
+            button = self:CreateDraggableButton(buttonName, self.MacrobialSpellbookFrame, "custom", macroInfo, icon,
                 addon.positionOptions.iconSize)
             table.insert(self.spellButtons, button)
         end
@@ -26,10 +26,21 @@ function addon:FindButtonByName(name)
     return nil
 end
 
-function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, iconSize)
+function addon:GetMacroIcon(macroInfo, name)
+    local macroID = self:getMacroIDByName(name)
+    if macroID then
+        local _, icon = GetMacroInfo(macroID)
+        return icon
+    else
+        return macroInfo.icon or "Interface\\Icons\\INV_Misc_QuestionMark"
+    end
+end
+
+function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, icon, iconSize)
     local button = CreateFrame("Button", name, parentFrame, "SecureActionButtonTemplate, ActionButtonTemplate")
     button:SetSize(iconSize, iconSize)
     button.icon = _G[name .. "Icon"]
+    button.icon:SetTexture(icon)
 
     local function setButtonAttributes(type, data)
         button:SetAttribute("type", type)
@@ -48,14 +59,11 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
 
     if actionType == "spell" then
         setButtonAttributes("spell", actionData)
-        button.icon:SetTexture(GetSpellTexture(actionData))
         setButtonScripts(PickupSpell, PlaceAction)
     elseif actionType == "macro" then
         setButtonAttributes("macro", actionData)
-        button.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
         setButtonScripts(PickupMacro, PlaceAction)
     elseif actionType == "custom" then
-        button.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
         button:SetScript("OnDragStart", function(self)
             local macroName = addon:getMacroName(name)
             local macroID = addon:getMacroIDByName(name)
@@ -72,7 +80,6 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
         button:SetScript("OnReceiveDrag", function(self)
             local _, _, _, id = GetCursorInfo()
             if id then
-                -- actionData.macroID = id
                 ClearCursor()
             end
         end)
@@ -96,4 +103,58 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
 
     button:RegisterForDrag("LeftButton")
     return button
+end
+
+function addon:getMacroIDByName(name)
+    for i = 1, MAX_ACCOUNT_MACROS + MAX_CHARACTER_MACROS do
+        local macroName, _, icon = GetMacroInfo(i)
+        if macroName == self:getMacroName(name) or macroName == name then
+            return i, icon
+        end
+    end
+    return nil
+end
+
+function addon:getMacroName(name)
+    return "!" .. name -- Prefix is configurable if needed
+end
+
+function addon:createMacro(info)
+    local perCharacter = false
+    return CreateMacro(self:getMacroName(info.name), info.icon or "INV_Misc_QuestionMark", info.macroText, perCharacter)
+end
+
+function addon:updateMacro(info, macroID)
+    local macroString = self:buildMacroString(info)
+    EditMacro(macroID, self:getMacroName(info.name), info.icon, macroString)
+    return macroID
+end
+
+function addon:buildMacroString(info)
+    local lines = {"#showtooltip"}
+
+    local item = self:getBestItem(info.items)
+    if item then
+        local condition = info.condition and " [" .. info.condition .. "]" or ""
+        table.insert(lines, "/cast" .. condition .. " " .. item.name)
+    end
+
+    if info.nuance and type(info.nuance) == "function" then
+        info.nuance(lines)
+    end
+
+    return self:formatMacro(table.concat(lines, "\n"))
+end
+
+function addon:formatMacro(macro)
+    local formattedMacro = macro
+    repeat
+        macro = formattedMacro
+        formattedMacro = formattedMacro:gsub(",;", ";"):gsub(";,", ";"):gsub(";+", ";"):gsub("%s%s+", " "):gsub(",%s+",
+            ","):gsub("%s+$", ""):gsub("%][ \t]+", "]"):gsub("%[%s+", "["):gsub(",%]", "]"):gsub(";+$", ""):gsub(
+            "([/#]%w+%s[;,])", function(match)
+                return match:sub(1, -2)
+            end):lower()
+    until formattedMacro == macro
+    return formattedMacro
 end
