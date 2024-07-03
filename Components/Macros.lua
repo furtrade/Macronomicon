@@ -21,6 +21,8 @@ end
 -- Handles creation or update of a macro
 function addon:createOrUpdateMacro(info)
     local macroName = self:getMacroName(info.name)
+    local macroID = info.id
+
     if not self:macroExists(macroName) then
         self:createMacro(info)
     else
@@ -57,7 +59,10 @@ end
 -- Creates a new macro in the game
 function addon:createMacro(info)
     local perCharacter = false -- Always create in the general tab
-    CreateMacro(self:getMacroName(info.name), info.icon or "INV_Misc_QuestionMark", info.macroText, perCharacter)
+    local id = CreateMacro(self:getMacroName(info.name), info.icon or "INV_Misc_QuestionMark", info.macroText,
+        perCharacter)
+
+    return id
 end
 
 -- Deletes a game macro by name
@@ -96,6 +101,8 @@ function addon:updateMacro(info)
     local macroID = self:getMacroIDByName(info.name)
     local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
     EditMacro(macroID, self:getMacroName(info.name), info.icon, macroString)
+
+    return macroID
 end
 
 -- Processes macros from the provided macro tables

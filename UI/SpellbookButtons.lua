@@ -5,12 +5,12 @@ function addon:CreateButtons()
     self.spellButtons = self.spellButtons or {}
     print("Entering addon:CreateButtons...")
 
-    for macroHeader, macroData in pairs(self.macroData) do
-        local buttonName = macroData.name
+    for macroHeader, macroInfo in pairs(self.macroData) do
+        local buttonName = macroInfo.name
         local button = self:FindButtonByName(buttonName)
         if not button then
             print("Creating button:", buttonName)
-            button = self:CreateDraggableButton(buttonName, self.MacrobialSpellbookFrame, "custom", macroData,
+            button = self:CreateDraggableButton(buttonName, self.MacrobialSpellbookFrame, "custom", macroInfo,
                 addon.positionOptions.iconSize)
             table.insert(self.spellButtons, button)
         end
@@ -55,12 +55,20 @@ function addon:CreateDraggableButton(name, parentFrame, actionType, actionData, 
         button.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
         setButtonScripts(PickupMacro, PlaceAction)
     elseif actionType == "custom" then
-        button.icon:SetTexture(actionData.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
+        button.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
         button:SetScript("OnDragStart", function(self)
-            if not addon:macroExists(name) then
-                addon:createOrUpdateMacro(actionData)
+            local macroID = nil
+            local macroName = addon:getMacroName(name)
+            print("\ncreateDraggableButton NAME: ", name, " MACRONAME: ", macroName)
+
+            if not addon:macroExists(macroName) then
+                macroID = addon:createMacro(actionData)
+            else
+                macroID = addon:updateMacro(actionData)
             end
-            PickupMacro(addon:getMacroIDByName(name))
+
+            print("id: ", macroID, "name: ", name, "; actionData.name: ", actionData.name)
+            PickupMacro(macroID)
         end)
         button:SetScript("OnReceiveDrag", function(self)
             local _, _, _, id = GetCursorInfo()

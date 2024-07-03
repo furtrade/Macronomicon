@@ -35,7 +35,7 @@ function addon:OnInitialize()
     end
 
     -- Load custom buttons and process scripts
-    self:LoadCustomButtonScripts()
+    -- self:LoadCustomButtonScripts()
 
     -- Generate the macro groups
     self:loadCustomMacros()
@@ -123,7 +123,7 @@ function addon:ProcessAll()
         self:UpdateItemCache()
         self:UpdateSpellbook()
         self:updateMacroData()
-        self:processMacros()
+        -- self:processMacros()
         -- self:processCustomScripts()
         return true
     end
