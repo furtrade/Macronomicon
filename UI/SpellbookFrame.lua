@@ -1,4 +1,3 @@
--- SpellBookFrame.lua
 local _, addon = ...
 
 addon.spellbookWidth, addon.spellbookHeight = nil, nil
@@ -38,6 +37,11 @@ function addon:CreateMacrobialSpellbookFrame()
         addon:CreateButtons()
         addon:PositionButtonsInGrid()
         addon:CreatePaginationButtons(frame, math.ceil(#addon.spellButtons / addon.positionOptions.buttonsPerPage))
+    end)
+
+    frame:SetScript("OnHide", function()
+        -- Clear any tooltips
+        GameTooltip:Hide()
     end)
 
     print("Creating Macrobial spellbook frame...")
