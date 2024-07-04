@@ -128,3 +128,6 @@ function addon:ProcessAll()
         return true
     end
 end
+
+-- Expose the addon globally for debugging
+_G.Macrobial = addon
