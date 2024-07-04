@@ -30,15 +30,15 @@ Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 Components\Inventory.lua
 Components\MacroPatcher.lua
 Components\Macros.lua
-Components\Spellbook.lua
+Components\LearnedSpells.lua
 Components\Score.lua
 Components\Tooltip.lua
 
 # Spellbook components
-UI\SpellbookFrame.lua
-UI\ButtonPosition.lua
-UI\SpellbookTab.lua
-UI\SpellbookButtons.lua
+UI\SpellBookFrame.lua
+UI\SpellBookTab.lua
+UI\SpellButton\ButtonPosition.lua
+UI\SpellBookButton\SpellButtons.lua
 UI\PageNavigation.lua
 
 # Entry point
