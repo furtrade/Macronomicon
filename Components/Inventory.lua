@@ -2,18 +2,107 @@ local _, addon = ...
 
 addon.itemCache = addon.itemCache or {}
 
--- Add item to macro data
-function addon:addItem(macroKey, item)
-    item.timestamp = GetTime()
-    local items = self.macroData[macroKey].items
-
-    for i = #items, 1, -1 do
-        if items[i].name == item.name then
-            table.remove(items, i)
+-- Helper function to check if an item exists in a table by its name
+local function itemExists(tbl, itemName)
+    for _, item in ipairs(tbl) do
+        if item.name == itemName then
+            return true
         end
     end
+    return false
+end
 
-    table.insert(items, item)
+-- Helper function to add an item to a table if it doesn't already exist
+local function addItemIfNotExists(tbl, item)
+    if not itemExists(tbl, item.name) then
+        table.insert(tbl, item)
+        return true
+    end
+    return false
+end
+
+-- Helper function to remove an item from a table by its name
+local function removeItem(tbl, itemName)
+    for i = #tbl, 1, -1 do
+        if tbl[i].name == itemName then
+            table.remove(tbl, i)
+            return true
+        end
+    end
+    return false
+end
+
+-- Processes items or spells for the given macro
+local scoreCache = {}
+local function getScore(self, entry, entryType, macroInfo)
+    local key = entry.name .. entryType
+    if scoreCache[key] then
+        return scoreCache[key]
+    end
+    local score = self:scoreEntry(entry, entryType, macroInfo)
+    scoreCache[key] = score
+    return score
+end
+
+local function processEntries(self, macroKey, macroInfo)
+    local keywords = macroInfo.keywords or {}
+    local matchedEntries = {}
+
+    for _, entryType in ipairs({"item", "spell"}) do
+        local entries = entryType == "item" and self.itemCache or self.spellbook
+        local macroEntriesKey = entryType == "item" and "items" or "spells"
+
+        if not macroInfo[macroEntriesKey] then
+            macroInfo[macroEntriesKey] = {}
+        end
+        local macroEntries = macroInfo[macroEntriesKey]
+
+        for _, entry in ipairs(entries or {}) do
+            for _, keyword in ipairs(keywords) do
+                if entry.name:match(keyword) then
+                    if not matchedEntries[entry.name] then
+                        matchedEntries[entry.name] = true
+                        entry.score = getScore(self, entry, entryType, macroInfo)
+                        addItemIfNotExists(macroEntries, entry)
+                    end
+                    break
+                end
+            end
+        end
+
+        -- Remove items that are no longer matched
+        for i = #macroEntries, 1, -1 do
+            if not matchedEntries[macroEntries[i].name] then
+                table.remove(macroEntries, i)
+            end
+        end
+    end
+end
+
+-- Updates the macro data by processing items and spells
+function addon:updateMacroData()
+    for macroKey, macroInfo in pairs(self.macroData) do
+        processEntries(self, macroKey, macroInfo)
+    end
+    self:sortMacroData("level")
+end
+
+-- Sorts items and spells within macros based on the specified attribute
+function addon:sortMacroData(attribute)
+    if attribute ~= "score" and attribute ~= "level" then
+        return
+    end
+
+    for _, macroInfo in pairs(self.macroData) do
+        for _, entryType in pairs({"items", "spells"}) do
+            local entries = macroInfo[entryType]
+            if entries then
+                table.sort(entries, function(a, b)
+                    return a[attribute] < b[attribute]
+                end)
+            end
+        end
+    end
 end
 
 -- Function to get the best item based on score
@@ -38,9 +127,7 @@ function addon:getBestItem(t)
             end
         end
     end
-
     return selectedElement
-
 end
 
 local function getItemLink(bagOrSlotIndex, slotIndex)
@@ -90,45 +177,41 @@ local function addItemToCache(bagOrSlotIndex, slotIndex)
     end
 
     local cache = addon.itemCache
-    for i = 1, #cache do
-        local cachedItem = cache[i]
-        if cachedItem.link == itemLink then
-            cachedItem.count = C_Item.GetItemCount(cachedItem.id, false, true, false)
-            cachedItem.found = true
-            return
-        end
-    end
-
     local itemInfo = itemizer(bagOrSlotIndex, slotIndex)
     if itemInfo then
+        removeItem(cache, itemInfo.name) -- Remove the existing item first
         table.insert(cache, itemInfo)
     end
 end
 
 function addon:UpdateItemCache()
     local cache = addon.itemCache
-
-    -- Mark all items in the cache as not found
-    for i = 1, #cache do
-        cache[i].found = false
-    end
+    local foundItems = {}
 
     -- Update equipped items
     for bagOrSlotIndex = 1, 19 do
-        addItemToCache(bagOrSlotIndex)
+        local itemInfo = itemizer(bagOrSlotIndex)
+        if itemInfo then
+            foundItems[itemInfo.name] = true
+            addItemToCache(bagOrSlotIndex)
+        end
     end
 
     -- Update bag items
     for bagOrSlotIndex = 0, Constants.InventoryConstants.NumBagSlots do
         local numSlots = C_Container.GetContainerNumSlots(bagOrSlotIndex)
         for slotIndex = 1, numSlots do
-            addItemToCache(bagOrSlotIndex, slotIndex)
+            local itemInfo = itemizer(bagOrSlotIndex, slotIndex)
+            if itemInfo then
+                foundItems[itemInfo.name] = true
+                addItemToCache(bagOrSlotIndex, slotIndex)
+            end
         end
     end
 
     -- Remove items from the cache that were not found
     for i = #cache, 1, -1 do
-        if not cache[i].found then
+        if not foundItems[cache[i].name] then
             table.remove(cache, i)
         end
     end

@@ -31,7 +31,6 @@ function addon:OnInitialize()
     -- Generate the macro groups
     self:loadCustomMacros()
     self:generateMacroGroups()
-
 end
 
 function addon:OnEnable()
