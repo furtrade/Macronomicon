@@ -60,12 +60,12 @@ local function itemizer(bagOrSlotIndex, slotIndex)
     end
 
     local canUse = C_PlayerInfo.CanUseItem(itemID)
-    local itemSpell, itemSpellId = GetItemSpell(itemID)
+    local itemSpell, itemSpellId = C_Item.GetItemSpell(itemID)
     if not (canUse and itemSpell) then
         return nil
     end
 
-    local itemLevel, _, itemType, itemSubType, _, equipLoc = select(4, GetItemInfo(itemID))
+    local itemLevel, _, itemType, itemSubType, _, equipLoc = select(4, C_Item.GetItemInfo(itemID))
 
     return {
         id = itemID,
@@ -77,8 +77,8 @@ local function itemizer(bagOrSlotIndex, slotIndex)
         equipLoc = equipLoc,
         spellName = itemSpell,
         spellId = itemSpellId,
-        rank = GetSpellSubtext(itemSpellId),
-        count = GetItemCount(itemID),
+        rank = C_Spell.GetSpellSubtext(itemSpellId),
+        count = C_Item.GetItemCount(itemID, false, true, false),
         found = true
     }
 end
@@ -93,7 +93,7 @@ local function addItemToCache(bagOrSlotIndex, slotIndex)
     for i = 1, #cache do
         local cachedItem = cache[i]
         if cachedItem.link == itemLink then
-            cachedItem.count = GetItemCount(cachedItem.id)
+            cachedItem.count = C_Item.GetItemCount(cachedItem.id, false, true, false)
             cachedItem.found = true
             return
         end
@@ -119,9 +119,8 @@ function addon:UpdateItemCache()
     end
 
     -- Update bag items
-    local GetContainerNumSlots = C_Container.GetContainerNumSlots
     for bagOrSlotIndex = 0, Constants.InventoryConstants.NumBagSlots do
-        local numSlots = GetContainerNumSlots(bagOrSlotIndex)
+        local numSlots = C_Container.GetContainerNumSlots(bagOrSlotIndex)
         for slotIndex = 1, numSlots do
             addItemToCache(bagOrSlotIndex, slotIndex)
         end

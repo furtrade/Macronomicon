@@ -18,7 +18,6 @@ addon.player = {
 
 addon.spellbook = {}
 addon.itemCache = {}
-addon.spellButtons = {} -- Initialize spellButtons table
 
 function addon:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New(addonName .. "DB", self.defaults)
