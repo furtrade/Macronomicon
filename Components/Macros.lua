@@ -51,9 +51,10 @@ end
 function addon:createMacro(info)
     local name = self:prefixedMacroName(info.name)
     local perCharacter = false -- Always create in the general tab
-    local id = CreateMacro(name, "INV_Misc_QuestionMark", info.macroText, perCharacter)
+    local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
 
-    return id
+    local macroID = CreateMacro(name, "INV_Misc_QuestionMark", macroString, perCharacter)
+    return macroID
 end
 
 -- Deletes a game macro by name
@@ -89,8 +90,8 @@ end
 
 -- Updates a macro with new information
 function addon:updateMacro(info, id)
-    local macroID = id or self:getMacroIDByName(info.name)
     local name = self:prefixedMacroName(info.name)
+    local macroID = id or self:getMacroIDByName(name)
     local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
 
     EditMacro(macroID, name, "INV_Misc_QuestionMark", macroString)
