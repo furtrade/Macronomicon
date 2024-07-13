@@ -193,10 +193,10 @@ function addon:GetItemLinksForMacro(macroName)
     -- Initialize the item links string as empty
     local itemLinksString = ""
 
-    -- Define the callback function
-    local function callback(macroInfo)
-        -- Check if the macroInfo is the selected macro
-        if macroInfo.name == macroName and macroInfo.items then
+    for header, macroInfo in pairs(addon.macroData) do
+        -- Use the forEachMacro function to apply the callback to each macro
+        -- addon:forEachMacro(callback)
+        if header == macroName and macroInfo.items then
             -- Initialize an empty table to hold the item links
             local itemLinks = {}
 
@@ -212,16 +212,6 @@ function addon:GetItemLinksForMacro(macroName)
             itemLinksString = table.concat(itemLinks, "\n")
         end
     end
-
-    -- Use the forEachMacro function to apply the callback to each macro
-    addon:forEachMacro(callback)
-
     return itemLinksString
 end
 
--- Simplify iteration over macros with a single loop
-function addon:forEachMacro(callback)
-    for _, macroInfo in pairs(addon.macroData) do
-        callback(macroInfo)
-    end
-end
