@@ -50,6 +50,31 @@ function addon:scoreEntry(entry, byType, macroInfo)
     return #values > 0 and total / #values or 0
 end
 
+-- Function to get the best item based on score
+function addon:getBestItem(t)
+    if not t then
+        print("Error: items is nil")
+        return nil
+    end
+
+    local selectedElement = nil
+    local highestScore = -math.huge -- Initialize to lowest possible value
+
+    -- Iterate over the elements
+    for _, element in ipairs(t) do
+        -- Check if the score field is present and numeric
+        if element.score and type(element.score) == "number" then
+            -- Check if the element's score is higher than the current highest score
+            -- and if the count is not present or not equal to 0
+            if element.score > highestScore and (not element.count or element.count ~= 0) then
+                highestScore = element.score
+                selectedElement = element
+            end
+        end
+    end
+    return selectedElement
+end
+
 -- Checks if the player has the best item for the specified macro
 function addon:getBestItemForMacro(macroKey)
     local bestItem, bestScore, bestLevel = nil, -1, -1

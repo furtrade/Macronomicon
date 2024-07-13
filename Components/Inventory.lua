@@ -104,31 +104,6 @@ function addon:sortMacroData(attribute)
     end
 end
 
--- Function to get the best item based on score
-function addon:getBestItem(t)
-    if not t then
-        print("Error: items is nil")
-        return nil
-    end
-
-    local selectedElement = nil
-    local highestScore = -math.huge -- Initialize to lowest possible value
-
-    -- Iterate over the elements
-    for _, element in ipairs(t) do
-        -- Check if the score field is present and numeric
-        if element.score and type(element.score) == "number" then
-            -- Check if the element's score is higher than the current highest score
-            -- and if the count is not present or not equal to 0
-            if element.score > highestScore and (not element.count or element.count ~= 0) then
-                highestScore = element.score
-                selectedElement = element
-            end
-        end
-    end
-    return selectedElement
-end
-
 local function getItemLink(bagOrSlotIndex, slotIndex)
     return slotIndex and C_Container.GetContainerItemLink(bagOrSlotIndex, slotIndex) or
                GetInventoryItemLink("player", bagOrSlotIndex)
@@ -167,18 +142,6 @@ local function itemizer(bagOrSlotIndex, slotIndex)
         count = C_Item.GetItemCount(itemID, false, true, false),
         found = true
     }
-end
-
-local function addItemToCache(bagOrSlotIndex, slotIndex)
-    local itemLink = getItemLink(bagOrSlotIndex, slotIndex)
-    if not itemLink then
-        return
-    end
-
-    local itemInfo = itemizer(bagOrSlotIndex, slotIndex)
-    if itemInfo then
-        addOrUpdateItem(addon.itemCache, itemInfo)
-    end
 end
 
 function addon:UpdateItemCache()
