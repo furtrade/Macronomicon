@@ -16,7 +16,7 @@ addon.macroData = {
         }},
         nuance = function(macroLines)
             -- Add a healthstone to our heal pot macro
-            local healthstone = addon:playerHasItem("HS")
+            local healthstone = addon:getBestItemForMacro("HS")
             if healthstone then
                 local healthstoneLine = "/use " .. healthstone
                 table.insert(macroLines, 2, healthstoneLine)
