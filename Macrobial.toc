@@ -34,13 +34,6 @@ Components\LearnedSpells.lua
 Components\Score.lua
 Components\Tooltip.lua
 
-# Spellbook components
-UI\SpellBookFrame.lua
-UI\SpellBookTab.lua
-UI\SpellButton\ButtonPosition.lua
-UI\SpellBookButton\SpellButtons.lua
-UI\PageNavigation.lua
-
 # Entry point
 Main.lua
 Options.lua

@@ -29,20 +29,10 @@ function addon:OnInitialize()
 
     self.gui = LibStub("AceGUI-3.0")
 
-    -- Ensure the Spellbook tab is created
-    if self.CreateSpellbookTab then
-        self.CreateSpellbookTab()
-    end
-
-    -- Load custom buttons and process scripts
-    -- self:LoadCustomButtonScripts()
-
     -- Generate the macro groups
     self:loadCustomMacros()
     self:generateMacroGroups()
 
-    -- Ensure the Spellbook frame is created
-    self:CreateMacrobialSpellbookFrame()
 end
 
 function addon:OnEnable()
@@ -121,10 +111,9 @@ function addon:ProcessAll()
         return false
     else
         self:UpdateItemCache()
-        self:UpdateSpellbook()
+        -- self:UpdateSpellbook()
         self:updateMacroData()
-        -- self:processMacros()
-        -- self:processCustomScripts()
+        self:processMacros()
         return true
     end
 end
