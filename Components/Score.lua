@@ -75,19 +75,18 @@ function addon:getBestItem(t)
     return selectedElement
 end
 
--- Checks if the player has the best item for the specified macro
-function addon:getBestItemForMacro(macroKey)
-    local bestItem, bestScore, bestLevel = nil, -1, -1
-
-    if self.macroData[macroKey] then
-        for _, item in pairs(self.macroData[macroKey].items) do
-            if item.score > bestScore or (item.score == bestScore and item.level > bestLevel) then
-                bestItem = item.name
-                bestScore = item.score
-                bestLevel = item.level
-            end
+-- Example function to get the best item for a macro
+function addon:getBestItemForMacro(macroName)
+    local items = addon.macroData[macroName].getItems()
+    local bestItem
+    local highestScore = 0
+    for _, item in ipairs(items) do
+        local score = item.score
+        if item.count > 0 and score > highestScore then
+            highestScore = score
+            bestItem = item.name
         end
     end
-
     return bestItem
 end
+

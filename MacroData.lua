@@ -1,6 +1,33 @@
 -- macroData.lua
--- Contains data for macros and some related functions.
+-- Contains data for macros and related functions.
 local _, addon = ...
+
+-- Function to get items for a given macro from the centralized item cache
+local function getItemsForMacro(macroKey)
+    local macroInfo = addon.macroData[macroKey]
+    local items = addon.itemCache
+    local matchedItems = {}
+
+    for _, entry in ipairs(items) do
+        for _, keyword in ipairs(macroInfo.keywords) do
+            if entry.name:match(keyword) then
+                matchedItems[entry.name] = entry
+                entry.score = addon:scoreEntry(entry, "item", macroInfo)
+            end
+        end
+    end
+
+    local sortedItems = {}
+    for _, item in pairs(matchedItems) do
+        table.insert(sortedItems, item)
+    end
+
+    table.sort(sortedItems, function(a, b)
+        return a.score > b.score
+    end)
+
+    return sortedItems
+end
 
 addon.macroData = {
     HP = {
@@ -22,7 +49,9 @@ addon.macroData = {
                 table.insert(macroLines, 2, healthstoneLine)
             end
         end,
-        items = {}
+        getItems = function()
+            return getItemsForMacro("HP")
+        end
     },
     MP = {
         name = "Mana Pot",
@@ -35,8 +64,9 @@ addon.macroData = {
                 -- Handle the match
             end
         }},
-        items = {},
-        spells = {}
+        getItems = function()
+            return getItemsForMacro("MP")
+        end
     },
     Food = {
         name = "Food",
@@ -49,8 +79,9 @@ addon.macroData = {
                 -- Handle the match
             end
         }},
-        items = {},
-        spells = {}
+        getItems = function()
+            return getItemsForMacro("Food")
+        end
     },
     Drink = {
         name = "Drink",
@@ -63,8 +94,9 @@ addon.macroData = {
                 -- Handle the match
             end
         }},
-        items = {},
-        spells = {}
+        getItems = function()
+            return getItemsForMacro("Drink")
+        end
     },
     Bandage = {
         name = "Bandage",
@@ -77,8 +109,9 @@ addon.macroData = {
                 -- Handle the match
             end
         }},
-        items = {},
-        spells = {}
+        getItems = function()
+            return getItemsForMacro("Bandage")
+        end
     },
     HS = {
         name = "Healthstone",
@@ -91,8 +124,9 @@ addon.macroData = {
                 -- Handle the match
             end
         }},
-        items = {},
-        spells = {}
+        getItems = function()
+            return getItemsForMacro("HS")
+        end
     },
     Bang = {
         name = "Bang",
@@ -105,7 +139,8 @@ addon.macroData = {
                 -- Handle the match
             end
         }},
-        items = {},
-        spells = {}
+        getItems = function()
+            return getItemsForMacro("Bang")
+        end
     }
 }
