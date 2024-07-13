@@ -1,5 +1,5 @@
 -- Tooltip.lua
-local _, addon = ...
+local addonName, addon = ...
 
 -- `GetTooltipByType(id, type)`: Creates/uses a tooltip for a given item or spell ID.
 -- `type` can be "item" or "spell". Returns the tooltip object.
@@ -13,23 +13,23 @@ local _, addon = ...
 
 -- Global or persistent tooltip frame
 local persistentTooltip = persistentTooltip or
-                              CreateFrame("GameTooltip", "MyAddonPersistentTooltip", nil, "GameTooltipTemplate")
+                              CreateFrame("GameTooltip", addonName .. "PersistentTooltip", nil, "GameTooltipTemplate")
 
 -- Function to create a tooltip based on type and ID
-function addon:GetTooltipByType(id, isType)
+function addon:GetTooltipByType(id, byType)
     local tooltip = persistentTooltip
     tooltip:SetOwner(UIParent, "ANCHOR_NONE")
 
     -- Clearing lines before setting new data
     tooltip:ClearLines()
 
-    if isType == "item" then
+    if byType == "item" then
         tooltip:SetItemByID(id)
-    elseif isType == "spell" then
+    elseif byType == "spell" then
         print(id)
         tooltip:SetSpellByID(id)
     else
-        print("Error: Invalid type specified.")
+        print("Error: Invalid type specified: ")
         return nil
     end
 

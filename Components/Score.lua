@@ -25,12 +25,12 @@ local function any(tbl, condition)
 end
 
 -- Scores an item or spell based on its tooltip and macro information
-function addon:scoreEntry(entry, isItem, macroInfo)
+function addon:scoreEntry(entry, byType, macroInfo)
     if not entry.id or type(entry.id) ~= "number" then
         return 0
     end
 
-    local tooltip = self:GetTooltipByType(entry.id, isItem)
+    local tooltip = self:GetTooltipByType(entry.id, byType)
     if not tooltip then
         return 0
     end
@@ -74,7 +74,7 @@ local function processEntries(self, macroKey, macroInfo)
             end) then
                 if not matchedEntries[entry.name] then
                     matchedEntries[entry.name] = true
-                    entry.score = self:scoreEntry(entry, entryType == "item", macroInfo)
+                    entry.score = self:scoreEntry(entry, entryType == "item" and "item" or "spell", macroInfo)
                     table.insert(macroInfo[entryType == "item" and "items" or "spells"], entry)
                 end
             end

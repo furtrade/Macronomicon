@@ -150,6 +150,7 @@
 		"enabled",
 		"WEAPON",
 		"MAX_ACCOUNT_MACROS",
-		"SpellBookFrame"
+		"SpellBookFrame",
+		"persistentTooltip"
 	]
 }
