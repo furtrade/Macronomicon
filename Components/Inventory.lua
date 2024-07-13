@@ -2,34 +2,37 @@ local _, addon = ...
 
 addon.itemCache = addon.itemCache or {}
 
--- Helper function to check if an item exists in a table by its name
-local function itemExists(tbl, itemName)
+-- Helper function to create a lookup table for quick existence checks
+local function createLookupTable(tbl)
+    local lookup = {}
     for _, item in ipairs(tbl) do
-        if item.name == itemName then
-            return true
-        end
+        lookup[item.name] = item
     end
-    return false
+    return lookup
 end
 
--- Helper function to add an item to a table if it doesn't already exist
-local function addItemIfNotExists(tbl, item)
-    if not itemExists(tbl, item.name) then
+-- Helper function to add or update an item in a table
+local function addOrUpdateItem(tbl, item)
+    local lookup = createLookupTable(tbl)
+    if lookup[item.name] then
+        for i, existingItem in ipairs(tbl) do
+            if existingItem.name == item.name then
+                tbl[i] = item
+                return
+            end
+        end
+    else
         table.insert(tbl, item)
-        return true
     end
-    return false
 end
 
--- Helper function to remove an item from a table by its name
-local function removeItem(tbl, itemName)
+-- Helper function to remove items not present in the lookup
+local function removeUnmatchedItems(tbl, matchedItems)
     for i = #tbl, 1, -1 do
-        if tbl[i].name == itemName then
+        if not matchedItems[tbl[i].name] then
             table.remove(tbl, i)
-            return true
         end
     end
-    return false
 end
 
 -- Processes items or spells for the given macro
@@ -63,7 +66,7 @@ local function processEntries(self, macroKey, macroInfo)
                     if not matchedEntries[entry.name] then
                         matchedEntries[entry.name] = true
                         entry.score = getScore(self, entry, entryType, macroInfo)
-                        addItemIfNotExists(macroEntries, entry)
+                        addOrUpdateItem(macroEntries, entry)
                     end
                     break
                 end
@@ -71,11 +74,7 @@ local function processEntries(self, macroKey, macroInfo)
         end
 
         -- Remove items that are no longer matched
-        for i = #macroEntries, 1, -1 do
-            if not matchedEntries[macroEntries[i].name] then
-                table.remove(macroEntries, i)
-            end
-        end
+        removeUnmatchedItems(macroEntries, matchedEntries)
     end
 end
 
@@ -176,11 +175,9 @@ local function addItemToCache(bagOrSlotIndex, slotIndex)
         return
     end
 
-    local cache = addon.itemCache
     local itemInfo = itemizer(bagOrSlotIndex, slotIndex)
     if itemInfo then
-        removeItem(cache, itemInfo.name) -- Remove the existing item first
-        table.insert(cache, itemInfo)
+        addOrUpdateItem(addon.itemCache, itemInfo)
     end
 end
 
@@ -193,7 +190,7 @@ function addon:UpdateItemCache()
         local itemInfo = itemizer(bagOrSlotIndex)
         if itemInfo then
             foundItems[itemInfo.name] = true
-            addItemToCache(bagOrSlotIndex)
+            addOrUpdateItem(cache, itemInfo)
         end
     end
 
@@ -204,15 +201,11 @@ function addon:UpdateItemCache()
             local itemInfo = itemizer(bagOrSlotIndex, slotIndex)
             if itemInfo then
                 foundItems[itemInfo.name] = true
-                addItemToCache(bagOrSlotIndex, slotIndex)
+                addOrUpdateItem(cache, itemInfo)
             end
         end
     end
 
     -- Remove items from the cache that were not found
-    for i = #cache, 1, -1 do
-        if not foundItems[cache[i].name] then
-            table.remove(cache, i)
-        end
-    end
+    removeUnmatchedItems(cache, foundItems)
 end
