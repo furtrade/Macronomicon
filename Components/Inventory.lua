@@ -67,7 +67,7 @@ local function itemizer(bagOrSlotIndex, slotIndex)
         equipLoc = equipLoc,
         spellName = itemSpell,
         spellId = itemSpellId,
-        rank = C_Spell.GetSpellSubtext(itemSpellId),
+        rank = addon.gameVersion < 4000 and C_Spell.GetSpellSubtext(itemSpellId),
         count = C_Item.GetItemCount(itemID, false, true, false),
         found = true
     }
