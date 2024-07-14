@@ -32,7 +32,7 @@ MacroData.lua
 # Core files
 Components\Inventory.lua
 Components\LearnedSpells.lua
-Components\FsTooltip.lua
+Components\Tooltip.lua
 Components\Macros.lua
 Components\Score.lua
 Components\MacroPatcher.lua
