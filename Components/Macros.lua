@@ -35,12 +35,12 @@ end
 
 -- Gets the macro ID by name
 function addon:getMacroIDByName(name)
-    print("searching for: ", name)
+    -- print("searching for: ", name)
     local searchName = self:prefixedMacroName(name)
     for i = 1, MAX_ACCOUNT_MACROS + MAX_CHARACTER_MACROS do
         local macroSearch = GetMacroInfo(i)
         if macroSearch == searchName or macroSearch == name then
-            print("matched ", macroSearch, " with ", name, " at index: ", i)
+            -- print("matched ", macroSearch, " with ", name, " at index: ", i)
             return i
         end
     end
