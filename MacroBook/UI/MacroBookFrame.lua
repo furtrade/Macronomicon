@@ -18,10 +18,7 @@ function addon.SetupFrame()
         TabSystemOwnerMixin.OnLoad(self);
         self:SetTabSystem(self.CategoryTabSystem);
 
-        self.categoryMixins = { -- CreateAndInitFromMixin(SpellBookClassCategoryMixin, self),
-        -- CreateAndInitFromMixin(SpellBookGeneralCategoryMixin, self),
-        -- CreateAndInitFromMixin(SpellBookPetCategoryMixin, self)};
-        CreateAndInitFromMixin(SpellBookMacrobialCategory, self)};
+        self.categoryMixins = {CreateAndInitFromMixin(SpellBookMacrobialCategory, self)};
 
         for _, categoryMixin in ipairs(self.categoryMixins) do
             categoryMixin:SetTabID(self:AddNamedTab(categoryMixin:GetName()));
@@ -65,6 +62,23 @@ function addon.SetupFrame()
 
         -- SpellBookFrameTutorialsMixin.OnLoad(self);
         -- self:InitializeSearch();
+        EventRegistry:RegisterCallback("PlayerSpellsFrame.SpellBookFrame.Hide", self.OnSpellBookHidden, self)
+        EventRegistry:RegisterCallback("PlayerSpellsFrame.SpellBookFrame.Show", self.OnSpellBookShown, self)
+        EventRegistry:RegisterCallback("PlayerSpellsFrame.SpellBookFrame.DisplayedSpellsChanged",
+            self.OnSpellBookSpellsChanged, self)
+
+    end
+
+    function MacroBookFrameMixin:OnSpellBookHidden()
+        self:Hide()
+    end
+
+    function MacroBookFrameMixin:OnSpellBookShown()
+        self:Show()
+    end
+
+    function MacroBookFrameMixin:OnSpellBookSpellsChanged()
+        self:SetMinimized(PlayerSpellsFrame.isMinimized)
     end
 
     function MacroBookFrameMixin:OnPagedSpellsUpdate()
@@ -105,7 +119,6 @@ function addon.SetupFrame()
         end
 
         self:SetMinimized(PlayerSpellsFrame.isMinimized)
-
     end
 
     function MacroBookFrameMixin:OnHide()
