@@ -151,6 +151,26 @@
 		"WEAPON",
 		"MAX_ACCOUNT_MACROS",
 		"SpellBookFrame",
-		"persistentTooltip"
+		"persistentTooltip",
+		"TabSystemOwnerMixin",
+		"FrameUtil",
+		"GenerateClosure",
+		"InClickBindingMode",
+		"ClickBindingFrame",
+		"Kiosk",
+		"CreateDataProvider",
+		"SpellFlyout",
+		"ClearOnBarHighlightMarks",
+		"ActionBarController_UpdateAllSpellHighlights",
+		"TextureKitConstants",
+		"SPELL_PASSIVE",
+		"GameTooltip_AddErrorLine",
+		"GameTooltip_AddColoredLine",
+		"CLICK_BINDING_NOT_AVAILABLE",
+		"LIGHTBLUE_FONT_COLOR",
+		"ActionButtonUtil",
+		"MacroFrameText",
+		"ChatEdit_InsertLink",
+		"CreateAnchor"
 	]
 }

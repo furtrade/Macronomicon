@@ -24,6 +24,16 @@ Libs\AceComm-3.0\AceComm-3.0.xml
 Libs\AceTab-3.0\AceTab-3.0.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 
+# Scripts
+MacroBook/K_MacroBook.lua
+MacroBook/MacroBank.lua
+# SpellBook Interface
+MacroBook/UI/MacroBookItem.xml
+MacroBook/UI/MacroBookItem.lua
+MacroBook/UI/MacroBookCategory.lua
+MacroBook/UI/MacroBookFrame.xml
+MacroBook/UI/MacroBookFrame.lua
+
 # Core files
 Components\Inventory.lua
 Components\LearnedSpells.lua

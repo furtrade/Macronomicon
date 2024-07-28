@@ -21,6 +21,11 @@ function addon:OnInitialize()
     -- Generate the macro groups
     self:loadCustomMacros()
     self:generateMacroGroups()
+
+    -- Initialize from file 1
+    -- addon.SetupCategory() -- Initialize mixin
+    -- addon.SetupFrame() -- Initialize mixin
+    -- addon.CreateAndInitCustomCategory()
 end
 
 function addon:OnEnable()
@@ -41,6 +46,28 @@ function addon:OnEnable()
     self:RegisterEvent("SPELLS_CHANGED", sendIt)
     self:RegisterEvent("LEARNED_SPELL_IN_TAB", sendIt)
     self:RegisterEvent("SKILL_LINES_CHANGED", sendIt)
+
+    -- Custom event handlers from file 1
+    self:RegisterEvent("ADDON_LOADED", "OnPlayerSpellsLoaded")
+    -- self:RegisterEvent("PLAYER_LOGIN", "OnPlayerSpellsLoaded")
+end
+
+-- Setting up MacroBook UI
+function addon:OnPlayerSpellsLoaded(event, ...)
+    if event == "ADDON_LOADED" then
+        local loadedAddonName = ...
+        if loadedAddonName == "Blizzard_PlayerSpells" then
+            if PlayerSpellsFrame and PlayerSpellsFrame.SpellBookFrame then
+                addon.SetupCategory() -- Initialize mixin
+                addon.SetupFrame() -- Initialize mixin
+                addon.CreateAndInitCustomCategory()
+            end
+        end
+    elseif event == "PLAYER_ENTERING_WORLD" then
+        addon.InitializePlayerSpellsUtil()
+        -- elseif event == "PLAYER_LOGIN" then
+        --     addon.startNewSession()
+    end
 end
 
 function addon:SlashCommand(input, editbox)
@@ -99,7 +126,6 @@ function addon:ProcessAll()
         return false
     else
         self:UpdateItemCache()
-        -- self:UpdateSpellbook()
         self:updateMacroData()
         self:processMacros()
         return true
@@ -108,3 +134,4 @@ end
 
 -- Expose the addon globally for debugging
 _G.Macrobial = addon
+_G["a_reverse_engine"] = addon -- From file 1
