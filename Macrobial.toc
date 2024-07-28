@@ -24,11 +24,6 @@ Libs\AceComm-3.0\AceComm-3.0.xml
 Libs\AceTab-3.0\AceTab-3.0.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 
-# Entry point
-Main.lua
-Options.lua
-MacroData.lua
-
 # Core files
 Components\Inventory.lua
 Components\LearnedSpells.lua
@@ -36,4 +31,11 @@ Components\Tooltip.lua
 Components\Macros.lua
 Components\Score.lua
 Components\MacroPatcher.lua
+
+# Entry point
+Constants.lua
+MacroData.lua
+Options.lua
+Main.lua
+
 

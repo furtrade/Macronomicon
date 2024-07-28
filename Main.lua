@@ -6,39 +6,6 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
 local _G = _G
 
-local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or _G.GetAddOnMetadata
-addon.title = GetAddOnMetadata(addonName, "Title")
-
--- Table lookup for game versions
-local gameVersionLookup = {
-    [110000] = "RETAIL",
-    [100000] = "DRAGONFLIGHT",
-    [90000] = "SHADOWLANDS",
-    [80000] = "BFA",
-    [70000] = "LEGION",
-    [60000] = "WOD",
-    [50000] = "MOP",
-    [40000] = "CATA",
-    [30000] = "WOTLK",
-    [20000] = "TBC"
-}
-local gameVersion = select(4, GetBuildInfo())
-addon.gameVersion = gameVersion
--- Find the appropriate game version
-for version, name in pairs(gameVersionLookup) do
-    if gameVersion >= version then
-        addon.game = name
-        break
-    end
-end
-
-addon.player = {
-    localeClass = select(1, UnitClass("player")),
-    class = select(2, UnitClass("player")),
-    race = select(2, UnitRace("player")),
-    faction = select(1, UnitFactionGroup("player"))
-}
-
 addon.spellbook = {}
 addon.itemCache = {}
 
@@ -76,6 +43,24 @@ function addon:OnEnable()
     self:RegisterEvent("SKILL_LINES_CHANGED", sendIt)
 end
 
+function addon:SlashCommand(input, editbox)
+    input = input:trim()
+    if input == "run" then
+        self:Print("Running...")
+        self:ProcessAll()
+    elseif input == "enable" then
+        self:Enable()
+        self:Print("Enabled.")
+    elseif input == "disable" then
+        self:Disable()
+        self:Print("Disabled.")
+    elseif input == "message" then
+        print("this is our saved message:", self.db.profile.someInput)
+    else
+        Settings.OpenToCategory(self.optionsFrame.name)
+    end
+end
+
 local lastTrigger = 0
 local threshold = 5
 local retryPending = false
@@ -106,24 +91,6 @@ function addon:tryAction()
     local success = self:ProcessAll()
     if success then
         lastTrigger = GetTime()
-    end
-end
-
-function addon:SlashCommand(input, editbox)
-    input = input:trim()
-    if input == "run" then
-        self:Print("Running...")
-        self:ProcessAll()
-    elseif input == "enable" then
-        self:Enable()
-        self:Print("Enabled.")
-    elseif input == "disable" then
-        self:Disable()
-        self:Print("Disabled.")
-    elseif input == "message" then
-        print("this is our saved message:", self.db.profile.someInput)
-    else
-        Settings.OpenToCategory(self.optionsFrame.name)
     end
 end
 
