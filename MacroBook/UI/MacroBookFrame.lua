@@ -8,7 +8,7 @@ function addon.SetupFrame()
 
     local SpellBookLifetimeEvents = {"LEARNED_SPELL_IN_SKILL_LINE", "USE_GLYPH", "ACTIVATE_GLYPH", "CANCEL_GLYPH_CAST"};
 
-    local SpellBookWhileVisibleEvents = {"SPELLS_CHANGED", "DISPLAY_SIZE_CHANGED", "UI_SCALE_CHANGED"}
+    local SpellBookWhileVisibleEvents = {"UPDATE_MACROS", "SPELLS_CHANGED", "DISPLAY_SIZE_CHANGED", "UI_SCALE_CHANGED"}
     local SpellBookWhileVisibleUnitEvents = {"PLAYER_SPECIALIZATION_CHANGED"}
 
     -- MacroBookFrameMixin = CreateFromMixins(SpellBookFrameTutorialsMixin, SpellBookSearchMixin);
