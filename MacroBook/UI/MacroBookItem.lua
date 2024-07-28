@@ -517,9 +517,15 @@ function MacroBookItemMixin:OnIconDragStart()
         return;
     end
 
-    print("slotIndiex: " .. self.slotIndex)
-    print("macroID: " .. addon.MacroBank:GetMacroIDForSlot(self.slotIndex))
-    PickupMacro(addon.MacroBank:GetMacroIDForSlot(self.slotIndex));
+    local macroInfo = addon.MacroBank:GetMacroInfoPlus(self.slotIndex);
+    local macroData = addon.MacroBank:GetMacroDataByName(macroInfo.name);
+
+    -- Create the macro if it doesn't exist
+    if not macroInfo.macroID then
+        macroInfo.macroID = addon:CreateMacro(macroInfo.name, macroData)
+    end
+
+    PickupMacro(macroInfo.macroID);
     self.macroGrabbed = true;
     self:UpdateActionBarStatus();
 end

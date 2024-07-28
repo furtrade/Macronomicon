@@ -178,3 +178,13 @@ function addon.MacroBank:GetMacroCount()
 
     return #self.combinedMacroList
 end
+
+-- This is used to get macroData for functions like CreateMacro
+function addon.MacroBank:GetMacroDataByName(name)
+    for key, value in pairs(addon.macroData) do
+        if value.name == name then
+            return value
+        end
+    end
+    return nil -- Return nil if no match is found
+end

@@ -48,12 +48,27 @@ function addon:getMacroIDByName(name)
 end
 
 -- Creates a new macro in the game
-function addon:createMacro(info)
-    local name = self:prefixedMacroName(info.name)
+function addon:CreateMacro(name, info)
+    local info = info or addon.MacroBank:GetMacroDataByName(name)
+
+    local prefixedName = self:prefixedMacroName(info.name)
     local perCharacter = false -- Always create in the general tab
     local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
 
-    local macroID = CreateMacro(name, "INV_Misc_QuestionMark", macroString, perCharacter)
+    local macroID = CreateMacro(prefixedName, "INV_Misc_QuestionMark", macroString, perCharacter)
+    return macroID
+end
+
+-- Updates a macro with new information
+function addon:EditMacro(name, info, id)
+    local info = info or addon.MacroBank:GetMacroDataByName(name)
+
+    local prefixedName = self:prefixedMacroName(info.name)
+    local macroID = id or self:getMacroIDByName(name)
+    local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
+
+    EditMacro(macroID, prefixedName, "INV_Misc_QuestionMark", macroString)
+
     return macroID
 end
 
@@ -88,23 +103,12 @@ function addon:loadCustomMacros()
     end
 end
 
--- Updates a macro with new information
-function addon:updateMacro(info, id)
-    local name = self:prefixedMacroName(info.name)
-    local macroID = id or self:getMacroIDByName(name)
-    local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
-
-    EditMacro(macroID, name, "INV_Misc_QuestionMark", macroString)
-
-    return macroID
-end
-
 -- Processes macros from the provided macro tables
 function addon:processMacros()
     self:loadCustomMacros()
 
     for header, info in pairs(self.macroData) do
-        self:updateMacro(info)
+        self:EditMacro(info.name, info)
     end
 end
 

@@ -32,7 +32,7 @@ end
 addon.macroData = {
     HP = {
         name = "Heal Pot",
-        icon = "Interface\\Icons\\inv_potion_167",
+        icon = 134795,
         keywords = {"Healing Potion"},
         valuation = {"(%d+)%s+to%s+(%d+) health"},
         patterns = {{
