@@ -6,6 +6,20 @@ addon.MacroBank = addon.MacroBank or {}
 -- Prepare the data
 function addon.MacroBank:GetRealMacros()
     local MacroBankData = {}
+    local nameCount = {}
+
+    -- Function to rename duplicate macros
+    local function getUniqueName(name)
+        if not nameCount[name] then
+            nameCount[name] = 0
+        end
+        nameCount[name] = nameCount[name] + 1
+        if nameCount[name] > 1 then
+            return name .. "(" .. (nameCount[name] - 1) .. ")"
+        else
+            return name
+        end
+    end
 
     -- Get the number of account macros and character macros
     local numAccountMacros, numCharacterMacros = GetNumMacros()
@@ -13,10 +27,11 @@ function addon.MacroBank:GetRealMacros()
     -- Iterate over account macros
     for i = 1, numAccountMacros do
         local name, iconTexture, body = GetMacroInfo(i)
+        local uniqueName = getUniqueName(name)
         table.insert(MacroBankData, {
             macroType = "account",
             macroID = i,
-            name = name,
+            name = uniqueName,
             iconID = iconTexture,
             body = body,
             itemType = 1,
@@ -29,10 +44,11 @@ function addon.MacroBank:GetRealMacros()
     -- Iterate over character macros
     for i = 121, 120 + numCharacterMacros do
         local name, iconTexture, body = GetMacroInfo(i)
+        local uniqueName = getUniqueName(name)
         table.insert(MacroBankData, {
             macroType = "character",
             macroID = i,
-            name = name,
+            name = uniqueName,
             iconID = iconTexture,
             body = body,
             itemType = 1,
