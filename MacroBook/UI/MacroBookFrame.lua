@@ -14,11 +14,17 @@ function addon.SetupFrame()
     -- MacroBookFrameMixin = CreateFromMixins(SpellBookFrameTutorialsMixin, SpellBookSearchMixin);
 
     function MacroBookFrameMixin:OnLoad()
-        -- ❄️Let the default ui handle the tab button for now.
         TabSystemOwnerMixin.OnLoad(self);
         self:SetTabSystem(self.CategoryTabSystem);
 
         self.categoryMixins = {CreateAndInitFromMixin(SpellBookMacrobialCategory, self)};
+
+        -- ❄️Add default tabs to macrobook
+        for _, categoryMixin in ipairs(PlayerSpellsFrame.SpellBookFrame.categoryMixins) do
+            if categoryMixin:IsAvailable() then
+                self:AddNamedTab(categoryMixin:GetName())
+            end
+        end
 
         for _, categoryMixin in ipairs(self.categoryMixins) do
             categoryMixin:SetTabID(self:AddNamedTab(categoryMixin:GetName()));

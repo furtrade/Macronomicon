@@ -255,8 +255,8 @@ local function NudgeFrame(frame, xOffset, yOffset)
 end
 
 local function OnClickBtnXT()
-    local blizz = PlayerSpellsFrame.SpellBookFrame
-    local blizzTabSystem = PlayerSpellsFrame.SpellBookFrame.CategoryTabSystem
+    -- local blizz = PlayerSpellsFrame.SpellBookFrame
+    -- local blizzTabSystem = PlayerSpellsFrame.SpellBookFrame.CategoryTabSystem
 
     -- Function to extend the OnClick handler of a frame
     local function OnClickXT(frame, xt)
@@ -278,19 +278,19 @@ local function OnClickBtnXT()
         end
     end
 
-    -- This triggers when we click a default spellbook tab like "General"
-    local function OnClickSpellBookTab(self, button, down)
-        -- print(self.tabText .. " custom functionality triggered!")
-        -- unselect MacroBookTab
-        MacroBookFrame.CategoryTabSystem:SetTabVisuallySelected(0)
-        MacroBookFrame.PagedSpellsFrame:Hide()
-        blizz.PagedSpellsFrame:Show()
+    -- -- This triggers when we click a default spellbook tab like "General"
+    -- local function OnClickSpellBookTab(self, button, down)
+    --     -- print(self.tabText .. " custom functionality triggered!")
+    --     -- unselect MacroBookTab
+    -- MacroBookFrame.CategoryTabSystem:SetTabVisuallySelected(0)
+    -- MacroBookFrame.PagedSpellsFrame:Hide()
+    -- blizz.PagedSpellsFrame:Show()
 
-    end
+    -- end
 
-    for i, button in ipairs(blizzTabSystem.tabs) do
-        OnClickXT(button, OnClickSpellBookTab)
-    end
+    -- for i, button in ipairs(blizzTabSystem.tabs) do
+    --     OnClickXT(button, OnClickSpellBookTab)
+    -- end
 
     -- This triggers when we click a custom tab like "Macrobial"
     local function OnClickMacroBookTab(self, button, down)
@@ -305,12 +305,6 @@ local function OnClickBtnXT()
     for i, button in ipairs(MacroBookFrame.CategoryTabSystem.tabs) do
         OnClickXT(button, OnClickMacroBookTab)
     end
-
-    local minMaxBtn = PlayerSpellsFrame.MaximizeMinimizeButton
-    local function refreshMacroBook()
-        return MacroBookFrame:OnShow()
-    end
-    OnClickXT(minMaxBtn.MinimizeButton, refreshMacroBook)
 
 end
 
@@ -338,5 +332,5 @@ function addon.CreateAndInitCustomCategory()
 
     MacroBookFrame:SetMinimized(blizz.isMinimized)
 
-    OnClickBtnXT()
+    -- OnClickBtnXT()
 end
