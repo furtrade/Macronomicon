@@ -160,6 +160,8 @@ function addon.SetupCategory()
     end
 
     function SpellBookMacrobialCategory:UpdateSpellGroups()
+        addon.MacroBank:MergeMacros()
+
         local newSpellGroups = {}
 
         -- Creating spellgroup for Curated Macros

@@ -1,6 +1,6 @@
 local _, addon = ...
 
-local MacroBookItemEvents = {"UPDATE_SHAPESHIFT_FORM", "SPELL_UPDATE_COOLDOWN", "PET_BAR_UPDATE",
+local MacroBookItemEvents = {"UPDATE_MACROS", "UPDATE_SHAPESHIFT_FORM", "SPELL_UPDATE_COOLDOWN", "PET_BAR_UPDATE",
                              "ACTIONBAR_SLOT_CHANGED", "CURSOR_CHANGED", "UPDATE_MACROS"}
 
 MacroBookItemMixin = MacroBookItemMixin or {}
@@ -23,15 +23,6 @@ function MacroBookItemMixin:UpdateMacroData(forceUpdate)
     end
 
     local macroBookItemInfo = addon.MacroBank:GetMacroInfoPlus(self.elementData.slotIndex)
-    -- local macroName, macroIcon, macroBody = GetMacroInfo(self.elementData.slotIndex) -- Fetch macro info
-    -- macroBookItemInfo.itemType = 1
-    -- macroBookItemInfo.isOffSpec = false
-    -- macroBookItemInfo.subName = "macro"
-    -- macroBookItemInfo.isPassive = false
-    -- macroBookItemInfo.name = macroName
-    -- macroBookItemInfo.iconID = macroIcon
-    -- macroBookItemInfo.actionID = 6603
-    -- macroBookItemInfo.spellID = 6603
 
     if not macroBookItemInfo then
         self:ClearMacroData()
@@ -106,6 +97,8 @@ function MacroBookItemMixin:OnEvent(event, ...)
 
     if event == "UPDATE_SHAPESHIFT_FORM" then
         -- Attack icons change when shapeshift form changes
+        self:UpdateIcon();
+    elseif "UPDATE_MACROS" then
         self:UpdateIcon();
     elseif event == "UPDATE_MACROS" then
         self:UpdateIcon();
@@ -251,7 +244,9 @@ function MacroBookItemMixin:UpdateIcon()
     end
 
     -- Set the icon texture for the macro
-    local _, iconID = GetMacroInfo(self.slotIndex)
+    -- local _, iconID = GetMacroInfo(self.slotIndex)
+    local macroIfo = addon.MacroBank:GetMacroInfoPlus(self.slotIndex)
+    local iconID = macroIfo.iconID
 
     self.Button.Icon:SetTexture(iconID);
 end
@@ -522,7 +517,9 @@ function MacroBookItemMixin:OnIconDragStart()
         return;
     end
 
-    PickupMacro(self.slotIndex);
+    print("slotIndiex: " .. self.slotIndex)
+    print("macroID: " .. addon.MacroBank:GetMacroIDForSlot(self.slotIndex))
+    PickupMacro(addon.MacroBank:GetMacroIDForSlot(self.slotIndex));
     self.macroGrabbed = true;
     self:UpdateActionBarStatus();
 end

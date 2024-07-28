@@ -124,6 +124,8 @@ function addon.SetupFrame()
     function MacroBookFrameMixin:OnEvent(event, ...)
         if event == "SPELLS_CHANGED" then
             self:UpdateAllMacroData();
+        elseif event == "UPDATE_MACROS" then
+            self:UpdateAllMacroData();
         elseif event == "PLAYER_SPECIALIZATION_CHANGED" then
             local resetCurrentPage = true;
             self:UpdateAllMacroData(resetCurrentPage);
@@ -364,6 +366,10 @@ function addon.SetupFrame()
 
     function MacroBookFrameMixin:UpdateAllMacroData(resetCurrentPage)
         self.isUpdatingAllMacroData = true;
+
+        -- update macrobank data
+        addon.MacroBank:MergeMacros()
+
         local activeTabID = self:GetTab();
 
         local isActiveCategoryUnavailable = false;
