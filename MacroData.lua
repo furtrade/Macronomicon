@@ -55,7 +55,7 @@ addon.macroData = {
     },
     MP = {
         name = "Mana Pot",
-        icon = "Interface\\Icons\\inv_potion_168",
+        icon = 134796,
         keywords = {"Mana Potion", "Restore Mana"},
         valuation = {"(%d+)%s+to%s+(%d+) mana"},
         patterns = {{
@@ -70,7 +70,7 @@ addon.macroData = {
     },
     Food = {
         name = "Food",
-        icon = "Interface\\Icons\\inv_misc_food_64",
+        icon = 134020,
         keywords = {"Food"},
         valuation = {"(%d+) health over %d+ sec"},
         patterns = {{
@@ -85,7 +85,7 @@ addon.macroData = {
     },
     Drink = {
         name = "Drink",
-        icon = "Interface\\Icons\\inv_drink_17",
+        icon = 132804,
         keywords = {"Drink"},
         valuation = {"(%d+) mana over %d+ sec"},
         patterns = {{
@@ -100,7 +100,7 @@ addon.macroData = {
     },
     Bandage = {
         name = "Bandage",
-        icon = "Interface\\Icons\\inv_misc_bandage_12",
+        icon = 133682,
         keywords = {"First Aid", "Bandage"},
         valuation = {"Heals (%d+)"},
         patterns = {{
@@ -115,7 +115,7 @@ addon.macroData = {
     },
     HS = {
         name = "Healthstone",
-        icon = "Interface\\Icons\\inv_stone_04",
+        icon = 135230,
         keywords = {"Healthstone"},
         valuation = {"(%d+) life"},
         patterns = {{
@@ -130,7 +130,7 @@ addon.macroData = {
     },
     Bang = {
         name = "Bang",
-        icon = "Interface\\Icons\\inv_misc_bomb_04",
+        icon = 133712,
         keywords = {"Explosive", "Bomb", "Grenade", "Dynamite", "Sapper", "Rocket", "Charge"},
         valuation = {"(%d+)%s+to%s+(%d+)"},
         patterns = {{

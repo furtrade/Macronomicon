@@ -54,8 +54,9 @@ function addon:CreateMacro(name, info)
     local prefixedName = self:prefixedMacroName(info.name)
     local perCharacter = false -- Always create in the general tab
     local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
+    local iconID = info.icon
 
-    local macroID = CreateMacro(prefixedName, "INV_Misc_QuestionMark", macroString, perCharacter)
+    local macroID = CreateMacro(prefixedName, iconID or "INV_Misc_QuestionMark", macroString, perCharacter)
     return macroID
 end
 
@@ -66,8 +67,9 @@ function addon:EditMacro(name, info, id)
     local prefixedName = self:prefixedMacroName(info.name)
     local macroID = id or self:getMacroIDByName(name)
     local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
+    local iconID = info.icon
 
-    EditMacro(macroID, prefixedName, "INV_Misc_QuestionMark", macroString)
+    EditMacro(macroID, prefixedName, iconID or "INV_Misc_QuestionMark", macroString)
 
     return macroID
 end
