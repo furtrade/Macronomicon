@@ -4,6 +4,12 @@
 
 ## Description
 
+_<span style="color:#8A2BE2">Within the accursed tome's brittle pages, chaotic
+scrawlings converge into an eldritch script, describing macros both alien and
+familiar. These arcane glyphs, seething with malevolent life, whisper of spells
+unseen by mortal eyes, yet resonant with memories you cannot fully
+grasp.</span>_
+
 Are you using Health Potions? What about Healthstones, Mana Potions, or
 Explosives? Well this addon might be perfect for you. Macronomicon provides
 mutating macros which are auto-refreshed with the best consumables present in
