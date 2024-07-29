@@ -11,8 +11,10 @@ addon.itemCache = {}
 
 function addon:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New(addonName .. "DB", self.defaults)
+    --[[ -- 🤗Disabled Options Frame temporarily
     AceConfig:RegisterOptionsTable(addon.title .. "_Options", self.options)
     self.optionsFrame = AceConfigDialog:AddToBlizOptions(addon.title .. "_Options", addon.title)
+    ]]
     self:RegisterChatCommand(addon.title, "SlashCommand")
     self:RegisterChatCommand("mbl", "SlashCommand")
 
@@ -22,10 +24,6 @@ function addon:OnInitialize()
     self:loadCustomMacros()
     self:generateMacroGroups()
 
-    -- Initialize from file 1
-    -- addon.SetupCategory() -- Initialize mixin
-    -- addon.SetupFrame() -- Initialize mixin
-    -- addon.CreateAndInitCustomCategory()
 end
 
 function addon:OnEnable()
@@ -75,16 +73,8 @@ function addon:SlashCommand(input, editbox)
     if input == "run" then
         self:Print("Running...")
         self:ProcessAll()
-    elseif input == "enable" then
-        self:Enable()
-        self:Print("Enabled.")
-    elseif input == "disable" then
-        self:Disable()
-        self:Print("Disabled.")
-    elseif input == "message" then
-        print("this is our saved message:", self.db.profile.someInput)
     else
-        Settings.OpenToCategory(self.optionsFrame.name)
+        -- Settings.OpenToCategory(self.optionsFrame.name)
     end
 end
 
@@ -133,5 +123,4 @@ function addon:ProcessAll()
 end
 
 -- Expose the addon globally for debugging
-_G.Macrobial = addon
-_G["a_reverse_engine"] = addon -- From file 1
+_G["Macrobial"] = addon
