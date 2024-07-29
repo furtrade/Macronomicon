@@ -2,8 +2,7 @@
 ## Title: Macronomicon
 ## Author: Principium-Caelestrasz
 ## Notes: Maintains macros based on item availability. 
-## X-Curse-Project-ID: 
-## X-Wago-ID: 
+## X-Curse-Project-ID: 1073494
 ## SavedVariables: MacronomiconDB
 
 # Ace3 Libraries
