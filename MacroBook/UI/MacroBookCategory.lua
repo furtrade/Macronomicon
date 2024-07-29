@@ -257,51 +257,43 @@ end
 local function OnClickBtnXT()
     -- Function to extend the OnClick handler of a frame
     local function OnClickXT(frame, xt)
-        if frame and frame.GetScript then
-            -- Retrieve the original OnClick handler
-            local ogOnClick = frame:GetScript("OnClick")
-
-            -- Define a new OnClick handler
-            frame:SetScript("OnClick", function(...)
-                -- Call the original handler if it exists
-                if ogOnClick then
-                    ogOnClick(...)
-                end
+        if frame and frame.HookScript then
+            -- Hook into the OnClick script of the frame
+            frame:HookScript("OnClick", function(...)
+                print("trying")
                 -- Call the new function
                 xt(...)
             end)
         else
-            print("Invalid frame or frame does not support GetScript.")
+            print("Invalid frame or frame does not support HookScript.")
         end
     end
 
-    -- ❄️Some localized blizzard framees
+    -- Some localized Blizzard frames
     local blizz = PlayerSpellsFrame.SpellBookFrame
     local blizzTabSystem = PlayerSpellsFrame.SpellBookFrame.CategoryTabSystem
 
-    -- This triggers when we click a custom tab like "Macrobial"
+    local function OnClickSpellBookTab(self, button, down)
+        MacroBookFrame.CategoryTabSystem:SetTabVisuallySelected(0)
+        MacroBookFrame.PagedSpellsFrame:Hide()
+        blizz.PagedSpellsFrame:Show()
+    end
+
+    for i, button in ipairs(blizzTabSystem.tabs) do
+        -- print("Initializing button in blizzTabSystem: ", button.tabText) -- Debugging
+        OnClickXT(button, OnClickSpellBookTab)
+    end
+
     local function OnClickMacroBookTab(self, button, down)
-        if self.tabText == "Macrobial" then
-            print(self.tabID .. " custom functionality triggered!")
-            -- unselect MacroBookTab
-
-            -- blizzTabSystem:SetTabVisuallySelected(0)
-            blizz.PagedSpellsFrame:Hide()
-            MacroBookFrame.PagedSpellsFrame:Show()
-        else
-            print(self.tabID .. " custom functionality triggered!")
-            -- 🤖Click() doesnt work -- blizzTabSystem.tabs[self.tabID]:Click()
-            -- MacroBookFrame.CategoryTabSystem:SetTabVisuallySelected(0)
-            MacroBookFrame.PagedSpellsFrame:Hide()
-            blizz.PagedSpellsFrame:Show()
-        end
-
+        blizzTabSystem:SetTabVisuallySelected(0)
+        blizz.PagedSpellsFrame:Hide()
+        MacroBookFrame.PagedSpellsFrame:Show()
     end
 
     for i, button in ipairs(MacroBookFrame.CategoryTabSystem.tabs) do
+        -- print("Initializing button in MacroBookFrame: ", button.tabText) -- Debugging
         OnClickXT(button, OnClickMacroBookTab)
     end
-
 end
 
 -- Function to create and initialize the custom category

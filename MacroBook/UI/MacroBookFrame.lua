@@ -20,11 +20,11 @@ function addon.SetupFrame()
         self.categoryMixins = {CreateAndInitFromMixin(SpellBookMacrobialCategory, self)};
 
         -- ❄️Add default tabs to macrobook
-        for _, categoryMixin in ipairs(PlayerSpellsFrame.SpellBookFrame.categoryMixins) do
-            if categoryMixin:IsAvailable() then
-                self:AddNamedTab(categoryMixin:GetName())
-            end
-        end
+        -- for _, categoryMixin in ipairs(PlayerSpellsFrame.SpellBookFrame.categoryMixins) do
+        --     if categoryMixin:IsAvailable() then
+        --         self:AddNamedTab(categoryMixin:GetName())
+        --     end
+        -- end
 
         for _, categoryMixin in ipairs(self.categoryMixins) do
             categoryMixin:SetTabID(self:AddNamedTab(categoryMixin:GetName()));
