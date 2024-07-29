@@ -8,7 +8,7 @@ function K_MacroBook.IsSpellBookItemPassive(slotIndex)
 end
 
 function K_MacroBook.GetSpellBookSkillLineInfo(macroEnum)
-    local name, numMacros, indexOffset, iconID = "Misc", 0, 0, 0
+    local name, numMacros, indexOffset, iconID = "", 0, 0, 0
 
     -- Ensure the combinedMacroList is populated
     if not addon.MacroBank.combinedMacroList then
@@ -20,13 +20,13 @@ function K_MacroBook.GetSpellBookSkillLineInfo(macroEnum)
     -- Define search criteria functions
     local searchCriteria
     if macroEnum == 1 then
-        name = "Curated"
+        name = "Mutating"
         searchCriteria = function(macro)
             return macro.isVirtual
         end
-        iconID = 12345 -- Example icon ID for Curated
+        iconID = 12345 -- Example icon ID for Mutating
     elseif macroEnum == 2 then
-        name = "Misc"
+        name = "Assorted"
         searchCriteria = function(macro)
             return not macro.isVirtual
         end

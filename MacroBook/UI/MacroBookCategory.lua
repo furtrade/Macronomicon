@@ -150,7 +150,7 @@ function addon.SetupCategory()
     end
 
     function SpellBookMacrobialCategory:Init(macroBookFrame)
-        self.displayName = "Macrobial"
+        self.displayName = "Macros"
         self.spellBank = Enum.SpellBookSpellBank.Player -- Assuming Custom spells are player-specific
         self.categoryEnum = PlayerSpellsUtil.SpellBookCategories.Macrobial
 
@@ -164,24 +164,24 @@ function addon.SetupCategory()
 
         local newSpellGroups = {}
 
-        -- Creating spellgroup for Curated Macros
+        -- Creating spellgroup for Mutating Macros
         -- local numMacros = addon.MacroBank:GetMacroCount() or 0;
-        local macrosCurated = K_MacroBook.GetSpellBookSkillLineInfo(1)
-        local curatedMacros = {
-            displayName = "Curated",
-            slotIndexOffset = macrosCurated.itemIndexOffset, -- Adjust as needed
-            numSpellBookItems = macrosCurated.numSpellBookItems, -- Adjust as needed
+        local macrosMutating = K_MacroBook.GetSpellBookSkillLineInfo(1)
+        local mutatingMacros = {
+            displayName = "Mutating",
+            slotIndexOffset = macrosMutating.itemIndexOffset, -- Adjust as needed
+            numSpellBookItems = macrosMutating.numSpellBookItems, -- Adjust as needed
             showActionBarStatuses = false,
             spellBookItemSlotIndices = {}, -- Handled by PopulateSpellGroupsIndiciesByRange
             orderedSpellBookItemSlotIndices = {} -- Handled by PopulateSpellGroupsIndiciesByRange
         }
-        table.insert(newSpellGroups, curatedMacros);
+        table.insert(newSpellGroups, mutatingMacros);
 
-        local macrosMisc = K_MacroBook.GetSpellBookSkillLineInfo(2)
+        local macrosAssorted = K_MacroBook.GetSpellBookSkillLineInfo(2)
         local miscMacros = {
-            displayName = "Misc",
-            slotIndexOffset = macrosMisc.itemIndexOffset, -- Adjust as needed
-            numSpellBookItems = macrosMisc.numSpellBookItems, -- Adjust as needed
+            displayName = "Assorted",
+            slotIndexOffset = macrosAssorted.itemIndexOffset, -- Adjust as needed
+            numSpellBookItems = macrosAssorted.numSpellBookItems, -- Adjust as needed
             showActionBarStatuses = false,
             spellBookItemSlotIndices = {}, -- Handled by PopulateSpellGroupsIndiciesByRange
             orderedSpellBookItemSlotIndices = {} -- Handled by PopulateSpellGroupsIndiciesByRange

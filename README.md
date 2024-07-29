@@ -5,12 +5,13 @@
 ## Description
 
 Are you using Health Potions? What about Healthstones, Mana Potions, or
-Explosives? Well this addon might be perfect for you. Macrobial provides curated
-macros which are auto-refreshed with the best consumables present in your bags.
-Macrobial relieves you of that burden of deciding which consumable to drag onto
-your bars. That means you can be comforted by the knowledge that when you use a
-Health Potion, the very best was selected from your bags. The same also applies
-for the other consumables, if they're available in your bags of course.
+Explosives? Well this addon might be perfect for you. Macrobial provides
+mutating macros which are auto-refreshed with the best consumables present in
+your bags. Macrobial relieves you of that burden of deciding which consumable to
+drag onto your bars. That means you can be comforted by the knowledge that when
+you use a Health Potion, the very best was selected from your bags. The same
+also applies for the other consumables, if they're available in your bags of
+course.
 
 That's not all I've been cooking. As of writing this, I'm working on a _Super
 Macro Patching_ feature that will enable you, my friend, to create autoupdating
