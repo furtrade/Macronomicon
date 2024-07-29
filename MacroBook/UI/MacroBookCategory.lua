@@ -236,7 +236,6 @@ local function OnClickBtnXT()
         if frame and frame.HookScript then
             -- Hook into the OnClick script of the frame
             frame:HookScript("OnClick", function(...)
-                print("trying")
                 -- Call the new function
                 xt(...)
             end)
