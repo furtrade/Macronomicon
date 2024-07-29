@@ -35,7 +35,7 @@ function addon.MacroBank:GetRealMacros()
             iconID = iconTexture,
             body = body,
             itemType = 1,
-            subName = "macro",
+            -- subName = "macro",
             isOffSpec = false,
             isPassive = false
         })
@@ -52,7 +52,7 @@ function addon.MacroBank:GetRealMacros()
             iconID = iconTexture,
             body = body,
             itemType = 1,
-            subName = "macro",
+            -- subName = "macro",
             isOffSpec = false,
             isPassive = false
         })
@@ -76,7 +76,7 @@ function addon.MacroBank:GetVirtualMacros()
             iconID = iconID, -- 🌩️Preferred over corresponding real macro
             -- body = "", --⚡This should be grabbed from the corresponding real macro
             itemType = 1, -- 🌩️Preferred over corresponding real macro
-            subName = "macro", -- 🌩️Preferred over corresponding real macro
+            -- subName = "macro", -- 🌩️Preferred over corresponding real macro
             isOffSpec = false, -- 🌩️Preferred over corresponding real macro
             isPassive = false -- 🌩️Preferred over corresponding real macro
         })
@@ -114,7 +114,7 @@ function addon.MacroBank:MergeMacros()
                 iconID = virtualMacro.iconID, -- Preferred over corresponding real macro
                 body = realMacro.body,
                 itemType = virtualMacro.itemType, -- Preferred over corresponding real macro
-                subName = virtualMacro.subName, -- Preferred over corresponding real macro
+                -- subName = virtualMacro.subName, -- Preferred over corresponding real macro
                 isOffSpec = virtualMacro.isOffSpec, -- Preferred over corresponding real macro
                 isPassive = virtualMacro.isPassive -- Preferred over corresponding real macro
             })

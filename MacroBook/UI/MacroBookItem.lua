@@ -35,7 +35,11 @@ function MacroBookItemMixin:UpdateMacroData(forceUpdate)
     end
 
     if macroBookItemInfo.isVirtual then
-        macroBookItemInfo.subName = addon:GetFirstItemLinkForMacro(macroBookItemInfo.name)
+        local detail = addon:GetFirstItemNameForMacro(macroBookItemInfo.name)
+        if detail then
+            macroBookItemInfo.subName = detail.name
+            macroBookItemInfo.description = detail.link
+        end
     end
 
     self:ClearMacroData()
@@ -456,7 +460,7 @@ function MacroBookItemMixin:OnIconEnter()
     self.Backplate:SetAlpha(self.hoverBackplateAlpha);
 
     tooltip:SetText(self.macroBookItemInfo.name);
-    tooltip:AddLine(self.macroBookItemInfo.description or "", 1, 1, 1);
+    tooltip:AddLine(self.macroBookItemInfo.description or self.macroBookItemInfo.subName or "", 1, 1, 1);
 
     local actionBarStatusToolTip = nil -- self.actionBarStatus and MacroSearchUtil.GetTooltipForActionBarStatus(self.actionBarStatus);
     if actionBarStatusToolTip then

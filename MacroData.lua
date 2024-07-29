@@ -3,7 +3,7 @@
 local _, addon = ...
 
 -- Grabs the first item from the table.
-function addon:GetFirstItemLinkForMacro(macroName)
+function addon:GetFirstItemNameForMacro(macroName)
     -- Iterate through each header and macroInfo in the macroData
     for header, macroInfo in pairs(addon.macroData) do
         -- Check if the macro name matches and if it has items
@@ -11,8 +11,8 @@ function addon:GetFirstItemLinkForMacro(macroName)
             -- Loop through the items and return the first item link found
             for i = 1, #macroInfo.items do
                 local item = macroInfo.items[i]
-                if item.name then
-                    return item.name
+                if item then
+                    return item
                 end
             end
         end
