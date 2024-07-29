@@ -34,6 +34,10 @@ function MacroBookItemMixin:UpdateMacroData(forceUpdate)
         return
     end
 
+    if macroBookItemInfo.isVirtual then
+        macroBookItemInfo.subName = addon:GetFirstItemLinkForMacro(macroBookItemInfo.name)
+    end
+
     self:ClearMacroData()
 
     self.macroBookItemInfo = macroBookItemInfo
@@ -157,8 +161,19 @@ function MacroBookItemMixin:UpdateVisuals()
     self.Name:SetText(self.macroBookItemInfo.name);
     self.Button.Icon:SetTexture(self.macroBookItemInfo.iconID);
 
-    -- Macros don't have subnames, so we skip that part
-    self.SubName:SetText("");
+    if self.macroBookItemInfo.subName then
+        self:UpdateSubName(self.macroBookItemInfo.subName);
+    else
+        self.SubName:SetText("");
+        -- if self.macroBookItemInfo.spellID then
+        --     local spell = Spell:CreateFromSpellID(spellID);
+        --     self.cancelSpellLoadCallback = spell:ContinueWithCancelOnSpellLoad(function()
+        --         local spellSubName = spell:GetSpellSubtext();
+        --         self:UpdateSubName(spellSubName);
+        --         self.cancelSpellLoadCallback = nil;
+        --     end);
+        -- end
+    end
 
     -- Macros do not have itemType equivalent to Flyout in spells
     self.Button.FlyoutArrow:Hide();
@@ -231,9 +246,16 @@ function MacroBookItemMixin:UpdateVisuals()
 end
 
 function MacroBookItemMixin:UpdateSubName(subNameText)
+    -- If no subtext but it isPassive
     if subNameText == "" and self.macroBookItemInfo.isPassive then
         subNameText = SPELL_PASSIVE;
     end
+
+    -- Truncate subNameText if it exceeds 14 characters and append ellipses
+    if string.len(subNameText) > 14 then
+        subNameText = string.sub(subNameText, 1, 14) .. "...";
+    end
+
     self.macroBookItemInfo.subName = subNameText;
     self.SubName:SetText(subNameText);
 end

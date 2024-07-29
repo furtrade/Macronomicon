@@ -2,6 +2,25 @@
 -- Contains data for macros and related functions.
 local _, addon = ...
 
+-- Grabs the first item from the table.
+function addon:GetFirstItemLinkForMacro(macroName)
+    -- Iterate through each header and macroInfo in the macroData
+    for header, macroInfo in pairs(addon.macroData) do
+        -- Check if the macro name matches and if it has items
+        if macroInfo.name == macroName and macroInfo.items then
+            -- Loop through the items and return the first item link found
+            for i = 1, #macroInfo.items do
+                local item = macroInfo.items[i]
+                if item.name then
+                    return item.name
+                end
+            end
+        end
+    end
+    -- Return nil if no matching item link is found
+    return nil
+end
+
 -- Function to get items for a given macro from the centralized item cache
 local function getItemsForMacro(macroKey)
     local macroInfo = addon.macroData[macroKey]

@@ -214,4 +214,3 @@ function addon:GetItemLinksForMacro(macroName)
     end
     return itemLinksString
 end
-
