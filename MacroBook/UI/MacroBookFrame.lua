@@ -68,19 +68,24 @@ function addon.SetupFrame()
 
         -- SpellBookFrameTutorialsMixin.OnLoad(self);
         -- self:InitializeSearch();
-        EventRegistry:RegisterCallback("PlayerSpellsFrame.SpellBookFrame.Hide", self.OnSpellBookHidden, self)
-        EventRegistry:RegisterCallback("PlayerSpellsFrame.SpellBookFrame.Show", self.OnSpellBookShown, self)
+
+        -- 🤖Watch if PlayerSpellsFrame is opened/closed
+        EventRegistry:RegisterCallback("PlayerSpellsFrame.OpenFrame", self.OnSpellBookVisibilityChanged, self)
+        EventRegistry:RegisterCallback("PlayerSpellsFrame.CloseFrame", self.OnSpellBookVisibilityChanged, self)
+        -- 🤖Watch if SpellBookFrame is opened/closed
+        EventRegistry:RegisterCallback("PlayerSpellsFrame.SpellBookFrame.Show", self.OnSpellBookVisibilityChanged, self)
+        EventRegistry:RegisterCallback("PlayerSpellsFrame.SpellBookFrame.Hide", self.OnSpellBookVisibilityChanged, self)
+        -- 🤖Watch if PagedSpellsFrame is Changed.
         EventRegistry:RegisterCallback("PlayerSpellsFrame.SpellBookFrame.DisplayedSpellsChanged",
             self.OnSpellBookSpellsChanged, self)
-
     end
 
-    function MacroBookFrameMixin:OnSpellBookHidden()
-        self:Hide()
-    end
-
-    function MacroBookFrameMixin:OnSpellBookShown()
-        self:Show()
+    function MacroBookFrameMixin:OnSpellBookVisibilityChanged()
+        if PlayerSpellsFrame.SpellBookFrame:IsShown() then
+            self:Show()
+        elseif not PlayerSpellsFrame.SpellBookFrame:IsShown() then
+            self:Hide()
+        end
     end
 
     function MacroBookFrameMixin:OnSpellBookSpellsChanged()

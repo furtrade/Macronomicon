@@ -277,6 +277,7 @@ function addon.CreateAndInitCustomCategory()
 
     MacroBookFrame = CreateFrame("Frame", "MacroBookFrame", PlayerSpellsFrame, "MacroBookFrameTemplate")
     MacroBookFrame.PagedSpellsFrame:Hide()
+    MacroBookFrame:Hide()
     MacroBookFrame:SetPoint("TOPLEFT", blizz, "TOPLEFT")
     MacroBookFrame:SetPoint("BOTTOMRIGHT", blizz, "BOTTOMRIGHT")
 
