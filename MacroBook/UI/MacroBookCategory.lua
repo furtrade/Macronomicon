@@ -230,30 +230,6 @@ function addon.InitializePlayerSpellsUtil()
     end
 end
 
--- Function to nudge a frame by xOffset and yOffset
-local function NudgeFrame(frame, xOffset, yOffset)
-    if frame and frame.GetPoint then
-        -- Get the current point of the frame
-        local point, relativeTo, relativePoint, xOfs, yOfs = frame:GetPoint()
-        if point then
-            -- Calculate the new offsets
-            local newXOffset = (xOfs or 0) + xOffset
-            local newYOffset = (yOfs or 0) + yOffset
-
-            -- Set the new point with the new offsets
-            frame:ClearAllPoints()
-            frame:SetPoint(point, relativeTo, relativePoint, newXOffset, newYOffset)
-
-            -- Print the new position for debugging
-            -- print("frame moved to new position: " .. newXOffset .. ", " .. newYOffset)
-        else
-            print("Unable to retrieve the current position of the frame.")
-        end
-    else
-        print("Invalid frame or frame does not support GetPoint.")
-    end
-end
-
 local function OnClickBtnXT()
     -- Function to extend the OnClick handler of a frame
     local function OnClickXT(frame, xt)
@@ -307,7 +283,8 @@ function addon.CreateAndInitCustomCategory()
 
     MacroBookFrame:SetFrameLevel(blizz:GetFrameLevel() + 1)
     -- 🤗This might require some more effort
-    NudgeFrame(MacroBookFrame.CategoryTabSystem, 200, 0)
+    -- NudgeFrame(MacroBookFrame.CategoryTabSystem, 200, 0)
+    MacroBookFrame.CategoryTabSystem:SetPoint("TOPLEFT", blizz.CategoryTabSystem, "TOPRIGHT")
     MacroBookFrame.CategoryTabSystem:SetTabVisuallySelected(0)
 
     MacroBookFrame.isMinimzed = blizz.isMinimized
