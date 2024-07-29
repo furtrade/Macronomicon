@@ -255,9 +255,6 @@ local function NudgeFrame(frame, xOffset, yOffset)
 end
 
 local function OnClickBtnXT()
-    -- local blizz = PlayerSpellsFrame.SpellBookFrame
-    -- local blizzTabSystem = PlayerSpellsFrame.SpellBookFrame.CategoryTabSystem
-
     -- Function to extend the OnClick handler of a frame
     local function OnClickXT(frame, xt)
         if frame and frame.GetScript then
@@ -278,27 +275,26 @@ local function OnClickBtnXT()
         end
     end
 
-    -- -- This triggers when we click a default spellbook tab like "General"
-    -- local function OnClickSpellBookTab(self, button, down)
-    --     -- print(self.tabText .. " custom functionality triggered!")
-    --     -- unselect MacroBookTab
-    -- MacroBookFrame.CategoryTabSystem:SetTabVisuallySelected(0)
-    -- MacroBookFrame.PagedSpellsFrame:Hide()
-    -- blizz.PagedSpellsFrame:Show()
-
-    -- end
-
-    -- for i, button in ipairs(blizzTabSystem.tabs) do
-    --     OnClickXT(button, OnClickSpellBookTab)
-    -- end
+    -- ❄️Some localized blizzard framees
+    local blizz = PlayerSpellsFrame.SpellBookFrame
+    local blizzTabSystem = PlayerSpellsFrame.SpellBookFrame.CategoryTabSystem
 
     -- This triggers when we click a custom tab like "Macrobial"
     local function OnClickMacroBookTab(self, button, down)
-        -- print(self.tabText .. " custom functionality triggered!")
-        -- unselect MacroBookTab
-        blizzTabSystem:SetTabVisuallySelected(0)
-        blizz.PagedSpellsFrame:Hide()
-        MacroBookFrame.PagedSpellsFrame:Show()
+        if self.tabText == "Macrobial" then
+            print(self.tabID .. " custom functionality triggered!")
+            -- unselect MacroBookTab
+
+            -- blizzTabSystem:SetTabVisuallySelected(0)
+            blizz.PagedSpellsFrame:Hide()
+            MacroBookFrame.PagedSpellsFrame:Show()
+        else
+            print(self.tabID .. " custom functionality triggered!")
+            -- 🤖Click() doesnt work -- blizzTabSystem.tabs[self.tabID]:Click()
+            -- MacroBookFrame.CategoryTabSystem:SetTabVisuallySelected(0)
+            MacroBookFrame.PagedSpellsFrame:Hide()
+            blizz.PagedSpellsFrame:Show()
+        end
 
     end
 
@@ -332,5 +328,5 @@ function addon.CreateAndInitCustomCategory()
 
     MacroBookFrame:SetMinimized(blizz.isMinimized)
 
-    -- OnClickBtnXT()
+    OnClickBtnXT()
 end
