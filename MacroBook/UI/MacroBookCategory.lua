@@ -8,35 +8,35 @@ function addon.SetupCategory()
 	Which spell book item is in a specific slot index will change as spells/talents are learned and unlearned.
 	These category mixins primarily track & maintain spell group index data, and corresponding specific spell book items are determined on demand for display.
 ]] --------------------------- Base Mixin --------------------------------
-    SpellBookMacrobialCategory = {};
-    -- SpellBookMacrobialCategory = CreateFromMixins(BaseSpellBookCategoryMixin)
+    SpellBookMacronomiconCategory = {};
+    -- SpellBookMacronomiconCategory = CreateFromMixins(BaseSpellBookCategoryMixin)
 
-    function SpellBookMacrobialCategory:Init(macroBookFrame)
+    function SpellBookMacronomiconCategory:Init(macroBookFrame)
         self.macroBookFrame = macroBookFrame;
         self:UpdateSpellGroups();
     end
 
-    function SpellBookMacrobialCategory:SetTabID(tabID)
+    function SpellBookMacronomiconCategory:SetTabID(tabID)
         self.tabID = tabID;
     end
 
-    function SpellBookMacrobialCategory:GetTabID()
+    function SpellBookMacronomiconCategory:GetTabID()
         return self.tabID;
     end
 
-    function SpellBookMacrobialCategory:GetName()
+    function SpellBookMacronomiconCategory:GetName()
         return self.displayName;
     end
 
-    function SpellBookMacrobialCategory:GetMacroBank()
+    function SpellBookMacronomiconCategory:GetMacroBank()
         return self.macroBank;
     end
 
-    function SpellBookMacrobialCategory:GetCategoryEnum()
+    function SpellBookMacronomiconCategory:GetCategoryEnum()
         return self.categoryEnum;
     end
 
-    function SpellBookMacrobialCategory:GetSpellGroupForSlotIndex(slotIndex)
+    function SpellBookMacronomiconCategory:GetSpellGroupForSlotIndex(slotIndex)
         for _, spellGroup in ipairs(self.spellGroups) do
             if spellGroup.spellBookItemSlotIndices and spellGroup.spellBookItemSlotIndices[slotIndex] then
                 return spellGroup;
@@ -45,7 +45,7 @@ function addon.SetupCategory()
         return nil;
     end
 
-    function SpellBookMacrobialCategory:ContainsSlot(slotIndex, spellBank)
+    function SpellBookMacronomiconCategory:ContainsSlot(slotIndex, spellBank)
         if not self.spellGroups then
             return false;
         end
@@ -62,7 +62,7 @@ function addon.SetupCategory()
     -- byDataGroup: [bool] - See Blizzard_PagedContentFrame.lua -> SetDataProvider for details on expected group data format
     -- itemFilterFunc: [func<bool>(slotIndex, spellBank)] - OPTIONAL - filter function that returns true if the passed SpellBookItem should be included in the data
     -- tableToAppendTo: [table] OPTIONAL - Existing table that data tables should be appended to (rather than a newly created table)
-    function SpellBookMacrobialCategory:GetSpellBookItemData(byDataGroup, itemFilterFunc, tableToAppendTo)
+    function SpellBookMacronomiconCategory:GetSpellBookItemData(byDataGroup, itemFilterFunc, tableToAppendTo)
         if not self.spellGroups then
             return nil;
         end
@@ -98,7 +98,7 @@ function addon.SetupCategory()
         return returnData;
     end
 
-    function SpellBookMacrobialCategory:GetElementDataForItem(slotIndex, spellBank, spellGroup)
+    function SpellBookMacronomiconCategory:GetElementDataForItem(slotIndex, spellBank, spellGroup)
         if not spellGroup then
             spellGroup = self:GetSpellGroupForSlotIndex(slotIndex);
         end
@@ -117,7 +117,7 @@ function addon.SetupCategory()
     end
 
     -- Returns true if any of the groups or index ranges within them changed between the old and new collection of groups
-    function SpellBookMacrobialCategory:DidSpellGroupsChange(oldSpellGroups, newSpellGroups, compareSpellIndicies)
+    function SpellBookMacronomiconCategory:DidSpellGroupsChange(oldSpellGroups, newSpellGroups, compareSpellIndicies)
         if oldSpellGroups == nil and newSpellGroups == nil then
             return false;
         elseif oldSpellGroups == nil or newSpellGroups == nil then
@@ -131,7 +131,7 @@ function addon.SetupCategory()
     end
 
     -- Use to populate spell groups with contiguous spell book item indices based on a defined offset and count
-    function SpellBookMacrobialCategory:PopulateSpellGroupsIndiciesByRange()
+    function SpellBookMacronomiconCategory:PopulateSpellGroupsIndiciesByRange()
         if not self.spellGroups then
             return;
         end
@@ -149,17 +149,17 @@ function addon.SetupCategory()
         end
     end
 
-    function SpellBookMacrobialCategory:Init(macroBookFrame)
+    function SpellBookMacronomiconCategory:Init(macroBookFrame)
         self.displayName = "Macros"
         self.spellBank = Enum.SpellBookSpellBank.Player -- Assuming Custom spells are player-specific
-        self.categoryEnum = PlayerSpellsUtil.SpellBookCategories.Macrobial
+        self.categoryEnum = PlayerSpellsUtil.SpellBookCategories.Macronomicon
 
         -- BaseSpellBookCategoryMixin.Init(self, macroBookFrame)
         self.macroBookFrame = macroBookFrame;
         self:UpdateSpellGroups();
     end
 
-    function SpellBookMacrobialCategory:UpdateSpellGroups()
+    function SpellBookMacronomiconCategory:UpdateSpellGroups()
         addon.MacroBank:MergeMacros()
 
         local newSpellGroups = {}
@@ -199,11 +199,11 @@ function addon.SetupCategory()
         return anyChanges
     end
 
-    function SpellBookMacrobialCategory:IsAvailable()
+    function SpellBookMacronomiconCategory:IsAvailable()
         return true
     end
 
-    function SpellBookMacrobialCategory:ContainsSkillLine(skillLineIndex)
+    function SpellBookMacronomiconCategory:ContainsSkillLine(skillLineIndex)
         -- if not self.spellGroups then
         --     return false
         -- end
@@ -222,7 +222,7 @@ end
 function addon.InitializePlayerSpellsUtil()
     -- addon.logMsg("Init PlayerSpellsUtil.")
     if PlayerSpellsUtil and PlayerSpellsUtil.SpellBookCategories then
-        PlayerSpellsUtil.SpellBookCategories.Macrobial = 4
+        PlayerSpellsUtil.SpellBookCategories.Macronomicon = 4
         -- addon.logMsg("Custom category added.")
         addon.customCategoryInitialized = true
     else

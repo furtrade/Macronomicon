@@ -337,7 +337,7 @@ function MacroBookItemMixin:UpdateCooldown()
     -- end
 end
 
--- TODO: 🤗Might be cool to show autocast anims for macrobial macros
+-- TODO: 🤗Might be cool to show autocast anims for special macros
 function MacroBookItemMixin:UpdateAutoCast()
     if not self:HasValidData() then
         return;

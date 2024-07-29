@@ -17,7 +17,7 @@ function addon.SetupFrame()
         TabSystemOwnerMixin.OnLoad(self);
         self:SetTabSystem(self.CategoryTabSystem);
 
-        self.categoryMixins = {CreateAndInitFromMixin(SpellBookMacrobialCategory, self)};
+        self.categoryMixins = {CreateAndInitFromMixin(SpellBookMacronomiconCategory, self)};
 
         -- ❄️Add default tabs to macrobook
         -- for _, categoryMixin in ipairs(PlayerSpellsFrame.SpellBookFrame.categoryMixins) do

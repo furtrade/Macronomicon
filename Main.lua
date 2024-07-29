@@ -16,7 +16,7 @@ function addon:OnInitialize()
     self.optionsFrame = AceConfigDialog:AddToBlizOptions(addon.title .. "_Options", addon.title)
     ]]
     self:RegisterChatCommand(addon.title, "SlashCommand")
-    self:RegisterChatCommand("mbl", "SlashCommand")
+    self:RegisterChatCommand("mcn", "SlashCommand")
 
     self.gui = LibStub("AceGUI-3.0")
 
@@ -123,4 +123,4 @@ function addon:ProcessAll()
 end
 
 -- Expose the addon globally for debugging
-_G["Macrobial"] = addon
+_G["Macronomicon"] = addon

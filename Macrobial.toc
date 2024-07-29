@@ -1,10 +1,10 @@
 ## Interface: 100207, 110000
-## Title: Macrobial
+## Title: Macronomicon
 ## Author: Principium-Caelestrasz
 ## Notes: Maintains macros based on item availability. 
 ## X-Curse-Project-ID: 
 ## X-Wago-ID: 
-## SavedVariables: MacrobialDB
+## SavedVariables: MacronomiconDB
 
 # Ace3 Libraries
 Libs\LibStub\LibStub.lua
