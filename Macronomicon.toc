@@ -1,9 +1,14 @@
 ## Interface: 110000
+## Version: @project-version@
 ## Title: Macronomicon
-## Author: Principium-Caelestrasz
 ## Notes: Maintains macros based on item availability. 
-## X-Curse-Project-ID: 1073494
+## Author: Principium-Caelestrasz
 ## SavedVariables: MacronomiconDB
+## OptionalDeps: Ace3
+
+## X-Category: Bags&Inventory
+## X-License: All Rights Reserved: You are free to fork and modify on GitHub, please ask me about anything else.
+## X-Curse-Project-ID: 1073494
 
 # Ace3 Libraries
 Libs\LibStub\LibStub.lua
