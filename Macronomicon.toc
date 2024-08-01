@@ -8,6 +8,7 @@
 
 ## X-Category: Bags&Inventory
 ## X-License: All Rights Reserved: You are free to fork and modify on GitHub, please ask me about anything else.
+## X-Website: https://github.com/furtrade/Macronomicon
 ## X-Curse-Project-ID: 1073494
 
 # Ace3 Libraries
