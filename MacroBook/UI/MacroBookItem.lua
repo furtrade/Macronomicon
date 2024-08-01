@@ -548,7 +548,11 @@ function MacroBookItemMixin:OnIconDragStart()
 
     -- Create the macro if it doesn't exist
     if not macroInfo.macroID then
-        macroInfo.macroID = addon:CreateMacro(macroInfo.name, macroData)
+        if UnitAffectingCombat("player") then
+            return
+        else
+            macroInfo.macroID = addon:CreateMacro(macroInfo.name, macroData)
+        end
     end
 
     PickupMacro(macroInfo.macroID);

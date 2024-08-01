@@ -75,8 +75,17 @@ function addon:EditMacro(name, info, id)
 end
 
 -- Deletes a game macro by name
-function addon:deleteMacro(name)
-    local macroID = self:getMacroIDByName(name)
+function addon:DeleteMacro(nameOrID)
+    local macroID = nil
+
+    if type(nameOrID) == "number" then
+        macroID = nameOrID
+    elseif type(nameOrID) == "string" then
+        macroID = self:getMacroIDByName(nameOrID)
+    else
+        print("Couldn't find macro to delete.")
+    end
+
     if macroID then
         DeleteMacro(macroID)
     end

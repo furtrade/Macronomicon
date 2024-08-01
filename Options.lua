@@ -179,7 +179,7 @@ function addon:DeleteCustomMacro(macroName)
         addon.macroData[macroName] = nil
 
         -- Delete the actual macro
-        addon:deleteMacro(macroName)
+        addon:DeleteMacro(macroName)
 
         addon:LoadCustomMutations()
         addon:generateMacroGroups()
