@@ -21,13 +21,12 @@ function addon:OnInitialize()
     self.gui = LibStub("AceGUI-3.0")
 
     -- Generate the macro groups
-    self:loadCustomMacros()
+    self:LoadCustomMutations()
     self:generateMacroGroups()
-
 end
 
 function addon:OnEnable()
-    local sendIt = "autoTrigger"
+    local sendIt = "OnEventThrottle"
     self:RegisterEvent("PLAYER_LEVEL_UP", sendIt)
     self:RegisterEvent("QUEST_TURNED_IN", sendIt)
     self:RegisterEvent("LOOT_CLOSED", sendIt)
@@ -75,50 +74,6 @@ function addon:SlashCommand(input, editbox)
         self:ProcessAll()
     else
         -- Settings.OpenToCategory(self.optionsFrame.name)
-    end
-end
-
-local lastTrigger = 0
-local threshold = 5
-local retryPending = false
-
-function addon:autoTrigger(event)
-    if event == "PLAYER_REGEN_DISABLED" or InCombatLockdown() then
-        return
-    end
-
-    local currentTime = GetTime()
-    if currentTime - lastTrigger > threshold then
-        self:tryAction()
-    elseif not retryPending then
-        local timeToAct = threshold - (currentTime - lastTrigger)
-        retryPending = true
-        C_Timer.After(timeToAct, function()
-            retryPending = false
-            self:tryAction()
-        end)
-    end
-end
-
-function addon:tryAction()
-    if InCombatLockdown() then
-        return
-    end
-
-    local success = self:ProcessAll()
-    if success then
-        lastTrigger = GetTime()
-    end
-end
-
-function addon:ProcessAll()
-    if InCombatLockdown() then
-        return false
-    else
-        self:UpdateItemCache()
-        self:updateMacroData()
-        self:processMacros()
-        return true
     end
 end
 

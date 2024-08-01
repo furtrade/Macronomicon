@@ -114,6 +114,13 @@ local function processEntries(self, macroKey, macroInfo)
     setUnmatchedItemsToZero(macroEntries, matchedEntries)
 end
 
+-- Function to update macro data
+function addon:StashItemsInMacroData()
+    for macroKey, macroInfo in pairs(self.macroData) do
+        processEntries(self, macroKey, macroInfo)
+    end
+end
+
 -- Updates the item cache
 function addon:UpdateItemCache()
     local cache = addon.itemCache
@@ -144,13 +151,6 @@ function addon:UpdateItemCache()
     setUnmatchedItemsToZero(cache, foundItems)
 
     -- Update macros to reflect the current state of the item cache
-    self:updateMacroData()
-end
-
--- Function to update macro data
-function addon:updateMacroData()
-    for macroKey, macroInfo in pairs(self.macroData) do
-        processEntries(self, macroKey, macroInfo)
-    end
+    self:StashItemsInMacroData()
 end
 

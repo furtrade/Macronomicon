@@ -160,7 +160,7 @@ function addon:CreateCustomMacro()
             addon.db.profile.macroS[macroName].toggleOption = true
 
             -- Update the macroData table
-            addon:loadCustomMacros()
+            addon:LoadCustomMutations()
             addon:generateMacroGroups()
             LibStub("AceConfigRegistry-3.0"):NotifyChange(addon.title .. "_options")
             -- Close the frame
@@ -181,7 +181,7 @@ function addon:DeleteCustomMacro(macroName)
         -- Delete the actual macro
         addon:deleteMacro(macroName)
 
-        addon:loadCustomMacros()
+        addon:LoadCustomMutations()
         addon:generateMacroGroups()
         LibStub("AceConfigRegistry-3.0"):NotifyChange(addon.title .. "_options")
     else

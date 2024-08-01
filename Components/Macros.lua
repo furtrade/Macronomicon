@@ -97,20 +97,11 @@ function addon:formatMacro(macro)
 end
 
 -- Retrieves user-made macros from the database and inserts them into the existing macroData table
-function addon:loadCustomMacros()
+function addon:LoadCustomMutations()
     for header, info in pairs(self.db.profile.macroS) do
         if type(info) == "table" and info.isCustom then
             self.macroData[header] = info
         end
-    end
-end
-
--- Processes macros from the provided macro tables
-function addon:processMacros()
-    self:loadCustomMacros()
-
-    for header, info in pairs(self.macroData) do
-        self:EditMacro(info.name, info)
     end
 end
 
