@@ -40,6 +40,7 @@ Components\Tooltip.lua
 Components\Macros.lua
 Components\Score.lua
 Components\MacroPatcher.lua
+Components\MacroBatch.lua
 
 # Entry point
 Constants.lua

@@ -71,7 +71,8 @@ function addon:SlashCommand(input, editbox)
     input = input:trim()
     if input == "run" then
         self:Print("Running...")
-        self:ProcessAll()
+        -- self:ProcessAll()
+        self:ForceProcess()
     else
         -- Settings.OpenToCategory(self.optionsFrame.name)
     end

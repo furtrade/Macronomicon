@@ -3,11 +3,13 @@ local _, addon = ...
 local lastTrigger = 0
 local threshold = 5
 local retryPending = false
+local pauseEditing = false
+local phaseOneComplete = false
+local inCombat = false
 
-function addon:OnEventThrottle(event)
-    -- The throttle logic
+function addon:OnEventThrottle(event, force)
     local currentTime = GetTime()
-    if currentTime - lastTrigger > threshold then
+    if force or currentTime - lastTrigger > threshold then
         self:tryAction()
     elseif not retryPending then
         local timeToAct = threshold - (currentTime - lastTrigger)
@@ -20,23 +22,17 @@ function addon:OnEventThrottle(event)
 end
 
 function addon:tryAction()
-    -- Scan and Collect data for ou macros
     if self:ProcessAll() then
-        -- returned true
         lastTrigger = GetTime()
     end
 end
 
 function addon:PrepMacroForEditing(name, info, id)
     local info = info or addon.MacroBank:GetMacroDataByName(name)
-
-    -- Gather necessary information
     local prefixedName = self:prefixedMacroName(info.name)
     local macroID = id or self:getMacroIDByName(name)
     local macroString = info.isCustom and self:patchMacro(info) or self:buildMacroString(info)
     local iconID = info.icon or "INV_Misc_QuestionMark"
-
-    -- Return the information needed to edit the macro
     return {
         macroID = macroID,
         name = prefixedName,
@@ -45,50 +41,102 @@ function addon:PrepMacroForEditing(name, info, id)
     }
 end
 
--- function to edit a macro from the QueuedMacros table
-function addon:EditQueuedMacro(queuedMacro)
-    -- We should add some combat checks here to pause the process 
-    -- and then resume later when combat ends
+function addon:EditQueuedMacro(index)
+    if inCombat then
+        pauseEditing = true
+        return
+    end
 
-    -- Edit the macro in the queue
+    local queuedMacro = self.QueuedMacros[index]
     if EditMacro(queuedMacro.macroID, queuedMacro.name, queuedMacro.icon, queuedMacro.macroString) then
-        -- returned macroID so we proceed to...
-        -- remove the macro from the QueuedMacros table.
-        table.remove(self.QueuedMacros, queuedMacro)
+        table.remove(self.QueuedMacros, index)
+        -- Update the index of remaining macros
+        for i = index, #self.QueuedMacros do
+            self.QueuedMacros[i].index = i
+        end
     end
 end
 
 addon.QueuedMacros = {}
-function addon:QueuMacros()
+function addon:QueueMacros()
     if not self.QueuedMacros then
         self.QueuedMacros = {}
     end
 
-    -- Prepare each macro with the macroData
     for _, info in pairs(self.macroData) do
         local prepMacro = self:PrepMacroForEditing(info.name, info)
+        prepMacro.index = #self.QueuedMacros + 1
         table.insert(self.QueuedMacros, prepMacro)
     end
 end
 
--- Processes macros from the provided macro tables
 function addon:FulfilQueuedMacros()
-    for _, queuedMacro in pairs(self.QueuedMacros) do
-        self:EditQueuedMacro(queuedMacro)
+    local index = 1
+    while index <= #self.QueuedMacros do
+        self:EditQueuedMacro(index)
+        if pauseEditing then
+            break
+        end
+        index = index + 1
     end
+end
+
+function addon:RunPhaseOne()
+    self:UpdateItemCache()
+    self:QueueMacros()
+    phaseOneComplete = true
+end
+
+function addon:RunPhaseTwo()
+    self:FulfilQueuedMacros()
 end
 
 function addon:ProcessAll()
-    if InCombatLockdown() then
-        return false -- signal that tryAction failed
-    else
-        -- Phase 1: Scan Items and Queue Macros for Editing
-        self:UpdateItemCache()
-        self:QueueMacros()
+    if not phaseOneComplete then
+        self:RunPhaseOne()
+    end
+    self:RunPhaseTwo()
 
-        -- Phase 2: This needs an overhaul
-        self:FulfilQueuedMacros()
-
+    -- Check if all macros have been processed
+    if #self.QueuedMacros == 0 then
+        phaseOneComplete = false -- Reset for the next cycle
         return true -- signal that tryAction succeeded
+    else
+        return false -- indicate that phase two is still running
     end
 end
+
+function addon:OnCombatStart()
+    inCombat = true
+end
+
+function addon:OnCombatEnd()
+    inCombat = false
+    if pauseEditing then
+        pauseEditing = false
+        self:FulfilQueuedMacros()
+    end
+end
+
+-- Function to force the process immediately
+function addon:ForceProcess()
+    -- reset flags so we can force the event
+    lastTrigger = 0
+    retryPending = false
+    pauseEditing = false
+    phaseOneComplete = false
+
+    self:OnEventThrottle(_, true)
+end
+
+-- Register for combat events
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+frame:SetScript("OnEvent", function(_, event)
+    if event == "PLAYER_REGEN_DISABLED" then
+        addon:OnCombatStart()
+    elseif event == "PLAYER_REGEN_ENABLED" then
+        addon:OnCombatEnd()
+    end
+end)
