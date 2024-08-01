@@ -22,5 +22,5 @@ jobs:
       - name: Package
         uses: BigWigsMods/packager@master
         env:
-          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          CF_API_KEY: ${{ secrets.CF_API_TOKEN }}
           GITHUB_OAUTH: ${{ secrets.OAUTH }}
